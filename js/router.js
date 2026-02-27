@@ -215,7 +215,7 @@ router
     
     .register('/admin', async () => {
         // Admin dashboard - separate HTML
-        window.location.href = '/admin.html';
+        window.location.href = 'admin.html';
     }, { 
         authRequired: true, 
         allowedRoles: ['admin'],
