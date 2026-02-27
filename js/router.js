@@ -1,6 +1,7 @@
 /**
  * MINDSKYRA Router Module
  * Handles client-side routing for Single Page Application behavior
+ * FIXED for GitHub Pages deployment
  */
 
 class Router {
@@ -23,6 +24,48 @@ class Router {
                 this.navigate(link.getAttribute('href'));
             }
         });
+    }
+
+    /**
+     * Get base path for GitHub Pages compatibility
+     * Detects if running on GitHub Pages with repo subdirectory
+     */
+    getBasePath() {
+        const { hostname, pathname } = window.location;
+        
+        // GitHub Pages detection
+        if (hostname.includes('github.io')) {
+            // Extract repo name from path (e.g., /mindskyra_institute/...)
+            const pathParts = pathname.split('/').filter(p => p);
+            if (pathParts.length > 0) {
+                return '/' + pathParts[0] + '/';
+            }
+        }
+        
+        // Local development or custom domain
+        return '/';
+    }
+
+    /**
+     * Resolve path relative to base
+     * @param {string} path - Relative path (e.g., 'admin.html')
+     */
+    resolvePath(path) {
+        // If path already starts with http or //, return as-is
+        if (path.startsWith('http') || path.startsWith('//')) {
+            return path;
+        }
+        
+        // If path starts with /, make it relative to base
+        if (path.startsWith('/')) {
+            const base = this.getBasePath();
+            // Remove leading / from path to avoid double slashes
+            const cleanPath = path.substring(1);
+            return base + cleanPath;
+        }
+        
+        // Relative path (no leading /) - return as-is for same-directory navigation
+        return path;
     }
 
     /**
@@ -194,10 +237,11 @@ class Router {
 // Create global router instance
 const router = new Router();
 
-// Register common routes
+// Register common routes - FIXED PATHS for GitHub Pages
 router
     .register('/', () => {
-        window.location.href = '/index.html';
+        // Use relative path - works on both local and GitHub Pages
+        window.location.href = router.resolvePath('index.html');
     }, { title: 'Home' })
     
     .register('/login', () => {
@@ -215,7 +259,8 @@ router
     
     .register('/admin', async () => {
         // Admin dashboard - separate HTML
-        window.location.href = 'admin.html';
+        // FIXED: Use resolvePath to handle GitHub Pages subdirectory
+        window.location.href = router.resolvePath('admin.html');
     }, { 
         authRequired: true, 
         allowedRoles: ['admin'],
