@@ -58,7 +58,7 @@ async function requireAuth(allowedRoles = []) {
     const { user, userData } = await initAuth();
     
     if (!user) {
-        window.location.href = '/login.html?redirect=' + encodeURIComponent(window.location.pathname);
+        window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.pathname);
         return null;
     }
     
@@ -377,7 +377,7 @@ async function signInWithGoogle() {
                 isNewUser: true,
                 user: user,
                 message: 'Please complete your profile',
-                redirectTo: '/login.html?completeProfile=true&uid=' + user.uid
+               redirectTo: 'login.html?completeProfile=true&uid=' + user.uid
             };
         } else {
             // Existing user - get full data
@@ -718,14 +718,14 @@ function redirectToDashboard(role) {
 function getDashboardUrl(role) {
     switch (role) {
         case 'admin':
-            return '/admin.html';
+            return 'admin.html';
         case 'teacher':
-            return '/teacher.html'; // Teachers use same app with different views
+            return 'teacher.html';
         case 'student':
         case 'parent':
-            return '/app.html';
+            return 'app.html';
         default:
-            return '/index.html';
+            return 'index.html';
     }
 }
 
@@ -767,7 +767,7 @@ async function logoutUser() {
         }
         
         await auth.signOut();
-        window.location.href = '/login.html';
+        window.location.href = 'login.html';
     } catch (error) {
         console.error('Logout error:', error);
         throw error;
@@ -1000,7 +1000,7 @@ async function createAdminUser(formData) {
         success: true,
         user: user,
         message: 'Admin account created successfully',
-        redirectTo: '/admin.html'
+        redirectTo: 'admin.html'
     };
 }
 
