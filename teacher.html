@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MINDSKYRA Institute - Teacher Portal</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#7C3AED',
+                        accent: '#F59E0B',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444',
+                        nebula: {
+                            dark: '#0f172a',
+                            light: '#1e293b',
+                            glow: '#0EA5E9',
+                            purple: '#A855F7'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * { 
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+        }
+        
+        .sidebar { 
+            transition: transform 0.3s ease; 
+            will-change: transform; 
+        }
+        .sidebar-hidden { 
+            transform: translateX(-100%); 
+        }
+        
+        .card { 
+            background: white; 
+            border-radius: 1rem; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .card:hover { 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+        }
+        
+        .nav-item { 
+            transition: all 0.2s; 
+        }
+        .nav-item:hover { 
+            background: rgba(79, 70, 229, 0.1); 
+            color: #4F46E5; 
+        }
+        .nav-item.active { 
+            background: #4F46E5; 
+            color: white; 
+        }
+        
+        .page { 
+            display: none; 
+        }
+        .page.active { 
+            display: block; 
+            animation: fadeIn 0.3s; 
+        }
+        
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .loader { 
+            border: 3px solid #f3f3f3; 
+            border-radius: 50%; 
+            border-top: 3px solid #4F46E5; 
+            width: 24px; 
+            height: 24px; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        .toast { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            padding: 1rem 1.5rem; 
+            border-radius: 1rem; 
+            color: white; 
+            font-weight: 500; 
+            transform: translateX(400px); 
+            transition: transform 0.3s; 
+            z-index: 9999; 
+            max-width: 90vw;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .toast.show { 
+            transform: translateX(0); 
+        }
+        
+        .nebula-container {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nebula-glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(14,165,233,0.4) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(30px, -30px); }
+        }
+        
+        .modal { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 50; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 1rem;
+            backdrop-filter: blur(4px);
+        }
+        .modal.show { 
+            display: flex; 
+        }
+        
+        .scroll-hidden { 
+            -webkit-overflow-scrolling: touch; 
+            scrollbar-width: none; 
+        }
+        .scroll-hidden::-webkit-scrollbar { 
+            display: none; 
+        }
+        
+        .attendance-checkbox {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: #4F46E5;
+        }
+        
+        .notif-badge {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .star-rating {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .star-rating:hover {
+            transform: scale(1.2);
+        }
+        
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s;
+        }
+        .upload-zone:hover {
+            border-color: #4F46E5;
+            background: rgba(79, 70, 229, 0.05);
+        }
+        .upload-zone.dragover {
+            border-color: #4F46E5;
+            background: rgba(79, 70, 229, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="toast" class="toast bg-gray-800"></div>
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <aside id="sidebar" class="sidebar fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 lg:translate-x-0 sidebar-hidden">
+            <div class="flex items-center justify-between p-4 md:p-6 border-b border-gray-200">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-sm md:text-lg">M</div>
+                    <span class="text-lg md:text-xl font-bold text-gray-800">MINDSKYRA</span>
+                </div>
+                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <nav class="p-4 space-y-1 overflow-y-auto h-[calc(100vh-80px)]" id="sidebarNav">
+                <!-- Navigation items injected by JavaScript -->
+            </nav>
+        </aside>
+
+        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
+            
+            <header class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 md:py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 md:space-x-4">
+                        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                        </button>
+                        <h1 id="pageTitle" class="text-xl md:text-2xl font-bold text-gray-800">Dashboard</h1>
+                    </div>
+
+                    <div class="flex items-center space-x-2 md:space-x-4">
+                        <button onclick="showNotifications()" class="relative p-2 rounded-lg hover:bg-gray-100 transition">
+                            <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <span id="notifBadge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full hidden notif-badge"></span>
+                        </button>
+
+                        <div class="relative" id="userMenu">
+                            <button onclick="toggleUserMenu()" class="flex items-center space-x-2 md:space-x-3 p-2 rounded-lg hover:bg-gray-100 transition">
+                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm md:text-base" id="userAvatar">T</div>
+                                <div class="hidden md:block text-left">
+                                    <div class="font-semibold text-sm" id="userName">Teacher</div>
+                                    <div class="text-xs text-gray-500" id="userRole">Teacher</div>
+                                </div>
+                            </button>
+                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                                <a href="#" onclick="navigateTo('teacher-profile'); return false;" class="block px-4 py-2 hover:bg-gray-50 text-sm">Profile</a>
+                                <a href="#" onclick="logout(); return false;" class="block px-4 py-2 hover:bg-gray-50 text-sm text-red-600">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 scroll-hidden pb-20 lg:pb-8" id="mainContent">
+                
+                <!-- TEACHER DASHBOARD PAGE -->
+                <div id="page-teacher-dashboard" class="page active">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold mb-2">Teacher Dashboard</h2>
+                        <p class="text-gray-600">Welcome back, <span id="teacherWelcomeName">Teacher</span></p>
+                    </div>
+
+                    <!-- Teacher Rating Chart - Nebula Design -->
+                    <div class="nebula-container p-4 md:p-6 mb-6">
+                        <div class="nebula-glow" style="top: 10%; left: 10%;"></div>
+                        <div class="nebula-glow" style="bottom: 10%; right: 10%; animation-delay: 3s;"></div>
+                        
+                        <div class="flex items-center justify-between mb-4 relative z-10">
+                            <div>
+                                <h3 class="text-white font-bold text-lg">Teaching Performance</h3>
+                                <p class="text-blue-200 text-sm">Based on student feedback ratings</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-3xl font-bold text-white" id="teacherAvgRating">0.0</div>
+                                <div class="text-yellow-400 text-sm">★ Average Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="relative h-48 md:h-64 w-full z-10">
+                            <canvas id="teacherRatingChart"></canvas>
+                        </div>
+                        
+                        <div class="grid grid-cols-3 gap-4 mt-4 relative z-10">
+                            <div class="text-center">
+                                <div class="text-blue-300 text-xs mb-1">Teaching</div>
+                                <div class="text-white font-bold" id="avgTeachingRating">0.0</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-purple-300 text-xs mb-1">Content</div>
+                                <div class="text-white font-bold" id="avgContentRating">0.0</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-indigo-300 text-xs mb-1">Doubt Solving</div>
+                                <div class="text-white font-bold" id="avgDoubtRating">0.0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="card p-4 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+                            <div class="text-sm opacity-90 mb-1">My Courses</div>
+                            <div class="text-3xl font-bold" id="teacherCourseCount">0</div>
+                        </div>
+                        <div class="card p-4 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+                            <div class="text-sm opacity-90 mb-1">Total Students</div>
+                            <div class="text-3xl font-bold" id="teacherStudentCount">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card p-4 md:p-6 mb-6">
+                        <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <button onclick="navigateTo('teacher-create-course')" class="p-4 bg-blue-50 text-blue-600 rounded-xl text-center hover:bg-blue-100 transition">
+                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                                <span class="font-medium text-sm">Create Course</span>
+                            </button>
+                            <button onclick="navigateTo('teacher-upload')" class="p-4 bg-green-50 text-green-600 rounded-xl text-center hover:bg-green-100 transition">
+                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                <span class="font-medium text-sm">Upload Content</span>
+                            </button>
+                            <button onclick="navigateTo('teacher-attendance')" class="p-4 bg-orange-50 text-orange-600 rounded-xl text-center hover:bg-orange-100 transition">
+                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                                <span class="font-medium text-sm">Attendance</span>
+                            </button>
+                            <button onclick="navigateTo('teacher-notifications')" class="p-4 bg-purple-50 text-purple-600 rounded-xl text-center hover:bg-purple-100 transition">
+                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                                <span class="font-medium text-sm">Notify Students</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- My Courses List -->
+                    <div class="card p-4 md:p-6 mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold">My Courses</h3>
+                            <button onclick="navigateTo('teacher-create-course')" class="text-primary text-sm hover:underline">+ Create New</button>
+                        </div>
+                        <div id="teacherCoursesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <p class="text-gray-500 col-span-2 text-center py-4">Loading courses...</p>
+                        </div>
+                    </div>
+
+                    <!-- Recent Feedback -->
+                    <div class="card p-4 md:p-6">
+                        <h3 class="text-lg font-bold mb-4">Recent Student Feedback</h3>
+                        <div id="teacherRecentFeedback" class="space-y-3">
+                            <p class="text-gray-500 text-center py-4">No feedback yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEACHER ATTENDANCE PAGE -->
+                <div id="page-teacher-attendance" class="page">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-bold mb-2">Take Attendance</h2>
+                        <p class="text-gray-600">Mark attendance for your classes</p>
+                    </div>
+
+                    <div class="card p-4 md:p-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
+                                <select id="attendanceCourse" onchange="loadAttendanceStudents()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                                    <option value="">Select Course</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                <input type="date" id="attendanceDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="loadAttendanceStudents()" class="w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
+                                    Load Students
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card p-4 md:p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold">Student List</h3>
+                            <div class="flex space-x-2">
+                                <button onclick="markAllPresent()" class="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200">Mark All Present</button>
+                                <button onclick="markAllAbsent()" class="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200">Mark All Absent</button>
+                            </div>
+                        </div>
+                        
+                        <div id="attendanceStudentList" class="space-y-2">
+                            <p class="text-gray-500 text-center py-8">Select a course to view students</p>
+                        </div>
+
+                        <button onclick="saveAttendance()" class="w-full mt-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 hidden" id="saveAttendanceBtn">
+                            Save Attendance
+                        </button>
+                    </div>
+
+                    <div class="card p-4 md:p-6 mt-6">
+                        <h3 class="text-lg font-bold mb-4">Recent Attendance Records</h3>
+                        <div id="attendanceHistory" class="space-y-2">
+                            <p class="text-gray-500 text-center py-4">No records found</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEACHER CREATE COURSE PAGE -->
+                <div id="page-teacher-create-course" class="page">
+                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Create New Course</h2>
+                    <div class="card p-4 md:p-6 max-w-2xl">
+                        <form id="createCourseForm" onsubmit="createCourse(event)">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Board *</label>
+                                    <select id="courseBoard" required onchange="updateCourseSubjects()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                                        <option value="">Select Board</option>
+                                        <option value="CBSE">CBSE</option>
+                                        <option value="SSC">SSC (State Board)</option>
+                                        <option value="ICSE">ICSE</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Class *</label>
+                                    <select id="courseClass" required onchange="updateStreamVisibility()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                                        <option value="">Select Class</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="courseStreamContainer" class="hidden">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Stream *</label>
+                                    <select id="courseStream" onchange="updateCourseSubjects()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                                        <option value="">Select Stream</option>
+                                        <option value="Science">Science</option>
+                                        <option value="Commerce">Commerce</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
+                                    <select id="courseSubject" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                                        <option value="">Select Subject</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Course Description</label>
+                                    <textarea id="courseDescription" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="Brief description of the course..."></textarea>
+                                </div>
+                                
+                                <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90">
+                                    Create Course
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- TEACHER UPLOAD CONTENT PAGE -->
+                <div id="page-teacher-upload" class="page">
+                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Upload Content</h2>
+                    <div class="card p-4 md:p-6 max-w-2xl mb-6">
+                        <form id="uploadContentForm" onsubmit="uploadContent(event)">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Your Course *</label>
+                                    <select id="uploadCourse" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                                        <option value="">Select Course</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Chapter Name *</label>
+                                    <input type="text" id="uploadChapter" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="e.g., Quadratic Equations">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes (PDF/DOC) *</label>
+                                    <div class="upload-zone rounded-lg p-4 text-center cursor-pointer" onclick="document.getElementById('notesFile').click()">
+                                        <input type="file" id="notesFile" accept=".pdf,.doc,.docx" required class="hidden" onchange="handleFileSelect(this, 'notesPreview')">
+                                        <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                        <p class="text-sm text-gray-600" id="notesPreview">Click to upload notes or drag & drop</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">DPP (Daily Practice Problems) *</label>
+                                    <div class="upload-zone rounded-lg p-4 text-center cursor-pointer" onclick="document.getElementById('dppFile').click()">
+                                        <input type="file" id="dppFile" accept=".pdf,.doc,.docx" required class="hidden" onchange="handleFileSelect(this, 'dppPreview')">
+                                        <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        <p class="text-sm text-gray-600" id="dppPreview">Click to upload DPP or drag & drop</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">YouTube Video Link *</label>
+                                    <input type="url" id="videoLink" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="https://youtube.com/watch?v= ...">
+                                </div>
+                                
+                                <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90">
+                                    Upload Content
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card p-4 md:p-6">
+                        <h3 class="text-lg font-bold mb-4">Recent Uploads</h3>
+                        <div id="teacherRecentUploads" class="space-y-3">
+                            <p class="text-gray-500 text-center py-4">No uploads yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TEACHER NOTIFICATIONS PAGE -->
+                <div id="page-teacher-notifications" class="page">
+                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Send Notification to Students</h2>
+                    
+                    <div class="card p-4 md:p-6 max-w-2xl">
+                        <form id="teacherNotifForm" onsubmit="sendTeacherNotification(event)">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
+                                    <select id="teacherNotifCourse" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
+                                        <option value="">Select Course</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                                    <input type="text" id="teacherNotifTitle" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="e.g., Test Tomorrow">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                    <textarea id="teacherNotifMessage" rows="4" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="Enter your message to students..."></textarea>
+                                </div>
+
+                                <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90">
+                                    Send to Students
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- TEACHER PROFILE PAGE -->
+                <div id="page-teacher-profile" class="page">
+                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">My Profile</h2>
+                    <div class="card p-4 md:p-6 max-w-2xl">
+                        <div class="text-center mb-6">
+                            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4" id="profileAvatar">T</div>
+                            <h3 class="text-xl font-bold" id="profileName">Teacher Name</h3>
+                            <p class="text-gray-600" id="profileEmail">teacher@mindskyra.com</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <div class="text-sm text-gray-600 mb-1">Total Courses</div>
+                                    <div class="text-2xl font-bold text-primary" id="profileCourseCount">0</div>
+                                </div>
+                                <div class="p-4 bg-gray-50 rounded-lg">
+                                    <div class="text-sm text-gray-600 mb-1">Total Students</div>
+                                    <div class="text-2xl font-bold text-secondary" id="profileStudentCount">0</div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-4 bg-gray-50 rounded-lg">
+                                <div class="text-sm text-gray-600 mb-1">Average Rating</div>
+                                <div class="flex items-center">
+                                    <span class="text-2xl font-bold text-yellow-500 mr-2" id="profileRating">0.0</span>
+                                    <span class="text-yellow-500">★</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 md:px-4 py-2 z-40">
+        <div class="flex justify-around items-center" id="mobileNav">
+            <!-- Mobile nav items injected by JavaScript -->
+        </div>
+    </nav>
+
+    <script>
+    try {
+        // ==========================================
+        // FIREBASE CONFIGURATION
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5TTCXCD74IUeLmM7bynlgCUvcmcM6rTw",
+            authDomain: "mind-skyra-institute.firebaseapp.com",
+            projectId: "mind-skyra-institute",
+            storageBucket: "mind-skyra-institute.firebasestorage.app",
+            messagingSenderId: "333988573281",
+            appId: "1:333988573281:web:7d775f902b55d2e15aba20"
+        };
+
+       if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // ==========================================
+        // GLOBAL STATE
+        // ==========================================
+        let currentUser = null;
+        let userData = null;
+        let teacherRatingChart = null;
+        let teacherCourses = [];
+
+        const subjectMappings = {
+            '3-5': ['Mathematics', 'English', 'Hindi', 'EVS'],
+            '6-8': ['Mathematics', 'English', 'Hindi', 'Science', 'Social Science', 'Marathi'],
+            '9-10': ['Mathematics', 'English', 'Hindi', 'Science', 'Social Science', 'Marathi'],
+            '11-Science': ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English'],
+            '11-Commerce': ['Accountancy', 'Business Studies', 'Economics', 'Mathematics', 'English'],
+            '12-Science': ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English'],
+            '12-Commerce': ['Accountancy', 'Business Studies', 'Economics', 'Mathematics', 'English']
+        };
+
+        const navStructure = [
+            { id: 'teacher-dashboard', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
+            { id: 'teacher-attendance', label: 'Attendance', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01' },
+            { id: 'teacher-create-course', label: 'Create Course', icon: 'M12 6v6m0 0v6m0-6h6m-6 0H6' },
+            { id: 'teacher-upload', label: 'Upload Content', icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12' },
+            { id: 'teacher-notifications', label: 'Notify Students', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9' }
+        ];
+
+        // ==========================================
+        // AUTHENTICATION
+        // ==========================================
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                await loadUserData();
+                setupNavigation();
+                setupMobileNav();
+                populateClassDropdowns();
+                setupNotificationsListener();
+                
+                // Check if user is teacher
+                if (userData.role !== 'teacher') {
+                    showToast('Access denied. Teachers only.', 'error');
+                    setTimeout(() => logout(), 2000);
+                    return;
+                }
+                
+                navigateTo('teacher-dashboard');
+                loadTeacherDashboard();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        async function loadUserData() {
+            try {
+                const doc = await db.collection('users').doc(currentUser.uid).get();
+                if (doc.exists) {
+                    userData = doc.data();
+                    const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'Teacher';
+                    document.getElementById('userName').textContent = fullName;
+                    document.getElementById('userAvatar').textContent = (userData.firstName || 'T').charAt(0).toUpperCase();
+                    document.getElementById('teacherWelcomeName').textContent = userData.firstName || 'Teacher';
+                    
+                    // Update profile page
+                    document.getElementById('profileName').textContent = fullName;
+                    document.getElementById('profileEmail').textContent = currentUser.email;
+                    document.getElementById('profileAvatar').textContent = (userData.firstName || 'T').charAt(0).toUpperCase();
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showToast('Error loading user data', 'error');
+            }
+        }
+
+        // ==========================================
+        // NAVIGATION
+        // ==========================================
+        function setupNavigation() {
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = navStructure.map(item => `
+                <button onclick="navigateTo('${item.id}')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left" data-page="${item.id}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}"></path>
+                    </svg>
+                    <span class="font-medium">${item.label}</span>
+                </button>
+            `).join('');
+        }
+
+        function setupMobileNav() {
+            const mobileItems = navStructure.slice(0, 4);
+            document.getElementById('mobileNav').innerHTML = mobileItems.map(item => `
+                <button onclick="navigateTo('${item.id}')" class="flex flex-col items-center p-2 text-gray-600 hover:text-primary">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}"></path>
+                    </svg>
+                    <span class="text-[10px] mt-1">${item.label.split(' ')[0]}</span>
+                </button>
+            `).join('');
+        }
+
+        function populateClassDropdowns() {
+            const classOptions = '<option value="">Select Class</option>' + 
+                Array.from({length: 10}, (_, i) => `<option value="${i + 3}">Class ${i + 3}</option>`).join('');
+            
+            const courseClass = document.getElementById('courseClass');
+            if (courseClass) courseClass.innerHTML = classOptions;
+        }
+
+        function navigateTo(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            
+            const targetPage = document.getElementById(`page-${page}`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                const pageTitle = page.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                document.getElementById('pageTitle').textContent = pageTitle;
+            }
+            
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === page) item.classList.add('active');
+            });
+            
+            if (window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.add('sidebar-hidden');
+            }
+            
+            loadPageData(page);
+        }
+
+        function loadPageData(page) {
+            switch(page) {
+                case 'teacher-dashboard':
+                    loadTeacherDashboard();
+                    break;
+                case 'teacher-attendance':
+                    loadTeacherCoursesForAttendance();
+                    break;
+                case 'teacher-upload':
+                    loadTeacherCoursesForUpload();
+                    loadTeacherRecentUploads();
+                    break;
+                case 'teacher-notifications':
+                    loadTeacherCoursesForNotif();
+                    break;
+                case 'teacher-profile':
+                    loadProfileData();
+                    break;
+            }
+        }
+
+        // ==========================================
+        // TEACHER DASHBOARD
+        // ==========================================
+        function initTeacherRatingChart(ratingsData) {
+            const ctx = document.getElementById('teacherRatingChart');
+            if (!ctx) return;
+            
+            if (teacherRatingChart) teacherRatingChart.destroy();
+            
+            const data = ratingsData || [4.2, 4.5, 4.3, 4.7, 4.6, 4.8, 4.5];
+            
+            teacherRatingChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Rating',
+                        data: data,
+                        borderColor: '#0EA5E9',
+                        backgroundColor: (context) => {
+                            const ctx = context.chart.ctx;
+                            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                            gradient.addColorStop(0, 'rgba(14, 165, 233, 0.4)');
+                            gradient.addColorStop(1, 'rgba(168, 85, 247, 0.1)');
+                            return gradient;
+                        },
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#A855F7',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            callbacks: {
+                                label: function(context) {
+                                    return '⭐ ' + context.parsed.y + ' / 5.0';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 5,
+                            ticks: {
+                                color: 'rgba(255,255,255,0.7)',
+                                stepSize: 1
+                            },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadTeacherDashboard() {
+            try {
+                const coursesSnap = await db.collection('courses')
+                    .where('teacherId', '==', currentUser.uid)
+                    .get();
+                
+                teacherCourses = coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                document.getElementById('teacherCourseCount').textContent = coursesSnap.size;
+                
+                let totalStudents = 0;
+                coursesSnap.docs.forEach(doc => {
+                    const data = doc.data();
+                    totalStudents += (data.enrolledStudents || []).length;
+                });
+                document.getElementById('teacherStudentCount').textContent = totalStudents;
+                
+                await loadTeacherRatings();
+                
+                const coursesList = document.getElementById('teacherCoursesList');
+                if (coursesSnap.empty) {
+                    coursesList.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">No courses created yet</p>';
+                } else {
+                    coursesList.innerHTML = coursesSnap.docs.map(doc => {
+                        const c = doc.data();
+                        const studentCount = (c.enrolledStudents || []).length;
+                        return `
+                            <div class="card p-4 border-l-4 border-primary">
+                                <h4 class="font-bold mb-1">${c.name}</h4>
+                                <p class="text-sm text-gray-600 mb-2">${c.board} • Class ${c.class}${c.stream ? ' • ' + c.stream : ''}</p>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${studentCount} Students</span>
+                                    <span class="text-xs text-gray-500">${c.subject}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+            } catch (error) {
+                console.error('Error loading teacher dashboard:', error);
+            }
+        }
+
+        async function loadTeacherRatings() {
+            try {
+                const feedbackSnap = await db.collection('teacherFeedback')
+                .where('teacherId', '==', currentUser.uid)
+                    .get();
+    
+            // Sort manually
+        const sortedDocs = feedbackSnap.docs.sort((a, b) => {
+            const dateA = a.data().createdAt?.toMillis() || 0;
+            const dateB = b.data().createdAt?.toMillis() || 0;
+            return dateB - dateA;
+            });
+                
+                if (feedbackSnap.empty) {
+                    document.getElementById('teacherAvgRating').textContent = '0.0';
+                    document.getElementById('avgTeachingRating').textContent = '0.0';
+                    document.getElementById('avgContentRating').textContent = '0.0';
+                    document.getElementById('avgDoubtRating').textContent = '0.0';
+                    initTeacherRatingChart([0, 0, 0, 0, 0, 0, 0]);
+                    document.getElementById('teacherRecentFeedback').innerHTML = '<p class="text-gray-500 text-center py-4">No feedback yet</p>';
+                    return;
+                }
+                
+                let totalRating = 0, totalTeaching = 0, totalContent = 0, totalDoubt = 0;
+                const ratings = [];
+                
+                feedbackSnap.docs.forEach((doc, index) => {
+                    const data = doc.data();
+                    totalRating += data.overallRating || 0;
+                    totalTeaching += data.teachingQuality || 0;
+                    totalContent += data.contentQuality || 0;
+                    totalDoubt += data.doubtSolving || 0;
+                    
+                    if (index < 7) ratings.push(data.overallRating || 0);
+                });
+                
+                const count = feedbackSnap.size;
+                document.getElementById('teacherAvgRating').textContent = (totalRating / count).toFixed(1);
+                document.getElementById('avgTeachingRating').textContent = (totalTeaching / count).toFixed(1);
+                document.getElementById('avgContentRating').textContent = (totalContent / count).toFixed(1);
+                document.getElementById('avgDoubtRating').textContent = (totalDoubt / count).toFixed(1);
+                
+                while (ratings.length < 7) ratings.push(0);
+                initTeacherRatingChart(ratings.reverse());
+                
+                const recentFeedback = feedbackSnap.docs.slice(0, 5);
+                document.getElementById('teacherRecentFeedback').innerHTML = recentFeedback.map(doc => {
+                    const data = doc.data();
+                    const stars = '⭐'.repeat(Math.round(data.overallRating || 0));
+                    return `
+                        <div class="border-b pb-3 last:border-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <div class="text-yellow-500 text-sm">${stars}</div>
+                                <span class="text-xs text-gray-500">${data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Unknown'}</span>
+                            </div>
+                            <p class="text-sm text-gray-700">${data.comment || 'No comment'}</p>
+                            <div class="mt-1 flex space-x-2 text-xs">
+                                <span class="text-green-600">Teaching: ${data.teachingQuality}/5</span>
+                                <span class="text-blue-600">Content: ${data.contentQuality}/5</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading ratings:', error);
+            }
+        }
+
+        // ==========================================
+        // ATTENDANCE FUNCTIONS
+        // ==========================================
+        async function loadTeacherCoursesForAttendance() {
+            const select = document.getElementById('attendanceCourse');
+            
+            if (teacherCourses.length === 0) {
+                const snap = await db.collection('courses')
+                    .where('teacherId', '==', currentUser.uid)
+                    .get();
+                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+            
+            if (teacherCourses.length === 0) {
+                select.innerHTML = '<option value="">No courses found</option>';
+                return;
+            }
+            
+            select.innerHTML = '<option value="">Select Course</option>' +
+                teacherCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            
+            document.getElementById('attendanceDate').valueAsDate = new Date();
+            loadAttendanceHistory();
+        }
+
+        async function loadAttendanceStudents() {
+            const courseId = document.getElementById('attendanceCourse').value;
+            const date = document.getElementById('attendanceDate').value;
+            
+            if (!courseId || !date) {
+                showToast('Please select course and date', 'error');
+                return;
+            }
+            
+            try {
+                const courseDoc = await db.collection('courses').doc(courseId).get();
+                const courseData = courseDoc.data();
+                const enrolledStudents = courseData.enrolledStudents || [];
+                
+                if (enrolledStudents.length === 0) {
+                    document.getElementById('attendanceStudentList').innerHTML = 
+                        '<p class="text-gray-500 text-center py-8">No students enrolled in this course</p>';
+                    document.getElementById('saveAttendanceBtn').classList.add('hidden');
+                    return;
+                }
+                
+                const existingAttendance = await db.collection('attendance')
+                    .where('courseId', '==', courseId)
+                    .where('date', '==', date)
+                    .get();
+                
+                const existingData = {};
+                existingAttendance.forEach(doc => {
+                    const data = doc.data();
+                    existingData[data.studentId] = data.status;
+                });
+                
+                const studentList = document.getElementById('attendanceStudentList');
+                studentList.innerHTML = '';
+                
+                for (const studentId of enrolledStudents) {
+                    const studentDoc = await db.collection('users').doc(studentId).get();
+                    const studentData = studentDoc.data();
+                    
+                    const isPresent = existingData[studentId] === 'present';
+                    const isAbsent = existingData[studentId] === 'absent';
+                    
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+                    div.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">
+                                ${(studentData.firstName || 'S').charAt(0)}
+                            </div>
+                            <div>
+                                <p class="font-medium">${studentData.firstName || ''} ${studentData.lastName || ''}</p>
+                                <p class="text-xs text-gray-500">Class ${studentData.class || ''}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <label class="flex items-center space-x-1 cursor-pointer">
+                                <input type="radio" name="attendance_${studentId}" value="present" 
+                                    ${isPresent ? 'checked' : ''} class="attendance-checkbox">
+                                <span class="text-sm text-green-600 font-medium">Present</span>
+                            </label>
+                            <label class="flex items-center space-x-1 cursor-pointer">
+                                <input type="radio" name="attendance_${studentId}" value="absent" 
+                                    ${isAbsent ? 'checked' : ''} class="attendance-checkbox">
+                                <span class="text-sm text-red-600 font-medium">Absent</span>
+                            </label>
+                        </div>
+                    `;
+                    studentList.appendChild(div);
+                }
+                
+                document.getElementById('saveAttendanceBtn').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error loading students:', error);
+                showToast('Error loading students', 'error');
+            }
+        }
+
+        function markAllPresent() {
+            document.querySelectorAll('input[type="radio"][value="present"]').forEach(radio => radio.checked = true);
+        }
+
+        function markAllAbsent() {
+            document.querySelectorAll('input[type="radio"][value="absent"]').forEach(radio => radio.checked = true);
+        }
+
+        async function saveAttendance() {
+            const courseId = document.getElementById('attendanceCourse').value;
+            const date = document.getElementById('attendanceDate').value;
+            
+            try {
+                const courseDoc = await db.collection('courses').doc(courseId).get();
+                const enrolledStudents = courseDoc.data().enrolledStudents || [];
+                
+                const batch = db.batch();
+                
+                for (const studentId of enrolledStudents) {
+                    const radio = document.querySelector(`input[name="attendance_${studentId}"]:checked`);
+                    if (!radio) continue;
+                    
+                    const attendanceRef = db.collection('attendance').doc(`${courseId}_${date}_${studentId}`);
+                    batch.set(attendanceRef, {
+                        courseId,
+                        studentId,
+                        date,
+                        status: radio.value,
+                        markedBy: currentUser.uid,
+                        markedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+                
+                await batch.commit();
+                showToast('Attendance saved successfully');
+                loadAttendanceHistory();
+                
+            } catch (error) {
+                console.error('Error saving attendance:', error);
+                showToast('Error saving attendance', 'error');
+            }
+        }
+
+        async function loadAttendanceHistory() {
+            try {
+                const snap = await db.collection('attendance')
+                    .where('markedBy', '==', currentUser.uid)
+                    .orderBy('markedAt', 'desc')
+                    .limit(10)
+                    .get();
+                
+                const container = document.getElementById('attendanceHistory');
+                
+                if (snap.empty) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">No records found</p>';
+                    return;
+                }
+                
+                const grouped = {};
+                snap.docs.forEach(doc => {
+                    const data = doc.data();
+                    if (!grouped[data.date]) grouped[data.date] = { present: 0, absent: 0 };
+                    if (data.status === 'present') grouped[data.date].present++;
+                    else grouped[data.date].absent++;
+                });
+                
+                container.innerHTML = Object.entries(grouped).slice(0, 5).map(([date, counts]) => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <span class="font-medium">${date}</span>
+                        <div class="flex space-x-3 text-sm">
+                            <span class="text-green-600">${counts.present} Present</span>
+                            <span class="text-red-600">${counts.absent} Absent</span>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading history:', error);
+            }
+        }
+
+        // ==========================================
+        // COURSE CREATION
+        // ==========================================
+        function updateStreamVisibility() {
+            const classVal = document.getElementById('courseClass').value;
+            const container = document.getElementById('courseStreamContainer');
+            
+            if (classVal === '11' || classVal === '12') {
+                container.classList.remove('hidden');
+                document.getElementById('courseStream').required = true;
+            } else {
+                container.classList.add('hidden');
+                document.getElementById('courseStream').required = false;
+                document.getElementById('courseStream').value = '';
+            }
+            
+            updateCourseSubjects();
+        }
+
+        function updateCourseSubjects() {
+            const classVal = document.getElementById('courseClass').value;
+            const stream = document.getElementById('courseStream').value;
+            const subjectSelect = document.getElementById('courseSubject');
+            
+            let subjects = [];
+            const classNum = parseInt(classVal);
+            
+            if (classNum >= 3 && classNum <= 5) {
+                subjects = subjectMappings['3-5'];
+            } else if (classNum >= 6 && classNum <= 8) {
+                subjects = subjectMappings['6-8'];
+            } else if (classNum >= 9 && classNum <= 10) {
+                subjects = subjectMappings['9-10'];
+            } else if ((classVal === '11' || classVal === '12') && stream) {
+                subjects = subjectMappings[`${classVal}-${stream}`] || [];
+            }
+            
+            subjectSelect.innerHTML = '<option value="">Select Subject</option>' + 
+                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
+        }
+
+        async function createCourse(e) {
+            e.preventDefault();
+            
+            const board = document.getElementById('courseBoard').value;
+            const classVal = document.getElementById('courseClass').value;
+            const stream = document.getElementById('courseStream').value;
+            const subject = document.getElementById('courseSubject').value;
+            const description = document.getElementById('courseDescription').value;
+            
+            const courseName = stream ? 
+                `${board} Class ${classVal} ${stream} ${subject}` : 
+                `${board} Class ${classVal} ${subject}`;
+            
+            try {
+                await db.collection('courses').add({
+                    name: courseName,
+                    board,
+                    class: classVal,
+                    stream: stream || null,
+                    subject,
+                    description,
+                    teacherId: currentUser.uid,
+                    teacherName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+                    enrolledStudents: [],
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    isActive: true
+                });
+                
+                showToast('Course created successfully');
+                document.getElementById('createCourseForm').reset();
+                document.getElementById('courseStreamContainer').classList.add('hidden');
+                
+                const snap = await db.collection('courses')
+                    .where('teacherId', '==', currentUser.uid)
+                    .get();
+                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                navigateTo('teacher-dashboard');
+            } catch (error) {
+                console.error('Error creating course:', error);
+                showToast('Error creating course', 'error');
+            }
+        }
+
+        // ==========================================
+        // CONTENT UPLOAD
+        // ==========================================
+        async function loadTeacherCoursesForUpload() {
+            const select = document.getElementById('uploadCourse');
+            
+            if (teacherCourses.length === 0) {
+                const snap = await db.collection('courses')
+                    .where('teacherId', '==', currentUser.uid)
+                    .get();
+                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+            
+            if (teacherCourses.length === 0) {
+                select.innerHTML = '<option value="">No courses found. Create a course first.</option>';
+                return;
+            }
+            
+            select.innerHTML = '<option value="">Select Course</option>' +
+                teacherCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        function handleFileSelect(input, previewId) {
+            const file = input.files[0];
+            if (file) {
+                const preview = document.getElementById(previewId);
+                preview.textContent = `Selected: ${file.name}`;
+                preview.classList.add('text-green-600', 'font-medium');
+            }
+        }
+
+        async function uploadContent(e) {
+            e.preventDefault();
+            
+            const courseId = document.getElementById('uploadCourse').value;
+            const chapter = document.getElementById('uploadChapter').value;
+            const videoLink = document.getElementById('videoLink').value;
+            const notesFile = document.getElementById('notesFile').files[0];
+            const dppFile = document.getElementById('dppFile').files[0];
+            
+            try {
+                showToast('Uploading content...');
+                
+                let notesUrl = '', dppUrl = '';
+                
+                if (notesFile) {
+                    const notesRef = storage.ref(`courses/${courseId}/notes/${Date.now()}_${notesFile.name}`);
+                    await notesRef.put(notesFile);
+                    notesUrl = await notesRef.getDownloadURL();
+                }
+                
+                if (dppFile) {
+                    const dppRef = storage.ref(`courses/${courseId}/dpp/${Date.now()}_${dppFile.name}`);
+                    await dppRef.put(dppFile);
+                    dppUrl = await dppRef.getDownloadURL();
+                }
+                
+                await db.collection('courses').doc(courseId).collection('content').add({
+                    chapter,
+                    notesUrl: notesUrl || videoLink,
+                    dppUrl: dppUrl || videoLink,
+                    videoUrl: videoLink,
+                    uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    uploadedBy: currentUser.uid
+                });
+                
+                showToast('Content uploaded successfully');
+                document.getElementById('uploadContentForm').reset();
+                document.getElementById('notesPreview').textContent = 'Click to upload notes or drag & drop';
+                document.getElementById('dppPreview').textContent = 'Click to upload DPP or drag & drop';
+                document.getElementById('notesPreview').classList.remove('text-green-600', 'font-medium');
+                document.getElementById('dppPreview').classList.remove('text-green-600', 'font-medium');
+                
+                loadTeacherRecentUploads();
+            } catch (error) {
+                console.error('Error uploading content:', error);
+                showToast('Error uploading content', 'error');
+            }
+        }
+
+        async function loadTeacherRecentUploads() {
+            const container = document.getElementById('teacherRecentUploads');
+            
+            if (teacherCourses.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-4">No uploads yet</p>';
+                return;
+            }
+            
+            try {
+                const uploads = [];
+                for (const course of teacherCourses) {
+                    const snap = await db.collection('courses').doc(course.id).collection('content')
+                        .orderBy('uploadedAt', 'desc').limit(2).get();
+                    snap.docs.forEach(doc => {
+                        uploads.push({ ...doc.data(), courseName: course.name, id: doc.id });
+                    });
+                }
+                
+                uploads.sort((a, b) => (b.uploadedAt?.toMillis() || 0) - (a.uploadedAt?.toMillis() || 0));
+                
+                if (uploads.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center py-4">No uploads yet</p>';
+                    return;
+                }
+                
+                container.innerHTML = uploads.slice(0, 5).map(u => `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                            <p class="font-medium text-sm">${u.courseName}</p>
+                            <p class="text-xs text-gray-600">${u.chapter}</p>
+                        </div>
+                        <span class="text-xs text-gray-400">${u.uploadedAt ? u.uploadedAt.toDate().toLocaleDateString() : 'Unknown'}</span>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading uploads:', error);
+            }
+        }
+
+        // ==========================================
+        // NOTIFICATIONS
+        // ==========================================
+        async function loadTeacherCoursesForNotif() {
+            const select = document.getElementById('teacherNotifCourse');
+            
+            if (teacherCourses.length === 0) {
+                const snap = await db.collection('courses')
+                    .where('teacherId', '==', currentUser.uid)
+                    .get();
+                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+            
+            select.innerHTML = '<option value="">Select Course</option>' +
+                teacherCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+
+        async function sendTeacherNotification(e) {
+            e.preventDefault();
+            
+            const courseId = document.getElementById('teacherNotifCourse').value;
+            const title = document.getElementById('teacherNotifTitle').value;
+            const message = document.getElementById('teacherNotifMessage').value;
+            
+            try {
+                const courseDoc = await db.collection('courses').doc(courseId).get();
+                const enrolledStudents = courseDoc.data().enrolledStudents || [];
+                
+                if (enrolledStudents.length === 0) {
+                    showToast('No students enrolled in this course', 'error');
+                    return;
+                }
+                
+                const batch = db.batch();
+                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                
+                enrolledStudents.forEach(studentId => {
+                    const notifRef = db.collection('notifications').doc();
+                    batch.set(notifRef, {
+                        userId: studentId,
+                        title,
+                        message,
+                        priority: 'normal',
+                        sender: userData.firstName + ' ' + userData.lastName,
+                        senderRole: 'teacher',
+                        courseId,
+                        read: false,
+                        createdAt: timestamp
+                    });
+                });
+                
+                await batch.commit();
+                showToast(`Notification sent to ${enrolledStudents.length} students`);
+                document.getElementById('teacherNotifForm').reset();
+                
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                showToast('Error sending notification', 'error');
+            }
+        }
+
+        // ==========================================
+        // PROFILE
+        // ==========================================
+        function loadProfileData() {
+            document.getElementById('profileCourseCount').textContent = document.getElementById('teacherCourseCount').textContent;
+            document.getElementById('profileStudentCount').textContent = document.getElementById('teacherStudentCount').textContent;
+            document.getElementById('profileRating').textContent = document.getElementById('teacherAvgRating').textContent;
+        }
+
+        // ==========================================
+        // NOTIFICATIONS LISTENER
+        // ==========================================
+        function setupNotificationsListener() {
+            if (!currentUser) return;
+            
+            db.collection('notifications')
+                .where('userId', '==', currentUser.uid)
+                .where('read', '==', false)
+                .onSnapshot(snapshot => {
+                    const badge = document.getElementById('notifBadge');
+                    if (snapshot.size > 0) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
+        }
+
+        function showNotifications() {
+            showToast('Notifications feature coming soon');
+        }
+
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('sidebar-hidden');
+        }
+
+        function toggleUserMenu() {
+            document.getElementById('userDropdown').classList.toggle('hidden');
+        }
+
+        async function logout() {
+            try {
+                await auth.signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#userMenu')) {
+                document.getElementById('userDropdown').classList.add('hidden');
+            }
+        });
+
+        document.querySelectorAll('.upload-zone').forEach(zone => {
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+            
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+            
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                
+            });
+            
+        });
+        } catch (error) {
+    console.error("PAGE ERROR:", error);
+    alert("Error loading page: " + error.message);
+}
+     
+</script>
+</body>
+</html>
+</body>
+</html>

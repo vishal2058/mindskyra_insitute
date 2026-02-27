@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINDSKYRA Institute – Master Your Future</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ═══════════ THEME TOKENS ═══════════ */
+:root{
+  --violet:#8b5cf6;--violet2:#7c3aed;--indigo:#6366f1;
+  --accent:#a78bfa;--gold:#f59e0b;
+  --sidebar-w:268px;--radius:16px;
+  --transition:.32s cubic-bezier(.4,0,.2,1);
+}
+[data-theme="dark"]{
+  --bg:#08080f;--bg2:#0f0f1a;--bg3:#141422;
+  --surface:#191927;--surface2:#1f1f30;
+  --border:rgba(139,92,246,0.14);--border2:rgba(255,255,255,0.06);
+  --text:#eeeaf8;--text2:#9b94b8;--text3:#5f587a;
+  --glow:0 0 50px rgba(139,92,246,0.22);
+  --shadow:0 4px 30px rgba(0,0,0,0.4);
+  --card-glow:0 8px 40px rgba(124,58,237,0.18);
+}
+[data-theme="light"]{
+  --bg:#f0effe;--bg2:#ffffff;--bg3:#e8e5ff;
+  --surface:#ffffff;--surface2:#f0effe;
+  --border:rgba(139,92,246,0.18);--border2:rgba(0,0,0,0.07);
+  --text:#1a1535;--text2:#5c5380;--text3:#9b94b8;
+  --glow:0 0 50px rgba(139,92,246,0.15);
+  --shadow:0 4px 24px rgba(100,80,200,0.1);
+  --card-glow:0 8px 40px rgba(124,58,237,0.12);
+}
+
+/* ═══════════ RESET ═══════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Plus Jakarta Sans',sans-serif;
+  overflow-x:hidden;min-height:100vh;
+  transition:background var(--transition),color var(--transition);
+}
+h1,h2,h3,h4,h5{font-family:'Outfit',sans-serif;}
+a{text-decoration:none;}
+
+/* ═══════════ SIDEBAR ═══════════ */
+.sidebar{
+  position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;
+  background:var(--bg2);border-right:1px solid var(--border);
+  z-index:200;display:flex;flex-direction:column;
+  transition:transform .38s cubic-bezier(.77,0,.18,1),background var(--transition),border-color var(--transition);
+  overflow:hidden;
+}
+.s-logo{padding:22px 22px 18px;border-bottom:1px solid var(--border);}
+.s-logo-row{display:flex;align-items:center;gap:10px;}
+.logo-box{
+  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:19px;color:#fff;
+  box-shadow:0 4px 14px rgba(124,58,237,0.4);
+}
+.logo-txt{
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:15px;letter-spacing:.5px;
+  background:linear-gradient(90deg,var(--accent),var(--indigo));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.s-nav{flex:1;padding:12px 0;overflow-y:auto;scrollbar-width:none;}
+.s-nav::-webkit-scrollbar{display:none;}
+.nav-grp{
+  font-size:9.5px;font-weight:700;letter-spacing:2.5px;
+  color:var(--text3);padding:10px 22px 4px;text-transform:uppercase;
+  font-family:'Outfit',sans-serif;
+}
+.nav-a{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 22px;color:var(--text2);
+  font-size:13.5px;font-weight:500;cursor:pointer;
+  transition:all .2s;border-left:2px solid transparent;
+  text-decoration:none;
+}
+.nav-a:hover,.nav-a.active{
+  color:var(--text);background:rgba(139,92,246,0.08);
+  border-left-color:var(--violet);
+}
+.nav-a svg{width:17px;height:17px;flex-shrink:0;opacity:.7;}
+.nav-a:hover svg,.nav-a.active svg{opacity:1;}
+.nav-badge{
+  margin-left:auto;font-size:9px;font-weight:700;
+  background:var(--violet);color:#fff;
+  padding:2px 7px;border-radius:20px;
+  font-family:'Outfit',sans-serif;
+}
+.s-bottom{padding:14px 22px 18px;border-top:1px solid var(--border);flex-shrink:0;}
+.theme-row{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.theme-row span{font-size:12.5px;color:var(--text2);font-weight:500;}
+/* ── Theme Toggle ── */
+.tog{
+  width:46px;height:26px;background:var(--surface2);border:1px solid var(--border);
+  border-radius:30px;cursor:pointer;display:flex;align-items:center;
+  padding:3px;position:relative;transition:background .3s,border-color .3s;
+  flex-shrink:0;
+}
+.tog-ball{
+  width:18px;height:18px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet),var(--indigo));
+  transition:transform .32s cubic-bezier(.34,1.56,.64,1);
+  flex-shrink:0;box-shadow:0 2px 8px rgba(124,58,237,0.45);
+  position:relative;z-index:1;
+}
+[data-theme="light"] .tog-ball{transform:translateX(20px);}
+.tog-icon{
+  position:absolute;font-size:11px;
+  transition:opacity .25s;pointer-events:none;
+}
+.i-moon{right:5px;opacity:1;}
+.i-sun{left:5px;opacity:0;}
+[data-theme="light"] .i-moon{opacity:0;}
+[data-theme="light"] .i-sun{opacity:1;}
+.s-cta{
+  width:100%;padding:12px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:13.5px;
+  cursor:pointer;transition:opacity .2s,transform .2s;letter-spacing:.3px;
+}
+.s-cta:hover{opacity:.9;transform:translateY(-1px);}
+
+/* ═══════════ MOBILE TOPNAV ═══════════ */
+.topnav{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:150;
+  background:var(--bg2);border-bottom:1px solid var(--border);
+  padding:0 16px;height:58px;align-items:center;justify-content:space-between;
+  transition:background var(--transition);
+}
+.topnav-r{display:flex;align-items:center;gap:10px;}
+.hamburger{
+  background:none;border:1px solid var(--border2);border-radius:9px;
+  padding:7px;cursor:pointer;color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s;
+}
+.hamburger:hover{border-color:var(--violet);}
+.s-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.55);z-index:190;
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+}
+
+/* ═══════════ LAYOUT ═══════════ */
+.main{margin-left:var(--sidebar-w);min-height:100vh;}
+section{padding:84px 52px;}
+
+/* ═══════════ HERO ═══════════ */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  position:relative;overflow:hidden;padding:110px 52px 90px;
+}
+.h-bg{position:absolute;inset:0;z-index:0;}
+.h-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,#0c052a 0%,#16093f 35%,#1a0b50 60%,#0e1440 100%);
+}
+[data-theme="light"] .h-grad{
+  background:linear-gradient(135deg,#3920a2 0%,#5435c9 40%,#6447d6 70%,#4c31b7 100%);
+}
+.h-mesh{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 55% at 70% 40%,rgba(139,92,246,0.28) 0%,transparent 65%),
+    radial-gradient(ellipse 45% 45% at 90% 85%,rgba(99,102,241,0.18) 0%,transparent 60%),
+    radial-gradient(ellipse 35% 35% at 12% 25%,rgba(167,139,250,0.14) 0%,transparent 60%);
+}
+.h-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.035) 1px,transparent 1px);
+  background-size:55px 55px;
+}
+.h-orb{
+  position:absolute;border-radius:50%;
+  filter:blur(75px);animation:floatO 7s ease-in-out infinite;pointer-events:none;
+}
+.o1{width:450px;height:450px;background:rgba(124,58,237,0.2);top:-80px;right:80px;}
+.o2{width:280px;height:280px;background:rgba(99,102,241,0.16);bottom:60px;right:-40px;animation-delay:2.5s;}
+.o3{width:180px;height:180px;background:rgba(245,158,11,0.09);top:200px;left:20px;animation-delay:5s;}
+@keyframes floatO{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-22px) scale(1.04);}}
+
+.h-content{position:relative;z-index:1;max-width:720px;}
+.h-badge{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:8px 18px;border-radius:40px;
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);
+  color:rgba(255,255,255,0.9);font-size:13px;font-weight:500;margin-bottom:28px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.ldot{
+  width:7px;height:7px;background:#22c55e;border-radius:50%;
+  box-shadow:0 0 8px #22c55e;animation:ldotP 2s ease infinite;
+}
+@keyframes ldotP{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.7;transform:scale(1.4);}}
+.hero h1{
+  font-size:clamp(38px,5.5vw,74px);font-weight:900;
+  line-height:1.04;letter-spacing:-2px;color:#fff;margin-bottom:22px;
+}
+.hero h1 .g{
+  background:linear-gradient(130deg,#c4b5fd 0%,#a78bfa 30%,#818cf8 60%,#fbbf24 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-size:200% auto;animation:shimr 4s linear infinite;
+}
+@keyframes shimr{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
+.h-sub{
+  font-size:17px;color:rgba(255,255,255,0.72);
+  line-height:1.75;margin-bottom:38px;max-width:580px;font-weight:400;
+}
+.h-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-p{
+  padding:14px 30px;background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  border:none;border-radius:50px;color:#fff;
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;cursor:pointer;
+  transition:all .25s;display:inline-flex;align-items:center;gap:8px;
+  box-shadow:0 8px 32px rgba(124,58,237,0.48);letter-spacing:.2px;
+}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 42px rgba(124,58,237,0.65);}
+.btn-o{
+  padding:13px 28px;background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.26);border-radius:50px;color:#fff;
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;
+  cursor:pointer;transition:all .25s;backdrop-filter:blur(8px);
+}
+.btn-o:hover{background:rgba(255,255,255,0.2);}
+.btn-s{
+  padding:13px 28px;background:var(--surface);border:1px solid var(--border);
+  border-radius:50px;color:var(--text);
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;
+  cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;
+}
+.btn-s:hover{border-color:var(--violet);color:var(--accent);}
+
+.h-stats{display:flex;gap:0;margin-top:52px;flex-wrap:wrap;}
+.stat{display:flex;flex-direction:column;padding:0 28px;}
+.stat:first-child{padding-left:0;}
+.stat-v{
+  font-family:'Outfit',sans-serif;font-size:30px;font-weight:900;
+  color:#fff;letter-spacing:-1px;
+}
+.stat-l{font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;font-weight:500;}
+.stat-sep{width:1px;background:rgba(255,255,255,0.15);align-self:stretch;margin:4px 0;}
+
+/* ═══════════ SECTION SHARED ═══════════ */
+.s-lbl{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--violet);margin-bottom:14px;font-family:'Outfit',sans-serif;
+}
+.s-lbl::before{
+  content:'';width:22px;height:2px;
+  background:linear-gradient(90deg,var(--violet),var(--indigo));border-radius:2px;
+}
+.s-title{
+  font-size:clamp(26px,3.5vw,44px);font-weight:800;
+  line-height:1.1;letter-spacing:-1.2px;margin-bottom:14px;
+}
+.s-sub{font-size:16px;color:var(--text2);line-height:1.8;max-width:620px;}
+.s-hdr{margin-bottom:52px;}
+
+/* ═══════════ COURSES ═══════════ */
+#courses{background:var(--bg);}
+.c-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:18px;}
+.c-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:28px;cursor:pointer;
+  transition:all .32s;position:relative;overflow:hidden;
+}
+.c-card::after{
+  content:'';position:absolute;inset:0;
+  background:var(--ch,linear-gradient(135deg,rgba(139,92,246,0.06),transparent));
+  opacity:0;transition:opacity .3s;
+}
+.c-card:hover{transform:translateY(-5px);border-color:var(--violet);box-shadow:var(--card-glow);}
+.c-card:hover::after{opacity:1;}
+.c-num{
+  font-family:'Outfit',sans-serif;font-size:50px;font-weight:900;
+  background:var(--cg,linear-gradient(135deg,var(--accent),var(--indigo)));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;letter-spacing:-2px;
+}
+.c-stg{font-size:12.5px;color:var(--text2);margin:6px 0 14px;font-weight:500;}
+.c-tag{
+  display:inline-block;padding:4px 11px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:.3px;
+  background:rgba(139,92,246,0.1);color:var(--accent);
+  border:1px solid rgba(139,92,246,0.22);margin-bottom:14px;
+  font-family:'Outfit',sans-serif;
+}
+.c-feats{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:22px;}
+.c-feats li{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text2);}
+.c-feats li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--violet);flex-shrink:0;}
+.c-btn{
+  width:100%;padding:11px;border:1px solid var(--border);background:transparent;
+  border-radius:11px;color:var(--text);
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:13.5px;
+  cursor:pointer;transition:all .25s;letter-spacing:.2px;
+}
+.c-btn:hover{background:var(--violet2);border-color:var(--violet2);color:#fff;}
+.c-new{
+  position:absolute;top:16px;right:16px;
+  background:var(--gold);color:#000;
+  font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:20px;
+  font-family:'Outfit',sans-serif;letter-spacing:.5px;
+}
+
+/* ═══════════ FEATURES ═══════════ */
+#features{background:var(--bg2);}
+.f-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:16px;}
+.f-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:26px;transition:all .28s;
+}
+.f-card:hover{border-color:var(--violet);transform:translateY(-3px);box-shadow:var(--shadow);}
+.f-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:20px;}
+.f-card h3{font-size:16px;font-weight:700;margin-bottom:9px;letter-spacing:-.2px;}
+.f-card p{font-size:13.5px;color:var(--text2);line-height:1.7;}
+
+/* ═══════════ FEES ═══════════ */
+#fees{background:var(--bg);}
+.fee-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px;}
+.fee-tab{
+  padding:9px 20px;border-radius:40px;
+  border:1px solid var(--border);background:var(--surface);
+  color:var(--text2);font-family:'Outfit',sans-serif;
+  font-size:13px;font-weight:600;cursor:pointer;transition:all .22s;
+}
+.fee-tab.active,.fee-tab:hover{background:var(--violet2);border-color:var(--violet2);color:#fff;}
+.fee-panel{display:none;}
+.fee-panel.active{display:block;}
+.fee-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.fee-card{
+  background:var(--surface);border-radius:18px;padding:22px 20px 18px;
+  border:2px solid transparent;transition:all .28s;position:relative;overflow:hidden;
+}
+.fee-card.c1-3{border-color:rgba(59,130,246,0.4);box-shadow:0 0 0 1px rgba(59,130,246,0.1);}
+.fee-card.c4-8{border-color:rgba(139,92,246,0.45);box-shadow:0 0 0 1px rgba(139,92,246,0.1);}
+.fee-card.c9-12{border-color:rgba(236,72,153,0.45);box-shadow:0 0 0 1px rgba(236,72,153,0.1);}
+.fee-card:hover{transform:translateY(-4px);box-shadow:var(--card-glow);}
+.fee-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.fee-class-name{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px;}
+.fee-set-badge{
+  font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;
+  font-family:'Outfit',sans-serif;letter-spacing:.5px;
+}
+.fee-card.c1-3 .fee-set-badge{background:rgba(59,130,246,0.2);color:#60a5fa;}
+.fee-card.c4-8 .fee-set-badge{background:rgba(139,92,246,0.2);color:var(--accent);}
+.fee-card.c9-12 .fee-set-badge{background:rgba(236,72,153,0.2);color:#f472b6;}
+.fee-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.fee-row-label{font-size:13px;color:var(--text2);}
+.fee-row-val{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;}
+.fee-row-val.annual{font-size:17px;color:var(--text);}
+.fee-divider{height:1px;background:var(--border2);margin:10px 0;}
+.fee-row-val.online{color:#818cf8;}
+.fee-row-val.offline{color:var(--text2);}
+.fee-sub-label{font-size:11.5px;color:var(--text3);}
+.fee-stream-tag{
+  display:inline-block;padding:2px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;letter-spacing:.3px;font-family:'Outfit',sans-serif;
+  margin-bottom:6px;
+}
+.stream-sci{background:rgba(239,68,68,0.12);color:#f87171;}
+.stream-com{background:rgba(245,158,11,0.12);color:var(--gold);}
+
+/* ═══════════ LIBRARY ═══════════ */
+#library{background:var(--bg2);}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:13px;}
+.lib-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:14px;padding:18px;
+  display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:all .25s;
+}
+.lib-card:hover{border-color:var(--violet);background:rgba(139,92,246,0.06);transform:translateY(-2px);}
+.lib-em{font-size:26px;}
+.lib-t{font-size:13.5px;font-weight:700;font-family:'Outfit',sans-serif;}
+.lib-m{font-size:12px;color:var(--text3);}
+.lib-f{
+  display:inline-block;padding:2px 8px;border-radius:20px;
+  font-size:10px;font-weight:700;background:rgba(34,197,94,0.1);color:#4ade80;
+  font-family:'Outfit',sans-serif;letter-spacing:.5px;width:fit-content;
+}
+
+/* ═══════════ WELLNESS ═══════════ */
+#wellness{background:var(--bg);}
+.w-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.w-big{
+  grid-row:span 2;
+  background:linear-gradient(140deg,rgba(139,92,246,0.12) 0%,rgba(99,102,241,0.07) 100%);
+  border:1px solid rgba(139,92,246,0.25);border-radius:20px;padding:34px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  transition:border-color .3s;
+}
+.w-big:hover{border-color:rgba(139,92,246,0.45);}
+.w-big h3{font-size:24px;font-weight:800;line-height:1.25;letter-spacing:-.5px;margin-top:14px;}
+.w-big p{font-size:14px;color:var(--text2);line-height:1.75;margin-top:12px;margin-bottom:22px;}
+.w-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.w-tag{
+  padding:5px 13px;border-radius:20px;
+  background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.22);
+  font-size:11.5px;color:var(--accent);font-weight:600;font-family:'Outfit',sans-serif;
+}
+.w-sm{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:16px;padding:22px;transition:all .25s;
+}
+.w-sm:hover{border-color:var(--violet);transform:translateY(-2px);}
+.w-em{font-size:30px;margin-bottom:12px;display:block;}
+.w-sm h4{font-size:15px;font-weight:700;margin-bottom:7px;font-family:'Outfit',sans-serif;}
+.w-sm p{font-size:13px;color:var(--text2);line-height:1.65;}
+
+/* ═══════════ TESTIMONIALS ═══════════ */
+#testimonials{background:var(--bg2);}
+.t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;}
+.t-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:18px;padding:26px;transition:all .28s;
+}
+.t-card:hover{border-color:var(--violet);transform:translateY(-3px);box-shadow:var(--glow);}
+.stars{color:var(--gold);font-size:12px;letter-spacing:3px;margin-bottom:10px;}
+.tq{font-size:44px;color:var(--violet);line-height:.9;margin-bottom:8px;font-family:'Outfit',sans-serif;opacity:.45;}
+.t-txt{font-size:13.5px;color:var(--text2);line-height:1.75;margin-bottom:18px;font-style:italic;}
+.t-auth{display:flex;align-items:center;gap:11px;}
+.t-av{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:16px;color:#fff;
+}
+.t-name{font-weight:700;font-size:13.5px;}
+.t-cls{font-size:11.5px;color:var(--text3);margin-top:1px;}
+
+/* ═══════════ ABOUT ═══════════ */
+#about{
+  background:var(--bg);
+  display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;
+}
+.ab-txt p{font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:15px;}
+.ab-btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px;}
+.ab-vis{position:relative;height:420px;}
+.acard{
+  position:absolute;border-radius:18px;padding:22px;
+  border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow);
+}
+.ac1{width:260px;top:0;left:0;}
+.ac2{
+  width:230px;top:90px;left:150px;
+  background:linear-gradient(135deg,rgba(139,92,246,0.16),rgba(99,102,241,0.07));
+  border-color:rgba(139,92,246,0.3);
+}
+.ac3{width:210px;top:250px;left:30px;background:var(--surface2);}
+.ac-v{
+  font-family:'Outfit',sans-serif;font-size:34px;font-weight:900;letter-spacing:-1.5px;
+  background:linear-gradient(135deg,var(--accent),var(--indigo));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.ac-l{font-size:13px;color:var(--text2);margin-top:4px;}
+
+/* ═══════════ FOOTER ═══════════ */
+footer{
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:60px 52px 32px;transition:background var(--transition);
+}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
+.ft-brand p{font-size:14px;color:var(--text2);line-height:1.75;margin-top:12px;max-width:260px;}
+.ft-col h5{
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:13.5px;
+  margin-bottom:16px;color:var(--text);letter-spacing:.3px;
+}
+.ft-col a{display:block;color:var(--text2);font-size:13.5px;margin-bottom:10px;transition:color .2s;}
+.ft-col a:hover{color:var(--accent);}
+.ft-col li{font-size:13.5px;color:var(--text2);margin-bottom:10px;list-style:none;}
+.ft-bot{
+  border-top:1px solid var(--border);padding-top:24px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.ft-bot p{font-size:13px;color:var(--text3);}
+
+/* ═══════════ CHATBOT ═══════════ */
+.ct-btn{
+  position:fixed;bottom:28px;right:28px;z-index:500;
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 32px rgba(124,58,237,0.52);transition:all .3s;
+}
+.ct-btn:hover{transform:scale(1.1);box-shadow:0 12px 44px rgba(124,58,237,0.72);}
+.ct-btn svg{width:26px;height:26px;color:#fff;}
+.ct-ping{
+  position:absolute;top:1px;right:1px;
+  width:14px;height:14px;background:#22c55e;
+  border-radius:50%;border:2px solid var(--bg);
+  animation:ctping 2.5s ease infinite;
+}
+@keyframes ctping{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.5);opacity:.6;}}
+.ct-win{
+  position:fixed;bottom:100px;right:28px;
+  width:365px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:22px;
+  box-shadow:0 24px 80px rgba(0,0,0,.5);z-index:500;
+  display:none;flex-direction:column;overflow:hidden;max-height:570px;
+  transition:background var(--transition);
+}
+.ct-win.open{display:flex;animation:ctup .3s ease;}
+@keyframes ctup{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.ct-head{
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  padding:16px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.ct-av{
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:17px;color:#fff;flex-shrink:0;
+}
+.ct-inf h4{font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;color:#fff;}
+.ct-inf p{font-size:11px;color:rgba(255,255,255,0.65);margin-top:1px;}
+.ct-cls{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;padding:4px;}
+.ct-cls:hover{color:#fff;}
+.ct-msgs{
+  flex:1;overflow-y:auto;padding:16px;
+  display:flex;flex-direction:column;gap:11px;min-height:300px;
+  scrollbar-width:thin;scrollbar-color:var(--surface2) transparent;
+}
+.ct-msgs::-webkit-scrollbar{width:4px;}
+.ct-msgs::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px;}
+.msg{
+  max-width:82%;padding:11px 14px;border-radius:15px;
+  font-size:13.5px;line-height:1.65;
+  animation:min .3s ease;white-space:pre-wrap;
+}
+@keyframes min{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+.msg.bot{background:var(--surface);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
+.msg.usr{background:linear-gradient(135deg,var(--violet2),var(--indigo));color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.typing{
+  display:flex;gap:5px;align-items:center;padding:11px 14px;
+  background:var(--surface);border-radius:15px;border-bottom-left-radius:4px;align-self:flex-start;
+}
+.typing span{width:7px;height:7px;background:var(--text3);border-radius:50%;animation:tdk 1.3s ease infinite;}
+.typing span:nth-child(2){animation-delay:.2s;}
+.typing span:nth-child(3){animation-delay:.4s;}
+@keyframes tdk{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+.ct-quick{
+  padding:8px 14px;display:flex;gap:6px;overflow-x:auto;
+  scrollbar-width:none;flex-shrink:0;border-top:1px solid var(--border);
+}
+.ct-quick::-webkit-scrollbar{display:none;}
+.qb{
+  white-space:nowrap;padding:6px 12px;
+  border:1px solid var(--border);background:var(--surface);
+  border-radius:20px;color:var(--text2);font-size:12px;font-weight:500;
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.qb:hover{border-color:var(--violet);color:var(--accent);background:rgba(139,92,246,0.07);}
+.ct-row{border-top:1px solid var(--border);padding:12px 14px;display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.ct-inp{
+  flex:1;background:var(--surface);border:1px solid var(--border);
+  border-radius:11px;padding:10px 14px;color:var(--text);
+  font-size:13.5px;outline:none;transition:border-color .2s;
+  font-family:'Plus Jakarta Sans',sans-serif;
+}
+.ct-inp:focus{border-color:var(--violet);}
+.ct-inp::placeholder{color:var(--text3);}
+.ct-snd{
+  width:38px;height:38px;border-radius:11px;background:var(--violet2);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:#fff;transition:all .2s;flex-shrink:0;
+}
+.ct-snd:hover{background:var(--violet);transform:scale(1.06);}
+
+/* ═══════════ REVEAL ═══════════ */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ═══════════ RESPONSIVE ═══════════ */
+@media(max-width:960px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .s-overlay.open{display:block;}
+  .topnav{display:flex;}
+  .main{margin-left:0;padding-top:58px;}
+  section{padding:60px 22px;}
+  .hero{padding:80px 22px 60px;}
+  .w-grid{grid-template-columns:1fr;}
+  .w-big{grid-row:auto;}
+  #about{grid-template-columns:1fr;gap:36px;padding:60px 22px;}
+  .ft-grid{grid-template-columns:1fr 1fr;gap:24px;}
+  footer{padding:48px 22px 28px;}
+}
+@media(max-width:640px){
+  .hero h1{font-size:36px;letter-spacing:-.5px;}
+  .ft-grid{grid-template-columns:1fr;}
+  .ab-vis{height:300px;}
+  .ac1{width:200px;}
+  .ac2{width:175px;left:110px;}
+  .ac3{width:168px;top:180px;}
+  .ct-win{right:10px;left:10px;width:auto;}
+  .h-stats{gap:0;}
+  .stat{padding:0 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- OVERLAY -->
+<div class="s-overlay" id="overlay" onclick="closeSB()"></div>
+
+<!-- ══════ SIDEBAR ══════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="s-logo">
+    <div class="s-logo-row">
+      <div class="logo-box">M</div>
+      <span class="logo-txt">MINDSKYRA</span>
+    </div>
+  </div>
+  <nav class="s-nav">
+    <div class="nav-grp">Main</div>
+    <a class="nav-a active" href="#hero" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Home</a>
+    <a class="nav-a" href="#courses" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Courses</a>
+    <a class="nav-a" href="#features" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Features</a>
+    <a class="nav-a" href="#fees" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>Fee Structure</a>
+    <a class="nav-a" href="#library" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>Free Library<span class="nav-badge">Free</span></a>
+    <div class="nav-grp" style="margin-top:6px;">More</div>
+    <a class="nav-a" href="#wellness" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>Mental Wellness</a>
+    <a class="nav-a" href="#testimonials" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>Testimonials</a>
+    <a class="nav-a" href="#about" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>About Us</a>
+  </nav>
+  <div class="s-bottom">
+    <div class="theme-row">
+      <span id="themeLabel">🌙 Dark Mode</span>
+      <button class="tog" onclick="toggleTheme()" aria-label="Toggle theme">
+        <span class="tog-icon i-moon">🌙</span>
+        <span class="tog-icon i-sun">☀️</span>
+        <div class="tog-ball"></div>
+      </button>
+    </div>
+    <button class="s-cta" onclick="window.location.href='login.html'">Login / Sign Up →</button>
+  </div>
+</aside>
+
+<!-- ══════ MOBILE TOPNAV ══════ -->
+<nav class="topnav" id="topnav">
+  <div class="s-logo-row">
+    <div class="logo-box">M</div>
+    <span class="logo-txt">MINDSKYRA</span>
+  </div>
+  <div class="topnav-r">
+    <button class="tog" onclick="toggleTheme()" aria-label="Toggle theme">
+      <span class="tog-icon i-moon">🌙</span>
+      <span class="tog-icon i-sun">☀️</span>
+      <div class="tog-ball"></div>
+    </button>
+    <button class="hamburger" onclick="toggleSB()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ══════ MAIN CONTENT ══════ -->
+<main class="main">
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="h-bg">
+    <div class="h-grad"></div><div class="h-mesh"></div><div class="h-grid"></div>
+    <div class="h-orb o1"></div><div class="h-orb o2"></div><div class="h-orb o3"></div>
+  </div>
+  <div class="h-content reveal">
+    <div class="h-badge"><span class="ldot"></span><span id="activeLearners">2,847</span>&nbsp;students learning right now</div>
+    <h1>Master Your Future<br>with <span class="g">MINDSKYRA</span></h1>
+    <p class="h-sub">India's most advanced learning platform for Classes 3–12. Live &amp; recorded classes, AI-powered skills, expert faculty — online &amp; offline.</p>
+    <div class="h-btns">
+      <button class="btn-p" onclick="goTo('courses')">Explore Courses <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      <button class="btn-o" onclick="goTo('library')">Free Library</button>
+    </div>
+    <div class="h-stats">
+      <div class="stat"><span class="stat-v">15K+</span><span class="stat-l">Students</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><span class="stat-v">98%</span><span class="stat-l">Success Rate</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><span class="stat-v">50+</span><span class="stat-l">Expert Teachers</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat"><span class="stat-v">4.9★</span><span class="stat-l">App Rating</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES -->
+<section id="courses">
+  <div class="s-hdr reveal"><div class="s-lbl">Curriculum</div><h2 class="s-title">Choose Your Class</h2><p class="s-sub">Board-aligned curriculum for every stage — from foundational concepts to JEE/NEET competitive excellence.</p></div>
+  <div class="c-grid">
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(99,102,241,0.08),transparent);--cg:linear-gradient(135deg,#818cf8,#6366f1);" onclick="goTo('fees')"><div class="c-num">3–5</div><div class="c-stg">Foundation Stage</div><ul class="c-feats"><li>Basic Concepts &amp; Fundamentals</li><li>Interactive &amp; Visual Learning</li><li>Activity-based Worksheets</li></ul><button class="c-btn">View Courses →</button></div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(34,197,94,0.07),transparent);--cg:linear-gradient(135deg,#4ade80,#22c55e);" onclick="goTo('fees')"><div class="c-num">6–8</div><div class="c-stg">Middle School</div><ul class="c-feats"><li>Deep Concept Building</li><li>Competitive Exam Preparation</li><li>Olympiad &amp; Science Fairs</li></ul><button class="c-btn">View Courses →</button></div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(139,92,246,0.08),transparent);--cg:linear-gradient(135deg,#c4b5fd,#8b5cf6);" onclick="goTo('fees')"><div class="c-num">9–10</div><div class="c-stg">Board Preparation</div><ul class="c-feats"><li>CBSE &amp; State Boards</li><li>Chapter-wise DPPs &amp; Tests</li><li>Mock Board Examinations</li></ul><button class="c-btn">View Courses →</button></div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(239,68,68,0.07),transparent);--cg:linear-gradient(135deg,#f87171,#ef4444);" onclick="goTo('fees')"><div class="c-num">11–12</div><div class="c-stg">Science Stream</div><div class="c-tag">PCM / PCB</div><ul class="c-feats"><li>JEE Main &amp; Advanced Prep</li><li>NEET / AIIMS Foundation</li><li>Virtual Lab Practicals</li></ul><button class="c-btn">View Courses →</button></div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(245,158,11,0.07),transparent);--cg:linear-gradient(135deg,#fbbf24,#f59e0b);" onclick="goTo('fees')"><div class="c-num">11–12</div><div class="c-stg">Commerce Stream</div><div class="c-tag">Accounts / Eco / BST</div><ul class="c-feats"><li>CA Foundation Prep</li><li>Business Studies &amp; Economics</li><li>Case Study Workshops</li></ul><button class="c-btn">View Courses →</button></div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(236,72,153,0.08),transparent);--cg:linear-gradient(135deg,#f472b6,#a78bfa);"><div class="c-new">NEW</div><div class="c-num" style="font-size:32px;letter-spacing:-1px;">LERNVO AI</div><div class="c-stg">Skills Platform</div><ul class="c-feats"><li>Spoken English Mastery</li><li>AI &amp; Coding Skills</li><li>Personality Development</li></ul><button class="c-btn">Coming Soon →</button></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="s-hdr reveal"><div class="s-lbl">Why MINDSKYRA</div><h2 class="s-title">Everything You Need to Excel</h2><p class="s-sub">A complete learning ecosystem built for the modern Indian student — powerful, flexible, and designed for results.</p></div>
+  <div class="f-grid">
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(99,102,241,0.1);">🎥</div><h3>Live &amp; Recorded Classes</h3><p>Attend live sessions with top educators or replay recordings anytime. Never miss a lesson, ever.</p></div>
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(34,197,94,0.1);">📚</div><h3>Rich Study Material</h3><p>Chapter-wise PDFs, DPPs, formula sheets and NCERT solutions — organized and instantly searchable.</p></div>
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(139,92,246,0.1);">📊</div><h3>Progress Analytics</h3><p>Detailed dashboards tracking test scores, study hours, weak areas, and improvement trends.</p></div>
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(245,158,11,0.1);">👨‍👩‍👧</div><h3>Parent Connect</h3><p>Real-time SMS &amp; app alerts for attendance, fee reminders, exam schedules, and performance reports.</p></div>
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(239,68,68,0.1);">🧪</div><h3>Virtual Lab &amp; Practicals</h3><p>Simulated physics, chemistry &amp; biology experiments accessible from any device — learn by doing.</p></div>
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(236,72,153,0.1);">🤖</div><h3>AI Doubt Engine</h3><p>Ask any doubt 24/7 — get instant AI answers followed by teacher verification during live hours.</p></div>
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(16,185,129,0.1);">📝</div><h3>Mock Test Series</h3><p>Hundreds of chapter tests, full-length mocks and previous year papers with AI-graded analysis.</p></div>
+    <div class="f-card reveal"><div class="f-icon" style="background:rgba(99,102,241,0.1);">📶</div><h3>Offline Mode</h3><p>Download videos and notes to study without internet — perfect for all connectivity conditions.</p></div>
+  </div>
+</section>
+
+<!-- FEES -->
+<section id="fees">
+  <div class="s-hdr reveal">
+    <div class="s-lbl">Pricing</div>
+    <h2 class="s-title">Transparent Fee Structure</h2>
+    <p class="s-sub">No hidden charges. Annual fee shown. Online is 10% of annual fee. All plans include Free Library access.</p>
+  </div>
+
+  <!-- Stream Tabs -->
+  <div class="fee-tabs reveal">
+    <button class="fee-tab active" onclick="switchTab('all',this)">All Classes</button>
+    <button class="fee-tab" onclick="switchTab('1-5',this)">Class 1–5</button>
+    <button class="fee-tab" onclick="switchTab('6-10',this)">Class 6–10</button>
+    <button class="fee-tab" onclick="switchTab('11-12',this)">Class 11–12</button>
+  </div>
+
+  <!-- ALL CLASSES panel -->
+  <div class="fee-panel active" id="panel-all">
+    <div class="fee-grid reveal">
+
+      <!-- Class 1 -->
+      <div class="fee-card c1-3">
+        <div class="fee-card-head"><span class="fee-class-name">Class 1</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div>
+      </div>
+
+      <!-- Class 2 -->
+      <div class="fee-card c1-3">
+        <div class="fee-card-head"><span class="fee-class-name">Class 2</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div>
+      </div>
+
+      <!-- Class 3 -->
+      <div class="fee-card c1-3">
+        <div class="fee-card-head"><span class="fee-class-name">Class 3</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div>
+      </div>
+
+      <!-- Class 4 -->
+      <div class="fee-card c1-3">
+        <div class="fee-card-head"><span class="fee-class-name">Class 4</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹8,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹800</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹8,000</span></div>
+      </div>
+
+      <!-- Class 5 -->
+      <div class="fee-card c4-8">
+        <div class="fee-card-head"><span class="fee-class-name">Class 5</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹10,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,000</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹10,000</span></div>
+      </div>
+
+      <!-- Class 6 -->
+      <div class="fee-card c4-8">
+        <div class="fee-card-head"><span class="fee-class-name">Class 6</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹12,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,200</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹12,000</span></div>
+      </div>
+
+      <!-- Class 7 -->
+      <div class="fee-card c4-8">
+        <div class="fee-card-head"><span class="fee-class-name">Class 7</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹14,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,400</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹14,000</span></div>
+      </div>
+
+      <!-- Class 8 -->
+      <div class="fee-card c4-8">
+        <div class="fee-card-head"><span class="fee-class-name">Class 8</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹15,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,500</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹15,000</span></div>
+      </div>
+
+      <!-- Class 9 -->
+      <div class="fee-card c9-12">
+        <div class="fee-card-head"><span class="fee-class-name">Class 9</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹18,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,800</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹18,000</span></div>
+      </div>
+
+      <!-- Class 10 -->
+      <div class="fee-card c9-12">
+        <div class="fee-card-head"><span class="fee-class-name">Class 10</span><span class="fee-set-badge">SET</span></div>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹22,500</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,250</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹22,500</span></div>
+      </div>
+
+      <!-- Class 11 Science -->
+      <div class="fee-card c9-12">
+        <div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div>
+        <span class="fee-stream-tag stream-sci">⚗️ Science</span>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹45,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,500</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹45,000</span></div>
+      </div>
+
+      <!-- Class 11 Commerce -->
+      <div class="fee-card c9-12">
+        <div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div>
+        <span class="fee-stream-tag stream-com">💼 Commerce</span>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹25,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,500</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹25,000</span></div>
+      </div>
+
+      <!-- Class 12 Science -->
+      <div class="fee-card c9-12">
+        <div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div>
+        <span class="fee-stream-tag stream-sci">⚗️ Science</span>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹48,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,800</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹48,000</span></div>
+      </div>
+
+      <!-- Class 12 Commerce -->
+      <div class="fee-card c9-12">
+        <div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div>
+        <span class="fee-stream-tag stream-com">💼 Commerce</span>
+        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹35,000</span></div>
+        <div class="fee-divider"></div>
+        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹3,500</span></div>
+        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹35,000</span></div>
+      </div>
+
+    </div><!-- end fee-grid -->
+  </div><!-- end panel-all -->
+
+  <!-- 1-5 panel -->
+  <div class="fee-panel" id="panel-1-5">
+    <div class="fee-grid reveal">
+      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 1</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div></div>
+      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 2</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div></div>
+      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 3</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div></div>
+      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 4</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹8,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹800</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹8,000</span></div></div>
+      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 5</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹10,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,000</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹10,000</span></div></div>
+    </div>
+  </div>
+
+  <!-- 6-10 panel -->
+  <div class="fee-panel" id="panel-6-10">
+    <div class="fee-grid reveal">
+      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 6</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹12,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,200</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹12,000</span></div></div>
+      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 7</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹14,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,400</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹14,000</span></div></div>
+      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 8</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹15,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹15,000</span></div></div>
+      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 9</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹18,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,800</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹18,000</span></div></div>
+      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 10</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹22,500</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,250</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹22,500</span></div></div>
+    </div>
+  </div>
+
+  <!-- 11-12 panel -->
+  <div class="fee-panel" id="panel-11-12">
+    <div class="fee-grid reveal">
+      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-sci">⚗️ Science</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹45,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹45,000</span></div></div>
+      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-com">💼 Commerce</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹25,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹25,000</span></div></div>
+      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-sci">⚗️ Science</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹48,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,800</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹48,000</span></div></div>
+      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-com">💼 Commerce</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹35,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹3,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹35,000</span></div></div>
+    </div>
+  </div>
+
+  <p style="font-size:13px;color:var(--text3);margin-top:18px;">* EMI options available. 15% sibling discount. Merit-based scholarships for top performers.</p>
+</section>
+
+<!-- LIBRARY -->
+<section id="library">
+  <div class="s-hdr reveal"><div class="s-lbl">Free Access</div><h2 class="s-title">Free Learning Library</h2><p class="s-sub">Sign up for free and instantly unlock hundreds of resources — no credit card, no catch.</p></div>
+  <div class="lib-grid">
+    <div class="lib-card reveal"><div class="lib-em">📄</div><div class="lib-t">NCERT Notes</div><div class="lib-m">All subjects · Classes 6–12</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal"><div class="lib-em">🎬</div><div class="lib-t">Sample Lectures</div><div class="lib-m">50+ free videos</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal"><div class="lib-em">❓</div><div class="lib-t">Chapter Q&amp;A</div><div class="lib-m">Expert-solved answers</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal"><div class="lib-em">📝</div><div class="lib-t">Practice Tests</div><div class="lib-m">1000+ MCQs, chapter-wise</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal"><div class="lib-em">📐</div><div class="lib-t">Formula Sheets</div><div class="lib-m">Physics, Chemistry, Maths</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal"><div class="lib-em">📅</div><div class="lib-t">Study Planner</div><div class="lib-m">Board exam countdown</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal"><div class="lib-em">🏆</div><div class="lib-t">PYQ Papers</div><div class="lib-m">Previous year questions</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal"><div class="lib-em">🌐</div><div class="lib-t">Live Q&amp;A Sessions</div><div class="lib-m">Weekly · All students</div><span class="lib-f">FREE</span></div>
+  </div>
+  <div style="text-align:center;margin-top:44px;" class="reveal">
+    <button class="btn-p">Unlock Free Content — Sign Up Now</button>
+  </div>
+</section>
+
+<!-- WELLNESS -->
+<section id="wellness">
+  <div class="s-hdr reveal"><div class="s-lbl">Student Wellbeing</div><h2 class="s-title">Mental Wellness Matters</h2><p class="s-sub">Academic success starts with a healthy mind. MINDSKYRA integrates wellness into every student's journey.</p></div>
+  <div class="w-grid">
+    <div class="w-big reveal">
+      <div>
+        <span style="font-size:48px;">🧘</span>
+        <h3>Your Mind Is Your Most Powerful Tool</h3>
+        <p>We believe top performance comes from mental clarity. Our wellness curriculum includes mindfulness sessions, stress management workshops, and peer support circles — embedded right in the learning schedule.</p>
+      </div>
+      <div>
+        <div class="w-tags"><span class="w-tag">✅ Stress Management</span><span class="w-tag">✅ Focus Techniques</span><span class="w-tag">✅ Peer Counselling</span><span class="w-tag">✅ Goal Setting</span></div>
+        <button class="btn-p" style="width:100%;">Learn More About Wellness →</button>
+      </div>
+    </div>
+    <div class="w-sm reveal"><span class="w-em">🧠</span><h4>Daily Mind Check-In</h4><p>A 2-minute mood check before every session helps teachers adapt lesson energy to how students are feeling.</p></div>
+    <div class="w-sm reveal"><span class="w-em">💬</span><h4>Peer Support Groups</h4><p>Moderated circles where learners share exam anxiety and celebrate each other's wins safely.</p></div>
+    <div class="w-sm reveal"><span class="w-em">🌙</span><h4>Sleep &amp; Study Balance</h4><p>Expert-designed timetables ensure efficient study without burnout — quality always over quantity.</p></div>
+    <div class="w-sm reveal"><span class="w-em">🎯</span><h4>Goal Setting Workshops</h4><p>Monthly sessions with mentors to set short and long-term academic goals with a realistic roadmap.</p></div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials">
+  <div class="s-hdr reveal"><div class="s-lbl">Success Stories</div><h2 class="s-title">What Our Students Say</h2><p class="s-sub">Real results from real students across India who transformed their academic journey with MINDSKYRA.</p></div>
+  <div class="t-grid">
+    <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">MINDSKYRA helped me crack JEE Mains with 97 percentile! The recorded lectures and doubt sessions were a game changer — I could revise any topic at 2am before exams.</p><div class="t-auth"><div class="t-av">A</div><div><div class="t-name">Arjun Sharma</div><div class="t-cls">Class 12 · PCM · Pune</div></div></div></div>
+    <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">As a parent, the real-time updates gave me complete visibility. My daughter improved from 65% to 89% in boards in just one year. Absolutely incredible platform.</p><div class="t-auth"><div class="t-av">P</div><div><div class="t-name">Priya Nair</div><div class="t-cls">Parent · Class 10 · Kochi</div></div></div></div>
+    <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">The offline mode saved me during power cuts! Downloaded all videos and studied without internet. Got 94% in boards — completely worth every rupee invested.</p><div class="t-auth"><div class="t-av">R</div><div><div class="t-name">Riya Desai</div><div class="t-cls">Class 10 · CBSE · Surat</div></div></div></div>
+    <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">Skyra AI answers my doubts instantly at night when teachers aren't available. It's like having a tutor on standby 24/7. Honestly the most incredible edtech platform.</p><div class="t-auth"><div class="t-av">K</div><div><div class="t-name">Kavya Menon</div><div class="t-cls">Class 9 · CBSE · Bangalore</div></div></div></div>
+    <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">Commerce student here! CA Foundation prep module is brilliant. The case studies, solved examples and mock tests made a huge difference — I feel fully exam-ready.</p><div class="t-auth"><div class="t-av">S</div><div><div class="t-name">Sahil Mehta</div><div class="t-cls">Class 12 · Commerce · Mumbai</div></div></div></div>
+    <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">The Mental Wellness sessions are something no other coaching offers. It genuinely helped me manage exam pressure and perform at my absolute best. Thank you!</p><div class="t-auth"><div class="t-av">D</div><div><div class="t-name">Divya Pillai</div><div class="t-cls">Class 11 · PCB · Chennai</div></div></div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="ab-txt reveal">
+    <div class="s-lbl">About Us</div>
+    <h2 class="s-title">Built for India's Next Generation</h2>
+    <p>MINDSKYRA Institute was founded with a single mission: make world-class education accessible, affordable, and effective for every Indian student — regardless of geography or background.</p>
+    <p>We combine the discipline of offline coaching with the flexibility of online learning, backed by a team of 50+ expert educators and a technology platform built for scale.</p>
+    <p>From Class 3 foundations to JEE/NEET cracking, and from board mastery to AI-era skills, MINDSKYRA is your partner at every step of the academic journey.</p>
+    <div class="ab-btns">
+      <button class="btn-p" onclick="goTo('courses')">Join 15,000+ Students →</button>
+      <button class="btn-s">📞 Talk to Us</button>
+    </div>
+  </div>
+  <div class="ab-vis reveal">
+    <div class="acard ac1"><div class="ac-v">15K+</div><div class="ac-l">Students Across India</div></div>
+    <div class="acard ac2"><div class="ac-v">50+</div><div class="ac-l">Expert Faculty Members</div></div>
+    <div class="acard ac3"><div class="ac-v">98%</div><div class="ac-l">Board Success Rate</div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-grid">
+    <div class="ft-brand">
+      <div class="s-logo-row" style="margin-bottom:4px;"><div class="logo-box">M</div><span class="logo-txt" style="font-size:17px;">MINDSKYRA</span></div>
+      <p>Transforming education through technology, mentorship and innovation — empowering India's next generation of achievers.</p>
+    </div>
+    <div class="ft-col"><h5>Platform</h5><a href="#courses">Courses</a><a href="#library">Free Library</a><a href="#fees">Fee Structure</a><a href="#features">Features</a></div>
+    <div class="ft-col"><h5>Company</h5><a href="#about">About Us</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Press Kit</a></div>
+    <div class="ft-col"><h5>Contact</h5><ul><li>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="21525451514e5355614c484f45524a5853400f424e4c">[email&#160;protected]</a></li><li>📞 +91 7058623898</li><li>📍 India</li></ul><a href="#" style="margin-top:6px;">Privacy Policy</a><a href="#">Terms of Service</a></div>
+  </div>
+  <div class="ft-bot">
+    <p>© 2024 MINDSKYRA Institute. All rights reserved.</p>
+    <p>Made with ❤️ for India's students</p>
+  </div>
+</footer>
+</main>
+
+<!-- CHATBOT BUTTON -->
+<button class="ct-btn" onclick="toggleChat()">
+  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+  <span class="ct-ping"></span>
+</button>
+
+<!-- CHATBOT WINDOW -->
+<div class="ct-win" id="ctWin">
+  <div class="ct-head">
+    <div class="ct-av">S</div>
+    <div class="ct-inf"><h4>Skyra · MINDSKYRA AI</h4><p>✅ Online — responds instantly</p></div>
+    <button class="ct-cls" onclick="toggleChat()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  </div>
+  <div class="ct-msgs" id="ctMsgs"></div>
+  <div class="ct-quick">
+    <button class="qb" onclick="sendQ('Tell me about courses')">📚 Courses</button>
+    <button class="qb" onclick="sendQ('What are the fees?')">💰 Fees</button>
+    <button class="qb" onclick="sendQ('Free library')">🆓 Library</button>
+    <button class="qb" onclick="sendQ('How to enroll?')">✅ Enroll</button>
+    <button class="qb" onclick="sendQ('Mental wellness support')">🧘 Wellness</button>
+  </div>
+  <div class="ct-row">
+    <input class="ct-inp" id="ctInp" placeholder="Ask Skyra anything..." onkeydown="if(event.key==='Enter')sendMsg()">
+    <button class="ct-snd" onclick="sendMsg()"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ── FEE TABS ── */
+function switchTab(id, btn) {
+  document.querySelectorAll('.fee-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.fee-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── THEME ── */
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('msk-t',t);
+  const lbl=document.getElementById('themeLabel');
+  if(lbl)lbl.textContent=t==='dark'?'🌙 Dark Mode':'☀️ Light Mode';
+}
+function toggleTheme(){
+  applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark');
+}
+(function(){applyTheme(localStorage.getItem('msk-t')||'dark');})();
+
+/* ── SIDEBAR ── */
+function toggleSB(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}
+function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+
+/* ── SCROLL ── */
+function goTo(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'});}
+
+/* ── ACTIVE NAV ── */
+const sids=['hero','courses','features','fees','library','wellness','testimonials','about'];
+window.addEventListener('scroll',()=>{
+  let cur='hero';
+  sids.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-120)cur=id;});
+  document.querySelectorAll('.nav-a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+});
+
+/* ── SCROLL REVEAL ── */
+const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+/* ── ACTIVE LEARNERS ── */
+function refreshL(){
+  const h=new Date().getHours();
+  let b=1800;
+  if(h>=6&&h<12)b=3400;else if(h>=12&&h<18)b=4100;else if(h>=18&&h<22)b=3700;
+  const el=document.getElementById('activeLearners');
+  if(el)el.textContent=(b+Math.floor(Math.random()*600)).toLocaleString();
+}
+setInterval(refreshL,15000);refreshL();
+
+/* ── CHATBOT ── */
+const R={
+  def:["Hi! I'm Skyra 👋 — your MINDSKYRA guide. I can help with courses, fees, enrollment, free library, or wellness. What would you like to know? 😊","Great question! Let me help. Are you looking for course info, fees, or how to get started?","Hello! I'm here 24/7. Ask me anything about MINDSKYRA! 🎓"],
+  courses:["MINDSKYRA offers courses for Classes 3–12:\n\n📘 Classes 3–5 — Foundation Stage\n📗 Classes 6–8 — Middle School\n📙 Classes 9–10 — Board Prep (CBSE/State)\n📕 Class 11–12 Science — JEE/NEET Prep\n📒 Class 11–12 Commerce — CA Foundation\n🤖 LERNVO AI Skills — English, AI, Coding\n\nWhich class are you interested in? 🎓"],
+  fees:["Here's a quick fee overview:\n\n🟣 Class 3–5: ₹499/mo (Online) | ₹799/mo (Offline)\n🟢 Class 6–8: ₹699/mo (Online) | ₹999/mo (Offline)\n🟡 Class 9–10: ₹1,299/mo (Both modes)\n🔴 Class 11–12 Science: ₹1,799–₹2,199/mo\n🟠 Class 11–12 Commerce: ₹1,499/mo\n🤖 LERNVO AI Skills: ₹299/mo\n\n💰 Annual plans save up to 25%! EMI available."],
+  enroll:["Enrolling is easy!\n\n1️⃣ Click 'Login / Sign Up'\n2️⃣ Create your free account\n3️⃣ Choose your class & stream\n4️⃣ Select Online or Offline mode\n5️⃣ Complete payment & start learning!\n\n🚀 Ready to begin your journey?"],
+  library:["Our Free Library gives you — completely FREE:\n\n📄 NCERT Notes (All subjects, Classes 6–12)\n🎬 50+ Sample Lecture Videos\n❓ Expert-solved Chapter Q&As\n📝 1000+ MCQ Practice Tests\n📐 Formula Sheets\n🏆 Previous Year Question Papers\n\nJust sign up — no credit card needed! 🆓"],
+  wellness:["MINDSKYRA cares deeply about mental health:\n\n🧘 Mindfulness & stress management sessions\n💬 Moderated peer support circles\n🌙 Expert sleep & study balance plans\n🎯 Monthly goal-setting workshops\n🧠 Daily mood check-ins before classes\n\nA healthy mind creates a bright future! ❤️"],
+  contact:["Reach us anytime:\n\n📧 support@mindskyra.com\n📞 +91 7058623898\n📍 India\n\nSupport: Mon–Sat, 9AM–7PM. I'm here 24/7! 😊"],
+  teachers:["MINDSKYRA has 50+ expert educators:\n\n✅ IIT/NIT alumni for Science & Maths\n✅ CA/MBA professionals for Commerce\n✅ Experienced board specialists\n✅ Subject experts for every topic\n\nAll teachers are vetted and trained! 👨‍🏫"],
+  offline:["Yes! MINDSKYRA works fully offline:\n\n📥 Download videos, PDFs & tests\n📶 Study without internet anytime\n✅ Progress syncs when back online\n📱 Android, iOS & Windows supported\n\nPerfect for areas with limited connectivity! 🌐"],
+};
+function getR(m){
+  const ml=m.toLowerCase();
+  if(ml.match(/course|class|stream/))return R.courses;
+  if(ml.match(/fee|price|cost|₹|rupee|pay/))return R.fees;
+  if(ml.match(/enroll|join|signup|register/))return R.enroll;
+  if(ml.match(/library|free|note|pdf/))return R.library;
+  if(ml.match(/well|mental|stress|anxiety|health/))return R.wellness;
+  if(ml.match(/contact|phone|email|support/))return R.contact;
+  if(ml.match(/teacher|faculty|educator/))return R.teachers;
+  if(ml.match(/offline|download|internet/))return R.offline;
+  return R.def;
+}
+let chatOpen=false;
+function addMsg(txt,role){
+  const w=document.getElementById('ctMsgs'),d=document.createElement('div');
+  d.className='msg '+role;d.textContent=txt;w.appendChild(d);w.scrollTop=9999;return d;
+}
+function typeMsg(txt,el){
+  el.textContent='';let i=0;
+  const iv=setInterval(()=>{el.textContent+=txt[i++];document.getElementById('ctMsgs').scrollTop=9999;if(i>=txt.length)clearInterval(iv);},16);
+}
+function showTyp(){
+  const w=document.getElementById('ctMsgs'),d=document.createElement('div');
+  d.className='typing';d.id='typEl';d.innerHTML='<span></span><span></span><span></span>';
+  w.appendChild(d);w.scrollTop=9999;
+}
+function hideTyp(){document.getElementById('typEl')?.remove();}
+function sendMsg(){
+  const inp=document.getElementById('ctInp'),txt=inp.value.trim();
+  if(!txt)return;inp.value='';
+  addMsg(txt,'usr');showTyp();
+  setTimeout(()=>{
+    hideTyp();
+    const arr=getR(txt),reply=arr[Math.floor(Math.random()*arr.length)];
+    typeMsg(reply,addMsg('','bot'));
+  },700+Math.random()*700);
+}
+function sendQ(msg){document.getElementById('ctInp').value=msg;sendMsg();}
+function toggleChat(){
+  chatOpen=!chatOpen;
+  const w=document.getElementById('ctWin');
+  if(chatOpen){
+    w.classList.add('open');
+    if(!document.getElementById('ctMsgs').hasChildNodes()){
+      setTimeout(()=>{showTyp();setTimeout(()=>{hideTyp();typeMsg("👋 Hi! I'm Skyra, your MINDSKYRA AI guide! I can help you explore courses, check fees, access the free library, or anything else. What would you like to know? 😊",addMsg('','bot'));},900);},300);
+    }
+  }else{w.classList.remove('open');}
+}
+</script>
+</body>
+</html>
