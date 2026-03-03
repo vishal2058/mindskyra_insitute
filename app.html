@@ -747,11 +747,13 @@
     const db   = firebase.firestore();
 
     // ── State ────────────────────────────────────────────────────
-    let currentUser    = null;
-    let studentData    = null;
-    let classFeeConfig = {};
-    let cbseFeeConfig  = {};
-    let selectedFile   = null;
+    let currentUser       = null;
+    let studentData       = null;
+    let classFeeConfig    = {};
+    let cbseFeeConfig     = {};
+    let selectedFile      = null;
+    let totalPaidApproved = 0;       // live sum of approved payments
+    let _paymentsUnsub    = null;    // real-time payments listener handle
 
     // Courses state
     let allSubjects       = [];   // subjects for student's class
@@ -761,6 +763,9 @@
     let currentContentTab = 'video';
 
     // ── Auth ──────────────────────────────────────────────────────
+    let _studentUnsubscribe = null;
+    let _appInitialized = false;
+
     auth.onAuthStateChanged(async (user) => {
         if (!user) { window.location.href = 'login.html'; return; }
         try {
@@ -772,26 +777,83 @@
                 return;
             }
             currentUser = { uid: user.uid, ...userDoc.data() };
-
-            const stuDoc = await db.collection('students').doc(user.uid).get();
-            studentData = stuDoc.exists
-                ? { id: user.uid, ...stuDoc.data() }
-                : { id: user.uid, ...currentUser, ...currentUser.roleData };
-
             await loadFeeSettings();
-            populateHeader();
-            loadDashboard();
-            loadFeeSection();
-            loadCourses();
-            loadAnnouncements();
-            loadNotifications();
-            loadProfile();
-            loadStudyData();
+
+            // ── Real-time listener on student doc ──────────────────
+            // This fires immediately on load AND whenever admin updates fees.paid, status, etc.
+            if (_studentUnsubscribe) _studentUnsubscribe();
+            _studentUnsubscribe = db.collection('students').doc(user.uid)
+                .onSnapshot((snap) => {
+                    studentData = snap.exists
+                        ? { id: user.uid, ...snap.data() }
+                        : { id: user.uid, ...currentUser, ...currentUser.roleData };
+
+                    if (!_appInitialized) {
+                        // First load — initialise everything
+                        _appInitialized = true;
+                        populateHeader();
+                        loadDashboard();
+                        loadFeeSection();
+                        loadCourses();
+                        loadAnnouncements();
+                        loadNotifications();
+                        loadProfile();
+                        loadStudyData();
+                        startPaymentsListener(user.uid);
+                    } else {
+                        // student doc changed (name, class, etc.)
+                        loadProfile();
+                    }
+                }, (err) => { console.error('Student listener error', err); });
+
         } catch (err) {
             console.error(err);
             showToast('Error loading your data', 'error');
         }
     });
+
+    // ── Refresh all fee-related UI without full reload ────────────
+    function refreshFeeDisplays() {
+        // Dashboard hero card
+        const { base, paid, remaining } = getFeeBreakdown();
+        const dashBase = document.getElementById('dashBaseFee');
+        const dashPaid = document.getElementById('dashPaid');
+        const dashDue  = document.getElementById('dashDue');
+        if (dashBase) dashBase.textContent = '₹' + base.toLocaleString();
+        if (dashPaid) dashPaid.textContent = '₹' + paid.toLocaleString();
+        if (dashDue)  dashDue.textContent  = '₹' + remaining.toLocaleString();
+
+        // Fee page
+        const { base: b2, offer: o2, net: n2, paid: p2, remaining: r2 } = getFeeBreakdown();
+        const feeDue   = document.getElementById('feeDueMain');
+        const feeBase  = document.getElementById('feeBaseAmt');
+        const feePaid  = document.getElementById('feePaidAmt');
+        const feeDueB  = document.getElementById('feeDueAmt');
+        const feeNetEl = document.getElementById('feeNetAmt');
+        const feeOffer = document.getElementById('feeOfferAmt');
+        const feeOfRow = document.getElementById('feeOfferRow');
+        if (feeDue)   feeDue.textContent   = '₹' + r2.toLocaleString();
+        if (feeBase)  feeBase.textContent  = '₹' + b2.toLocaleString();
+        if (feePaid)  feePaid.textContent  = '₹' + p2.toLocaleString();
+        if (feeDueB)  feeDueB.textContent  = '₹' + r2.toLocaleString();
+        if (feeNetEl) feeNetEl.textContent = '₹' + n2.toLocaleString();
+        if (feeOffer && o2 > 0) { feeOffer.textContent = '-₹' + o2.toLocaleString(); if (feeOfRow) feeOfRow.style.display = 'flex'; }
+
+        // Pay button state
+        const btn = document.getElementById('payNowBtn');
+        if (btn) {
+            if (r2 <= 0) {
+                btn.textContent = '✅ All Fees Paid';
+                btn.disabled    = true;
+                btn.style.cssText = 'background:linear-gradient(135deg,#166534,#16a34a);color:white;border-radius:0.875rem;font-weight:700;cursor:not-allowed;width:100%;padding:0.875rem;margin-top:0.75rem;display:flex;align-items:center;justify-content:center;gap:0.5rem';
+            } else {
+                btn.disabled = false;
+                btn.style.cssText = '';
+                btn.className = 'w-full mt-3 py-3.5 btn-primary flex items-center justify-center gap-2 text-base';
+            }
+        }
+
+    }  // end refreshFeeDisplays
 
     // ── Fee settings ─────────────────────────────────────────────
     async function loadFeeSettings() {
@@ -808,11 +870,32 @@
         return mode === 'offline' ? (cfg.offline || cfg.base || 0) : (cfg.online || cfg.base || 0);
     }
 
+    // startPaymentsListener — real-time sum of approved payments
+    function startPaymentsListener(uid) {
+        if (_paymentsUnsub) _paymentsUnsub();
+        _paymentsUnsub = db.collection('payments')
+            .where('studentId', '==', uid)
+            .onSnapshot((snap) => {
+                let approved = 0;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.status === 'approved') approved += (d.amount || 0);
+                });
+                totalPaidApproved = approved;
+                // Refresh all fee displays whenever any payment changes
+                refreshFeeDisplays();
+                // Refresh payment lists
+                loadPaymentHistory();
+                loadDashPayments();
+            }, (err) => console.error('Payments listener:', err));
+    }
+
     function getFeeBreakdown() {
         const base      = getBaseFee();
         const offer     = studentData.offer?.discount || 0;
         const net       = Math.max(0, base - offer);
-        const paid      = studentData.fees?.paid || 0;
+        // Use live sum of approved payments (not studentData.fees.paid which may be stale)
+        const paid      = totalPaidApproved || studentData.fees?.paid || 0;
         const remaining = Math.max(0, net - paid);
         return { base, offer, net, paid, remaining };
     }
@@ -1526,67 +1609,126 @@
         return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
     }
 
-    // ── Start session when user arrives ──────────────────────────
+    // ─────────────────────────────────────────────────────────────
+    //  STUDY TIMER  (localStorage backup + Firebase persistence)
+    //
+    //  Logic:
+    //  • Every second: update liveTimer = firebase_today + live_elapsed
+    //  • Every 5s: write to localStorage so data survives refresh/close
+    //  • Every 30s: flush to Firebase (increment) + reset chunk start
+    //  • On tab hide / page close: flush immediately to both
+    //  • On load: read localStorage FIRST (instant) then merge Firebase
+    // ─────────────────────────────────────────────────────────────
+
+    const LS_STUDY_KEY = 'ms_study_backup';
+
+    function lsReadToday() {
+        try {
+            const raw = localStorage.getItem(LS_STUDY_KEY);
+            if (!raw) return 0;
+            const obj = JSON.parse(raw);
+            if (obj.date !== todayKey()) return 0; // different day
+            return obj.seconds || 0;
+        } catch(e) { return 0; }
+    }
+
+    function lsWriteToday(totalSeconds) {
+        try {
+            localStorage.setItem(LS_STUDY_KEY, JSON.stringify({
+                date: todayKey(), seconds: totalSeconds
+            }));
+        } catch(e) {}
+    }
+
     function startStudySession() {
         sessionStartTime = Date.now();
         liveTimerInterval = setInterval(updateLiveTimer, 1000);
-        // Auto-save every 60s in case page closes
-        sessionSaveTimer = setInterval(() => saveSessionChunk(), 60000);
-        // Save on tab hidden / page unload
+        // Flush to Firebase every 30s (reliable; async ok here since not on close)
+        sessionSaveTimer  = setInterval(() => flushToFirebase(), 30000);
         document.addEventListener('visibilitychange', onVisibilityChange);
-        window.addEventListener('beforeunload', onBeforeUnload);
+        window.addEventListener('pagehide', onPageHide);      // reliable on mobile
+        window.addEventListener('beforeunload', onBeforeUnload); // desktop
     }
 
     function updateLiveTimer() {
         if (!sessionStartTime) return;
-        // Show today's TOTAL = saved Firebase seconds + this session's current seconds
         const sessionElapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
         const savedToday     = studyData[todayKey()] || 0;
         const totalToday     = savedToday + sessionElapsed;
+
         const el = document.getElementById('liveTimer');
         if (el) el.textContent = fmtTimer(totalToday);
-        // Update today stat live too
         const el1 = document.getElementById('studyTodayHr');
         if (el1) el1.textContent = fmtHr(totalToday);
+
+        // Write to localStorage every 5s (every 5 ticks)
+        if (sessionElapsed % 5 === 0) lsWriteToday(totalToday);
     }
 
     function onVisibilityChange() {
-        if (document.hidden) saveSessionChunk();
-        else sessionStartTime = Date.now(); // reset start when returning
+        if (document.hidden) {
+            syncToLocalStorageNow();
+            flushToFirebase();
+        } else {
+            sessionStartTime = Date.now(); // reset chunk start
+        }
     }
-    function onBeforeUnload() { saveSessionChunk(); }
 
-    async function saveSessionChunk() {
+    function syncToLocalStorageNow() {
+        if (!sessionStartTime) return;
+        const elapsed    = Math.floor((Date.now() - sessionStartTime) / 1000);
+        const savedToday = studyData[todayKey()] || 0;
+        lsWriteToday(savedToday + elapsed);
+    }
+
+    function onBeforeUnload() { syncToLocalStorageNow(); flushToFirebase(); }
+    function onPageHide()     { syncToLocalStorageNow(); flushToFirebase(); }
+
+    async function flushToFirebase() {
         if (!sessionStartTime || !currentUser) return;
         const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-        if (elapsed < 5) return; // ignore micro-sessions
-        sessionStartTime = Date.now(); // reset for next chunk
+        if (elapsed < 5) return;
+        sessionStartTime = Date.now(); // reset chunk
 
         const key = todayKey();
         try {
-            const ref = db.collection('studySessions').doc(currentUser.uid);
-            await ref.set({
+            await db.collection('studySessions').doc(currentUser.uid).set({
                 [`days.${key}`]: firebase.firestore.FieldValue.increment(elapsed),
                 total:           firebase.firestore.FieldValue.increment(elapsed),
                 lastUpdated:     firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
-            // Update local cache
             studyData[key] = (studyData[key] || 0) + elapsed;
             renderStudyStats();
             renderStreakDots();
             drawNebulaGraph();
-        } catch(e) { console.warn('Study session save failed', e); }
+        } catch(e) { console.warn('Study flush failed', e); }
     }
 
-    // ── Load study history from Firestore ─────────────────────────
+    // ── Load study history ─────────────────────────────────────────
     async function loadStudyData() {
         if (!currentUser) return;
+
+        // Step 1: Instantly show localStorage data (no wait)
+        const lsToday = lsReadToday();
+        if (lsToday > 0) {
+            studyData[todayKey()] = lsToday;
+            renderStudyStats();
+        }
+
+        // Step 2: Load from Firebase (may have more data from other devices/sessions)
         try {
             const doc = await db.collection('studySessions').doc(currentUser.uid).get();
             if (doc.exists) {
-                studyData = doc.data().days || {};
+                const fbDays    = doc.data().days || {};
+                const todayKey_ = todayKey();
+                // Merge: take max of localStorage and Firebase for today
+                // (localStorage may have unsaved seconds from last session)
+                const fbToday   = fbDays[todayKey_] || 0;
+                fbDays[todayKey_] = Math.max(fbToday, lsToday);
+                studyData = fbDays;
             }
-        } catch(e) { studyData = {}; }
+        } catch(e) { /* keep localStorage data */ }
+
         renderStudyStats();
         renderStreakDots();
         drawNebulaGraph();
@@ -1596,35 +1738,49 @@
 
     // ── Render stats row ──────────────────────────────────────────
     function renderStudyStats() {
-        const today = todayKey();
-        let weekSec = 0;
+        const today   = todayKey();
+        const now     = new Date();
+        // Include current live session in all counts
+        const liveSec = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
+
+        let weekSec  = 0;
         let totalSec = 0;
-        const now = new Date();
         for (const [k, v] of Object.entries(studyData)) {
             totalSec += v;
-            const d = new Date(k);
+            const d    = new Date(k);
             const diff = Math.floor((now - d) / 86400000);
             if (diff < 7) weekSec += v;
         }
-        const todaySec = studyData[today] || 0;
+        const savedToday = studyData[today] || 0;
+        const todaySec   = savedToday + liveSec;
+        weekSec  += liveSec; // add live seconds to week
+        totalSec += liveSec; // and total
+
         const el1 = document.getElementById('studyTodayHr');
         const el2 = document.getElementById('studyWeekHr');
         const el3 = document.getElementById('studyTotalHr');
-        if (el1) el1.textContent = todaySec ? fmtHr(todaySec) : '0m';
+        // el1 is also updated live by updateLiveTimer, skip to avoid double update
+        if (el1) el1.textContent = fmtHr(todaySec);
         if (el2) el2.textContent = fmtHr(weekSec);
         if (el3) el3.textContent = fmtHr(totalSec);
     }
 
     // ── Streak calculation ────────────────────────────────────────
     function calcStreak() {
-        const keys = Object.keys(studyData).filter(k => studyData[k] > 60).sort().reverse();
-        if (!keys.length) return 0;
+        // Build effective data including current live session
+        const effective = { ...studyData };
+        if (sessionStartTime) {
+            const sessionSec = Math.floor((Date.now() - sessionStartTime) / 1000);
+            const key = todayKey();
+            effective[key] = (effective[key] || 0) + sessionSec;
+        }
+
         let streak = 0;
         let check  = new Date();
-        check.setHours(0,0,0,0);
+        check.setHours(0, 0, 0, 0);
         for (let i = 0; i < 365; i++) {
             const k = dateKey(check);
-            if (studyData[k] && studyData[k] > 60) {
+            if (effective[k] && effective[k] > 30) { // 30s threshold (not 60) so today counts quickly
                 streak++;
                 check.setDate(check.getDate() - 1);
             } else {
