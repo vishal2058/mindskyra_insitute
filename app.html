@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal — MINDSKYRA</title>
-    <meta name="theme-color" content="#4F46E5">
+    <meta name="theme-color" content="#000814">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -14,110 +14,309 @@
     
     <script>
         tailwind.config = {
-            theme: { extend: { colors: { primary: '#4F46E5', secondary: '#7C3AED', success: '#10B981', warning: '#F59E0B', danger: '#EF4444' } } }
+            theme: { extend: { colors: { primary: '#0EA5E9', secondary: '#38BDF8', success: '#86EFAC', warning: '#FCD34D', danger: '#FCA5A5' } } }
         }
     </script>
     <style>
-        * { font-family: 'Inter', sans-serif; }
-        body { background: #F1F5F9; }
+        :root {
+            /* ── Dark mode palette (default) ── */
+            --bg:          #111117;
+            --bg2:         #18181F;
+            --card:        #1C1C26;
+            --card2:       #20202C;
+            --border:      rgba(139,92,246,0.15);
+            --border2:     rgba(139,92,246,0.30);
+            --purple1:     #7C3AED;
+            --purple2:     #A855F7;
+            --purple3:     #C084FC;
+            --violet:      #8B5CF6;
+            --indigo:      #6366F1;
+            --indigo2:     #818CF8;
+            --text:        #F1F0FF;
+            --text2:       #A09BB8;
+            --text3:       #5C5677;
+            --glow:        0 0 24px rgba(124,58,237,0.18);
+            --glow-lg:     0 0 52px rgba(124,58,237,0.26);
+            --grad-hero:   linear-gradient(135deg, #0D0B1A 0%, #1A0E35 50%, #2D1457 100%);
+            --grad-btn:    linear-gradient(135deg, #5B21B6 0%, #7C3AED 50%, #A855F7 100%);
+            --grad-card:   linear-gradient(135deg, #1C1C26 0%, #221A38 100%);
+        }
 
+        html.light {
+            /* ── Light mode: clean white + luxury cyan/blue ── */
+            --bg:          #F5FFFE;
+            --bg2:         #ECFBFA;
+            --card:        #FFFFFF;
+            --card2:       #F0FFFE;
+            --border:      rgba(6,182,212,0.18);
+            --border2:     rgba(6,182,212,0.38);
+            --purple1:     #0891B2;
+            --purple2:     #06B6D4;
+            --purple3:     #22D3EE;
+            --violet:      #0EA5E9;
+            --indigo:      #0369A1;
+            --indigo2:     #0284C7;
+            --text:        #0A1628;
+            --text2:       #1E4E6E;
+            --text3:       #64A4BE;
+            --glow:        0 0 20px rgba(6,182,212,0.10);
+            --glow-lg:     0 0 40px rgba(6,182,212,0.18);
+            --grad-hero:   linear-gradient(135deg, #0C4A6E 0%, #0369A1 55%, #0891B2 100%);
+            --grad-btn:    linear-gradient(135deg, #0369A1 0%, #0891B2 50%, #06B6D4 100%);
+            --grad-card:   linear-gradient(135deg, #FFFFFF 0%, #ECFBFA 100%);
+        }
+
+        * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+        html, body { background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; transition: background 0.3s, color 0.3s; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+        body::before {
+            content: '';
+            position: fixed; inset: 0; z-index: -1; pointer-events: none;
+            background:
+                radial-gradient(ellipse 70% 50% at 50% -10%, rgba(124,58,237,0.09) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 90% 110%, rgba(99,102,241,0.07) 0%, transparent 60%),
+                var(--bg);
+            transition: background 0.3s;
+        }
+
+        /* ── Pages ── */
         .page { display: none; animation: fadeIn 0.3s ease; }
         .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
-        .card { background: white; border-radius: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+        /* ── Card ── */
+        .card {
+            background: var(--card);
+            border-radius: 1.1rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.35), var(--glow);
+            transition: box-shadow 0.2s, transform 0.2s, background 0.3s, border-color 0.3s;
+        }
+        .card:hover { box-shadow: 0 8px 36px rgba(0,0,0,0.4), var(--glow-lg); }
 
-        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #E5E7EB; display: flex; z-index: 40; }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px 12px; cursor: pointer; transition: all 0.2s; color: #9CA3AF; font-size: 0.65rem; font-weight: 500; gap: 3px; }
-        .nav-item.active { color: #4F46E5; }
-        .nav-item svg { width: 22px; height: 22px; }
-        .nav-item .dot { width: 4px; height: 4px; background: #4F46E5; border-radius: 50%; margin-top: 2px; opacity: 0; transition: opacity 0.2s; }
-        .nav-item.active .dot { opacity: 1; }
+        /* ── Bottom nav ── */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(17,17,23,0.96); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border); display: flex; z-index: 40;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        html.light .bottom-nav { background: rgba(240,246,255,0.97); }
+        .nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px 4px 14px; cursor:pointer; transition:all 0.2s; color:var(--text3); font-size:0.62rem; font-weight:600; gap:3px; letter-spacing:0.02em; }
+        .nav-item.active { color: var(--purple2); }
+        .nav-item svg { width:22px; height:22px; }
+        .nav-item .dot { width:18px; height:2px; background:var(--grad-btn); border-radius:2px; margin-top:2px; opacity:0; transition:opacity 0.2s; }
+        .nav-item.active .dot { opacity:1; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 50; align-items: flex-start; justify-content: center; padding: 1rem; overflow-y: auto; }
-        .modal.show { display: flex; }
-        .modal-content { background: white; border-radius: 1.25rem; max-width: 560px; width: 100%; margin: auto; padding: 1.75rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.3); }
+        /* ── Modal ── */
+        .modal { display:none; position:fixed; inset:0; background:rgba(5,4,12,0.82); backdrop-filter:blur(14px); z-index:50; align-items:flex-start; justify-content:center; padding:1rem; overflow-y:auto; }
+        .modal.show { display:flex; }
+        .modal-content { background:var(--card2); border:1px solid var(--border2); border-radius:1.25rem; max-width:560px; width:100%; margin:auto; padding:1.75rem; box-shadow:0 32px 64px rgba(0,0,0,0.6), 0 0 60px rgba(124,58,237,0.12); transition:background 0.3s; }
 
-        .toast { position: fixed; top: 1rem; right: 1rem; padding: 0.875rem 1.25rem; border-radius: 0.75rem; color: white; font-weight: 500; transform: translateX(400px); transition: transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); z-index: 1000; font-size: 0.9rem; max-width: 320px; }
-        .toast.show { transform: translateX(0); }
+        /* ── Toast ── */
+        .toast { position:fixed; top:1rem; right:1rem; padding:0.875rem 1.25rem; border-radius:0.875rem; color:white; font-weight:600; transform:translateX(400px); transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); z-index:1000; font-size:0.875rem; max-width:320px; border:1px solid var(--border2); }
+        .toast.show { transform:translateX(0); }
 
-        .fee-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
-        .pill-base { background: #EDE9FE; color: #5B21B6; }
-        .pill-offer { background: #FEF3C7; color: #92400E; }
-        .pill-net { background: #DBEAFE; color: #1E40AF; }
-        .pill-paid { background: #D1FAE5; color: #065F46; }
-        .pill-due { background: #FEE2E2; color: #991B1B; }
+        /* ── Fee pills ── */
+        .fee-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 12px; border-radius:9999px; font-size:0.72rem; font-weight:700; }
+        .pill-base  { background:rgba(139,92,246,0.15); color:var(--purple3); border:1px solid rgba(139,92,246,0.3); }
+        .pill-offer { background:rgba(251,191,36,0.12); color:#FCD34D; border:1px solid rgba(251,191,36,0.25); }
+        .pill-net   { background:rgba(129,140,248,0.12); color:var(--indigo2); border:1px solid rgba(129,140,248,0.25); }
+        .pill-paid  { background:rgba(74,222,128,0.1); color:#86EFAC; border:1px solid rgba(74,222,128,0.2); }
+        .pill-due   { background:rgba(248,113,113,0.1); color:#FCA5A5; border:1px solid rgba(248,113,113,0.2); }
 
-        .drop-zone { border: 2px dashed #C7D2FE; border-radius: 0.75rem; padding: 1.5rem; text-align: center; cursor: pointer; transition: all 0.2s; background: #F5F3FF; }
-        .drop-zone:hover, .drop-zone.drag-over { border-color: #4F46E5; background: #EEF2FF; }
-        .drop-zone input[type="file"] { display: none; }
+        /* ── Drop zone ── */
+        .drop-zone { border:2px dashed rgba(139,92,246,0.3); border-radius:0.75rem; padding:1.5rem; text-align:center; cursor:pointer; transition:all 0.2s; background:rgba(124,58,237,0.04); }
+        .drop-zone:hover, .drop-zone.drag-over { border-color:var(--purple1); background:rgba(124,58,237,0.09); }
+        .drop-zone input[type="file"] { display:none; }
 
-        .skeleton { background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%); background-size: 200% 100%; animation: skeleton-anim 1.5s infinite; border-radius: 0.5rem; }
+        /* ── Skeleton ── */
+        .skeleton { background:linear-gradient(90deg, #1C1C26 25%, #252535 50%, #1C1C26 75%); background-size:200% 100%; animation:skeleton-anim 1.5s infinite; border-radius:0.6rem; }
+        html.light .skeleton { background:linear-gradient(90deg,#EEF2FF 25%,#E0E7FF 50%,#EEF2FF 75%); background-size:200% 100%; }
         @keyframes skeleton-anim { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-        .progress-bar { height: 6px; border-radius: 3px; background: #E5E7EB; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #4F46E5, #7C3AED); border-radius: 3px; transition: width 0.3s ease; }
+        /* ── Progress bar ── */
+        .progress-bar { height:5px; border-radius:3px; background:rgba(255,255,255,0.06); overflow:hidden; }
+        html.light .progress-bar { background:rgba(99,102,241,0.1); }
+        .progress-fill { height:100%; background:var(--grad-btn); border-radius:3px; transition:width 0.3s ease; }
 
-        .hero-gradient { background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); }
+        /* ── Hero gradient ── */
+        .hero-gradient { background: var(--grad-hero); }
 
-        /* ── Course styles ── */
-        .subject-card { border-radius: 1rem; overflow: hidden; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.07); transition: transform 0.2s, box-shadow 0.2s; }
-        .subject-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+        /* ── Page title ── */
+        .page-title { font-size:1.6rem; font-weight:800; background:linear-gradient(135deg, var(--text) 0%, var(--purple3) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        html.light .page-title { background:linear-gradient(135deg,#1E1B4B 0%,#4F46E5 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .page-sub { color:var(--text2); font-size:0.875rem; }
+        html.light .page-sub { color:#6366F1; }
 
-        .chapter-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 0.75rem; background: #F8FAFC; cursor: pointer; transition: background 0.2s; border: 1px solid transparent; }
-        .chapter-item:hover { background: #EEF2FF; border-color: #C7D2FE; }
-        .chapter-item.active { background: #EEF2FF; border-color: #4F46E5; }
+        /* ── Section headings ── */
+        .sec-head { font-weight:700; color:var(--text); }
+        html.light .sec-head { color:#1E1B4B; }
 
-        .content-tab { padding: 6px 16px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; border: 2px solid transparent; }
-        .content-tab.active-video { background: #DBEAFE; color: #1E40AF; border-color: #93C5FD; }
-        .content-tab.active-notes { background: #FEF3C7; color: #92400E; border-color: #FDE68A; }
-        .content-tab.active-dpp   { background: #D1FAE5; color: #065F46; border-color: #6EE7B7; }
-        .content-tab.inactive { background: #F3F4F6; color: #6B7280; }
+        /* ── Quick action card ── */
+        .qa-card { background:var(--card); border:1px solid var(--border); border-radius:1rem; padding:1rem 0.75rem; display:flex; flex-direction:column; align-items:center; gap:0.5rem; cursor:pointer; transition:all 0.2s; box-shadow:var(--glow); }
+        .qa-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:var(--glow-lg); }
+        .qa-card:active { transform:scale(0.96); }
+        .qa-icon { width:3rem; height:3rem; border-radius:0.875rem; display:flex; align-items:center; justify-content:center; }
+        .qa-icon-green  { background:linear-gradient(135deg,rgba(74,222,128,0.15),rgba(34,197,94,0.08)); border:1px solid rgba(74,222,128,0.2); }
+        .qa-icon-purple { background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(168,85,247,0.1)); border:1px solid rgba(139,92,246,0.25); }
+        .qa-icon-indigo { background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(129,140,248,0.08)); border:1px solid rgba(129,140,248,0.22); }
+        .qa-label { font-size:0.7rem; font-weight:700; color:var(--text2); letter-spacing:0.03em; }
 
-        .content-item-card { background: white; border: 1px solid #E5E7EB; border-radius: 0.75rem; padding: 12px 14px; display: flex; align-items: center; gap: 12px; transition: border-color 0.2s, box-shadow 0.2s; cursor: pointer; }
-        .content-item-card:hover { border-color: #A5B4FC; box-shadow: 0 2px 8px rgba(79,70,229,0.1); }
+        /* ── Announcement / payment item ── */
+        .ann-item { padding:0.75rem 1rem; background:rgba(124,58,237,0.05); border:1px solid var(--border); border-radius:0.875rem; cursor:pointer; transition:background 0.2s; }
+        .ann-item:hover { background:rgba(124,58,237,0.1); border-color:var(--border2); }
+        .pay-item { padding:0.75rem 1rem; background:rgba(124,58,237,0.04); border:1px solid var(--border); border-radius:0.875rem; display:flex; align-items:center; justify-content:space-between; }
 
-        /* YouTube embed */
-        .yt-embed-wrap { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 0.75rem; background: #000; }
-        .yt-embed-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 0.75rem; }
+        /* ── Subject card ── */
+        .subject-card { border-radius:1rem; overflow:hidden; background:var(--card); border:1px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,0.35),var(--glow); transition:transform 0.2s,box-shadow 0.2s; }
+        .subject-card:hover { transform:translateY(-3px); box-shadow:0 12px 32px rgba(0,0,0,0.4),var(--glow-lg); }
+
+        /* ── Chapter item ── */
+        .chapter-item { display:flex; align-items:center; gap:12px; padding:12px 14px; border-radius:0.875rem; background:rgba(124,58,237,0.05); cursor:pointer; transition:all 0.2s; border:1px solid var(--border); }
+        .chapter-item:hover { background:rgba(124,58,237,0.1); border-color:var(--border2); }
+        .chapter-item.active { background:rgba(124,58,237,0.14); border-color:var(--purple1); box-shadow:0 0 16px rgba(124,58,237,0.2); }
+
+        /* ── Content tabs ── */
+        .content-tab { padding:5px 14px; border-radius:9999px; font-size:0.75rem; font-weight:700; cursor:pointer; transition:all 0.2s; border:1.5px solid transparent; }
+        .content-tab.active-video { background:rgba(129,140,248,0.15); color:var(--indigo2); border-color:var(--indigo); }
+        .content-tab.active-notes { background:rgba(251,191,36,0.1); color:#FCD34D; border-color:rgba(251,191,36,0.4); }
+        .content-tab.active-dpp   { background:rgba(74,222,128,0.1); color:#86EFAC; border-color:rgba(74,222,128,0.3); }
+        .content-tab.inactive { background:rgba(255,255,255,0.04); color:var(--text3); border-color:var(--border); }
+
+        /* ── Content item card ── */
+        .content-item-card { background:rgba(124,58,237,0.05); border:1px solid var(--border); border-radius:0.875rem; padding:12px 14px; display:flex; align-items:center; gap:12px; transition:all 0.2s; cursor:pointer; }
+        .content-item-card:hover { border-color:var(--purple1); background:rgba(124,58,237,0.1); box-shadow:0 0 16px rgba(124,58,237,0.15); }
+
+        /* ── YouTube embed ── */
+        .yt-embed-wrap { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:0.875rem; background:#000; }
+        .yt-embed-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+
+        /* ── Study timer ── */
+        .timer-pulse { animation:timerPulse 2s ease-in-out infinite; }
+        @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+        .streak-fire { animation:streakBounce 1.5s ease-in-out infinite; display:inline-block; }
+        @keyframes streakBounce { 0%,100%{transform:scale(1)} 50%{transform:scale(1.18)} }
+
+        /* ── Nebula graph ── */
+        .nebula-wrap { position:relative; border-radius:1.1rem; overflow:hidden; background:var(--bg); border:1px solid var(--border); box-shadow:var(--glow); }
+        .nebula-wrap canvas { display:block; width:100%; }
+
+        /* ── Admin feedback ── */
+        .feedback-card { border-left:3px solid var(--purple1); background:var(--card); border-radius:0.875rem; border:1px solid var(--border); border-left:3px solid var(--purple1); }
+
+        /* ── Forms ── */
+        input, select, textarea { background:rgba(124,58,237,0.06)!important; color:var(--text)!important; border-color:var(--border)!important; transition:background 0.3s,color 0.3s; }
+        html.light input, html.light select, html.light textarea { background:rgba(99,102,241,0.05)!important; color:#1E1B4B!important; border-color:rgba(99,102,241,0.25)!important; }
+        input::placeholder { color:var(--text3)!important; }
+        input:focus, select:focus { border-color:var(--purple1)!important; outline:none; box-shadow:0 0 0 3px rgba(124,58,237,0.18)!important; }
+
+        /* ── Primary button ── */
+        .btn-primary { background:var(--grad-btn); color:white; font-weight:700; border-radius:0.875rem; border:none; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 20px rgba(124,58,237,0.35); }
+        .btn-primary:hover { box-shadow:0 6px 32px rgba(124,58,237,0.5); filter:brightness(1.08); }
+        .btn-primary:active { transform:scale(0.98); }
+
+        /* ── Ghost button ── */
+        .btn-ghost { background:rgba(255,255,255,0.05); color:var(--text); font-weight:600; border-radius:0.875rem; border:1px solid rgba(255,255,255,0.1); cursor:pointer; transition:all 0.2s; }
+        html.light .btn-ghost { background:rgba(99,102,241,0.06); color:#1E1B4B; border-color:rgba(99,102,241,0.2); }
+        .btn-ghost:hover { background:rgba(255,255,255,0.09); }
+
+        /* ── Profile tags ── */
+        .tag-purple { background:rgba(139,92,246,0.14); color:var(--purple3); border:1px solid rgba(139,92,246,0.28); padding:3px 10px; border-radius:9999px; font-size:0.7rem; font-weight:700; }
+
+        /* ── Light mode overrides ── */
+        html.light body::before {
+            background:
+                radial-gradient(ellipse 70% 50% at 50% -10%, rgba(6,182,212,0.08) 0%, transparent 70%),
+                radial-gradient(ellipse 50% 40% at 90% 110%, rgba(14,165,233,0.06) 0%, transparent 60%),
+                #F5FFFE;
+        }
+        html.light .sec-head { color: #0A1628; }
+        html.light .page-title {
+            background: linear-gradient(135deg, #0C4A6E 0%, #0891B2 60%, #06B6D4 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        html.light .page-sub { color: #1E4E6E; }
+        html.light .bottom-nav { background: rgba(245,255,254,0.97); border-top: 1px solid rgba(6,182,212,0.2); }
+        html.light .nav-item { color: #64A4BE; }
+        html.light .nav-item.active { color: #0891B2; }
+        html.light .ann-item { background: rgba(6,182,212,0.05); border-color: rgba(6,182,212,0.15); }
+        html.light .ann-item:hover { background: rgba(6,182,212,0.1); }
+        html.light .pay-item { background: rgba(6,182,212,0.04); border-color: rgba(6,182,212,0.15); }
+        html.light .chapter-item { background: rgba(6,182,212,0.04); border-color: rgba(6,182,212,0.14); }
+        html.light .chapter-item:hover { background: rgba(6,182,212,0.09); }
+        html.light .chapter-item.active { background: rgba(6,182,212,0.12); border-color: #06B6D4; }
+        html.light .content-item-card { background: rgba(6,182,212,0.04); border-color: rgba(6,182,212,0.14); }
+        html.light .content-item-card:hover { background: rgba(6,182,212,0.1); border-color: #06B6D4; }
+        html.light .subject-card { background:#FFFFFF; border-color:rgba(6,182,212,0.18); }
+        html.light .drop-zone { border-color: rgba(6,182,212,0.3); background: rgba(6,182,212,0.03); }
+        html.light .drop-zone:hover { background: rgba(6,182,212,0.08); }
+        html.light .modal-content { background:#FFFFFF; box-shadow:0 32px 64px rgba(0,0,0,0.12), 0 0 40px rgba(6,182,212,0.1); }
+        html.light .feedback-card { background:linear-gradient(135deg,#F0FFFE,#ECFBFA); border-left-color:#06B6D4; }
+        html.light .nebula-wrap { background:#ECFBFA; }
+        html.light .skeleton { background:linear-gradient(90deg,#E5F8F8 25%,#CDF0F0 50%,#E5F8F8 75%); background-size:200% 100%; }
+        html.light .tag-purple { background:rgba(6,182,212,0.1); color:#0891B2; border-color:rgba(6,182,212,0.28); }
+        html.light .content-tab.inactive { background:rgba(6,182,212,0.06); color:#64A4BE; border-color:rgba(6,182,212,0.15); }
+        html.light .pill-base  { background:rgba(6,182,212,0.12); color:#0891B2; border-color:rgba(6,182,212,0.28); }
+        html.light .pill-net   { background:rgba(14,165,233,0.1); color:#0284C7; border-color:rgba(14,165,233,0.25); }
+        /* Luxury blue headings in light mode */
+        html.light h2, html.light h3.sec-head {
+            background: linear-gradient(135deg, #0C4A6E, #0891B2);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        html.light .qa-label { color: #1E4E6E; }
+        html.light .btn-ghost { background:rgba(6,182,212,0.07); color:#0A1628; border-color:rgba(6,182,212,0.22); }
+        html.light [style*="color:var(--text)"]  { color: #0A1628 !important; }
+        html.light [style*="color:var(--text2)"] { color: #1E4E6E !important; }
+        html.light [style*="color:var(--text3)"] { color: #64A4BE !important; }
+        html.light [style*="color:var(--purple2)"] { color: #0891B2 !important; }
+        html.light [style*="color:var(--purple3)"] { color: #0891B2 !important; }
+        html.light [style*="color:var(--indigo2)"] { color: #0284C7 !important; }
+
+        /* ── Glow divider ── */
+        .glow-div { height:1px; background:linear-gradient(90deg,transparent,var(--border2),transparent); margin:0.5rem 0; }
     </style>
 </head>
-<body class="pb-24">
+<body class="pb-24" style="background:#04060F">
 
-    <div id="toast" class="toast bg-gray-800"></div>
+    <div id="toast" class="toast" style="background:linear-gradient(135deg,#001F3F,#0A3A5C)"></div>
 
     <!-- ═══ PAYMENT MODAL ═══ -->
     <div id="payModal" class="modal">
         <div class="modal-content">
-            <div class="flex items-center justify-between mb-5 border-b pb-4">
+            <div class="flex items-center justify-between mb-5 pb-4" style="border-bottom:1px solid rgba(139,92,246,0.15)">
                 <div>
-                    <h3 class="text-xl font-bold text-gray-800">Pay Fees</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Upload payment proof for admin verification</p>
+                    <h3 class="text-xl font-bold" style="color:var(--text)">Pay Fees</h3>
+                    <p class="text-xs mt-0.5" style="color:var(--text2)">Upload payment proof for admin verification</p>
                 </div>
-                <button onclick="closeModal('payModal')" class="text-gray-400 hover:text-gray-600 p-1">
+                <button onclick="closeModal('payModal')" class="p-1 rounded-lg hover:bg-white/10 transition" style="color:var(--text2)">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
-            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-4 mb-5 border border-indigo-100">
-                <div class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-3">Your Fee Summary</div>
+            <div class="rounded-xl p-4 mb-5" style="background:rgba(124,58,237,0.07);border:1px solid rgba(139,92,246,0.2)">
+                <div class="text-xs font-semibold uppercase tracking-wider mb-3" style="color:var(--purple3);letter-spacing:0.08em">Your Fee Summary</div>
                 <div class="space-y-2">
-                    <div class="flex justify-between text-sm"><span class="text-gray-600">Base Annual Fee</span><span class="font-bold text-purple-800" id="payBaseFee">₹0</span></div>
+                    <div class="flex justify-between text-sm"><span style="color:var(--text2)">Base Annual Fee</span><span class="font-bold" style="color:var(--purple3)" id="payBaseFee">₹0</span></div>
                     <div class="flex justify-between text-sm" id="payOfferRow" style="display:none!important">
-                        <span class="text-orange-600">Special Offer 🎁</span><span class="font-bold text-orange-700" id="payOfferAmt">-₹0</span>
+                        <span style="color:#FCD34D">Special Offer 🎁</span><span class="font-bold" style="color:#FCD34D" id="payOfferAmt">-₹0</span>
                     </div>
-                    <div class="flex justify-between text-sm border-t pt-2"><span class="text-gray-600">Net Fee</span><span class="font-bold text-blue-800" id="payNetFee">₹0</span></div>
-                    <div class="flex justify-between text-sm"><span class="text-gray-600">Already Paid</span><span class="font-bold text-green-700" id="payPaidAmt">₹0</span></div>
-                    <div class="flex justify-between text-sm border-t pt-2"><span class="font-semibold text-red-700">Remaining Due</span><span class="text-xl font-bold text-red-700" id="payRemaining">₹0</span></div>
+                    <div class="flex justify-between text-sm pt-2" style="border-top:1px solid rgba(139,92,246,0.12)"><span style="color:var(--text2)">Net Fee</span><span class="font-bold" style="color:var(--indigo2)" id="payNetFee">₹0</span></div>
+                    <div class="flex justify-between text-sm"><span style="color:var(--text2)">Already Paid</span><span class="font-bold" style="color:#86EFAC" id="payPaidAmt">₹0</span></div>
+                    <div class="flex justify-between text-sm pt-2" style="border-top:1px solid rgba(139,92,246,0.12)"><span class="font-semibold" style="color:#FCA5A5">Remaining Due</span><span class="text-xl font-bold" style="color:#FCA5A5" id="payRemaining">₹0</span></div>
                 </div>
             </div>
             <div class="space-y-4">
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Amount (₹) *</label>
+                        <label style="display:block;font-size:0.875rem;font-weight:600;color:var(--purple3);margin-bottom:4px">Amount (₹) *</label>
                         <input type="number" id="payAmount" placeholder="Enter amount" min="1" class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary text-sm font-semibold">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Payment Mode *</label>
+                        <label style="display:block;font-size:0.875rem;font-weight:600;color:var(--purple3);margin-bottom:4px">Payment Mode *</label>
                         <select id="payMode" class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm">
                             <option value="upi">UPI</option>
                             <option value="bank_transfer">Bank Transfer</option>
@@ -127,21 +326,21 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Transaction ID / UTR (optional)</label>
+                    <label style="display:block;font-size:0.875rem;font-weight:600;color:var(--purple3);margin-bottom:4px">Transaction ID / UTR (optional)</label>
                     <input type="text" id="payTxnId" placeholder="e.g. UPI ref / UTR number" class="w-full px-3 py-2.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary text-sm">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Screenshot * <span class="text-xs text-gray-400">(JPG/PNG, max 5MB)</span></label>
+                    <label style="display:block;font-size:0.875rem;font-weight:600;color:var(--purple3);margin-bottom:8px">Payment Screenshot * <span class="text-xs text-gray-400">(JPG/PNG, max 5MB)</span></label>
                     <div class="drop-zone" id="dropZone" onclick="document.getElementById('screenshotInput').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
                         <input type="file" id="screenshotInput" accept="image/*" onchange="handleFileSelect(event)">
                         <div id="dropZoneContent">
                             <svg class="w-10 h-10 text-indigo-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <p class="text-sm font-medium text-indigo-700">Tap to upload screenshot</p>
-                            <p class="text-xs text-gray-400 mt-1">or drag and drop</p>
+                            <p class="text-sm font-medium" style="color:var(--purple3)">Tap to upload screenshot</p>
+                            <p class="text-xs mt-1" style="color:var(--text3)">or drag and drop</p>
                         </div>
                     </div>
                     <div id="imagePreview" class="hidden mt-3 relative">
-                        <img id="previewImg" class="w-full max-h-48 object-contain rounded-xl border border-gray-200 bg-gray-50">
+                        <img id="previewImg" class="w-full max-h-48 object-contain rounded-xl" style="border:1px solid rgba(56,189,248,0.15);background:rgba(14,165,233,0.04)">
                         <button onclick="clearImage()" class="absolute top-2 right-2 bg-red-500 text-white w-7 h-7 rounded-full text-sm flex items-center justify-center hover:bg-red-600">✕</button>
                         <p id="previewName" class="text-xs text-gray-500 mt-1 text-center truncate"></p>
                     </div>
@@ -151,8 +350,8 @@
                     </div>
                 </div>
                 <div class="flex gap-3 pt-2">
-                    <button onclick="closeModal('payModal')" class="flex-1 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-medium hover:bg-gray-50 transition">Cancel</button>
-                    <button onclick="submitPayment()" id="submitPayBtn" class="flex-1 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-semibold hover:opacity-90 transition flex items-center justify-center gap-2">
+                    <button onclick="closeModal('payModal')" class="flex-1 py-3 btn-ghost">Cancel</button>
+                    <button onclick="submitPayment()" id="submitPayBtn" class="flex-1 py-3 btn-primary flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Submit for Approval
                     </button>
@@ -164,12 +363,12 @@
     <!-- ═══ CONTENT VIEWER MODAL ═══ -->
     <div id="contentModal" class="modal">
         <div class="modal-content" style="max-width:640px;">
-            <div class="flex items-center justify-between mb-4 border-b pb-4">
+            <div class="flex items-center justify-between mb-4 pb-4" style="border-bottom:1px solid rgba(139,92,246,0.15)">
                 <div class="flex-1 min-w-0 pr-4">
-                    <h3 class="text-lg font-bold text-gray-800 truncate" id="contentModalTitle">Content</h3>
-                    <p class="text-xs text-gray-500 mt-0.5" id="contentModalSubtitle"></p>
+                    <h3 class="text-lg font-bold truncate" style="color:var(--text)" id="contentModalTitle">Content</h3>
+                    <p class="text-xs mt-0.5" style="color:var(--text2)" id="contentModalSubtitle"></p>
                 </div>
-                <button onclick="closeModal('contentModal')" class="text-gray-400 hover:text-gray-600 p-1 flex-shrink-0">
+                <button onclick="closeModal('contentModal')" class="p-1 rounded-lg hover:bg-white/10 transition flex-shrink-0" style="color:var(--text2)">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -183,8 +382,8 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-bold text-lg">M</div>
                 <div>
-                    <div class="font-bold text-base leading-tight">MINDSKYRA</div>
-                    <div class="text-xs text-indigo-200">Student Portal</div>
+                    <div class="font-black text-base leading-tight tracking-wider" style="background:linear-gradient(90deg,#fff 0%,#7DD3FC 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">MINDSKYRA</div>
+                    <div class="text-xs" style="color:#C084FC;letter-spacing:0.08em;opacity:0.85">STUDENT PORTAL</div>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -222,29 +421,29 @@
                 </div>
             </div>
             <div class="grid grid-cols-3 gap-3">
-                <button onclick="navigateTo('fees')" class="card p-4 flex flex-col items-center gap-2 hover:shadow-md transition active:scale-95">
-                    <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <button onclick="navigateTo('fees')" class="qa-card">
+                    <div class="qa-icon qa-icon-green">
+                        <svg class="w-6 h-6" style="color:#86EFAC" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <span class="text-xs font-semibold text-gray-700">Pay Fees</span>
+                    <span class="qa-label">Pay Fees</span>
                 </button>
-                <button onclick="navigateTo('courses')" class="card p-4 flex flex-col items-center gap-2 hover:shadow-md transition active:scale-95">
-                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                <button onclick="navigateTo('courses')" class="qa-card">
+                    <div class="qa-icon qa-icon-purple">
+                        <svg class="w-6 h-6" style="color:#A855F7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                     </div>
-                    <span class="text-xs font-semibold text-gray-700">Courses</span>
+                    <span class="qa-label">Courses</span>
                 </button>
-                <button onclick="navigateTo('announcements')" class="card p-4 flex flex-col items-center gap-2 hover:shadow-md transition active:scale-95">
-                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                <button onclick="navigateTo('announcements')" class="qa-card">
+                    <div class="qa-icon qa-icon-indigo">
+                        <svg class="w-6 h-6" style="color:#818CF8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
                     </div>
-                    <span class="text-xs font-semibold text-gray-700">Updates</span>
+                    <span class="qa-label">Updates</span>
                 </button>
             </div>
             <div class="card p-5">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-bold text-gray-800">📢 Latest Updates</h3>
-                    <button onclick="navigateTo('announcements')" class="text-xs text-primary font-medium">See all</button>
+                    <h3 class="sec-head">📢 Latest Updates</h3>
+                    <button onclick="navigateTo('announcements')" style="color:var(--purple2);font-size:0.75rem;font-weight:600">See all</button>
                 </div>
                 <div id="dashAnnouncements" class="space-y-3">
                     <div class="skeleton h-14"></div>
@@ -253,14 +452,98 @@
             </div>
             <div class="card p-5">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-bold text-gray-800">💳 Recent Payments</h3>
-                    <button onclick="navigateTo('fees')" class="text-xs text-primary font-medium">See all</button>
+                    <h3 class="sec-head">💳 Recent Payments</h3>
+                    <button onclick="navigateTo('fees')" style="color:var(--purple2);font-size:0.75rem;font-weight:600">See all</button>
                 </div>
                 <div id="dashPayments" class="space-y-2">
                     <div class="skeleton h-12"></div>
                     <div class="skeleton h-12"></div>
                 </div>
             </div>
+
+            <!-- ── STUDY TRACKER CARD ── -->
+            <div class="card overflow-hidden" style="background:linear-gradient(135deg,#130D28,#1E1040,#2A1660)">
+                <div class="p-5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <div class="text-xs font-semibold uppercase tracking-widest" style="color:var(--purple3)">📚 Study Session</div>
+                            <div class="text-white font-bold text-lg mt-0.5">Active Timer</div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="w-2.5 h-2.5 rounded-full bg-green-400 timer-pulse"></div>
+                            <span class="text-xs font-bold" style="color:#86EFAC;letter-spacing:0.08em">LIVE</span>
+                        </div>
+                    </div>
+                    <!-- Timer display -->
+                    <div class="text-center py-4">
+                        <div class="text-5xl font-black tracking-widest" style="color:#EDE9FE;font-variant-numeric:tabular-nums;letter-spacing:0.05em" id="liveTimer">00:00:00</div>
+                        <div class="text-xs mt-2" style="color:var(--text3)">Session started when you opened the app</div>
+                    </div>
+                    <!-- Stats row -->
+                    <div class="grid grid-cols-3 gap-3 mt-2">
+                        <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,0.07)">
+                            <div class="text-xs" style="color:var(--text2)">Today</div>
+                            <div class="font-bold text-white mt-1" id="studyTodayHr">—</div>
+                        </div>
+                        <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,0.07)">
+                            <div class="text-xs" style="color:var(--text2)">This Week</div>
+                            <div class="font-bold text-white mt-1" id="studyWeekHr">—</div>
+                        </div>
+                        <div class="rounded-xl p-3 text-center" style="background:rgba(255,255,255,0.07)">
+                            <div class="text-xs" style="color:var(--text2)">Total</div>
+                            <div class="font-bold text-white mt-1" id="studyTotalHr">—</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── STREAK CARD ── -->
+            <div class="card overflow-hidden" style="background:linear-gradient(135deg,#150823,#2D0E52,#4C1D95)">
+                <div class="p-5">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-semibold uppercase tracking-widest" style="color:#F9A8D4">🔥 Study Streak</div>
+                            <div class="flex items-end gap-2 mt-1">
+                                <span class="text-5xl font-black text-white" id="streakCount">0</span>
+                                <span class="text-lg font-bold pb-1" style="color:#F9A8D4">days</span>
+                            </div>
+                            <div class="text-xs mt-1" style="color:#c084fc" id="streakMsg">Open the app daily to build your streak!</div>
+                        </div>
+                        <div class="text-6xl streak-fire" id="streakEmoji">🔥</div>
+                    </div>
+                    <!-- Last 7 days dots -->
+                    <div class="flex gap-2 mt-4" id="streakDots"></div>
+                </div>
+            </div>
+
+            <!-- ── NEBULA PROGRESS GRAPH ── -->
+            <div class="nebula-wrap p-1">
+                <div class="p-4 pb-2">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-xs font-semibold uppercase tracking-widest" style="color:var(--purple3)">📊 Study Progress</div>
+                            <div class="text-white font-bold mt-0.5">Last 14 Days</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs" style="color:var(--text3)">Best day</div>
+                            <div class="font-bold" style="color:var(--purple3)" id="bestDayLabel">—</div>
+                        </div>
+                    </div>
+                </div>
+                <canvas id="nebulaCanvas" height="180"></canvas>
+                <div class="p-4 pt-2 flex justify-between text-xs" style="color:var(--text3)" id="nebulaXLabels"></div>
+            </div>
+
+            <!-- ── ADMIN FEEDBACK ── -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="sec-head">💬 Admin Feedback</h3>
+                </div>
+                <div id="adminFeedbackList" class="space-y-3">
+                    <div class="skeleton h-20"></div>
+                </div>
+            </div>
+
         </div>
 
         <!-- ══════════════════════════════════════════
@@ -268,8 +551,8 @@
              ══════════════════════════════════════════ -->
         <div id="page-courses" class="page space-y-4">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800">My Courses</h2>
-                <p class="text-sm text-gray-500 mt-1" id="courseSubtitle">Loading your subjects…</p>
+                <h2 class="page-title">My Courses</h2>
+                <p class="page-sub mt-1" id="courseSubtitle">Loading your subjects…</p>
             </div>
 
             <!-- Subject list (top level) -->
@@ -281,7 +564,7 @@
             <!-- Chapter + content panel (shown when a subject is expanded) -->
             <div id="subjectDetailPanel" style="display:none" class="space-y-3">
                 <!-- back button -->
-                <button onclick="closeSubjectDetail()" class="flex items-center gap-2 text-sm text-primary font-semibold">
+                <button onclick="closeSubjectDetail()" class="flex items-center gap-2 text-sm font-semibold" style="color:var(--purple2)">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                     Back to Subjects
                 </button>
@@ -298,7 +581,7 @@
 
                 <!-- Chapter list -->
                 <div class="card p-4">
-                    <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Chapters</div>
+                    <div class="text-xs font-bold uppercase tracking-wider mb-3" style="color:var(--text3);letter-spacing:0.07em;font-size:0.7rem;font-weight:700;text-transform:uppercase">Chapters</div>
                     <div id="detailChapterList" class="space-y-2">
                         <div class="skeleton h-12"></div>
                         <div class="skeleton h-12"></div>
@@ -308,8 +591,8 @@
                 <!-- Content viewer (shown after chapter selected) -->
                 <div id="chapterContentPanel" style="display:none" class="card p-4 space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="font-bold text-gray-800 text-sm" id="selectedChapterTitle">Chapter</div>
-                        <button onclick="closeChapterContent()" class="text-xs text-gray-400 hover:text-gray-600">✕ Close</button>
+                        <div class="font-bold text-sm" style="color:var(--text)" id="selectedChapterTitle">Chapter</div>
+                        <button onclick="closeChapterContent()" class="text-xs" style="color:var(--text3)">✕ Close</button>
                     </div>
 
                     <!-- Content type tabs -->
@@ -325,7 +608,7 @@
 
         <!-- FEES -->
         <div id="page-fees" class="page space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800">Fee Management</h2>
+            <h2 class="page-title">Fee Management</h2>
             <div class="card overflow-hidden">
                 <div class="p-5 hero-gradient text-white">
                     <div class="text-sm opacity-80 mb-1">Annual Fee Breakdown</div>
@@ -337,34 +620,34 @@
                     </div>
                 </div>
                 <div class="p-5 space-y-3">
-                    <div class="flex justify-between items-center py-2 border-b border-gray-50">
-                        <span class="text-sm text-gray-600">Base Annual Fee</span>
+                    <div class="flex justify-between items-center py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)">
+                        <span class="text-sm" style="color:var(--text2)">Base Annual Fee</span>
                         <span class="fee-pill pill-base" id="feeBaseAmt">₹—</span>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b border-gray-50" id="feeOfferRow" style="display:none">
-                        <span class="text-sm text-orange-600 font-medium">🎁 Special Offer Applied</span>
+                        <span class="text-sm font-medium" style="color:#FCD34D">🎁 Special Offer Applied</span>
                         <span class="fee-pill pill-offer" id="feeOfferAmt">-₹0</span>
                     </div>
-                    <div class="flex justify-between items-center py-2 border-b border-gray-50">
-                        <span class="text-sm text-gray-700 font-medium">Net Fee</span>
+                    <div class="flex justify-between items-center py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)">
+                        <span class="text-sm font-medium" style="color:var(--purple3)">Net Fee</span>
                         <span class="fee-pill pill-net" id="feeNetAmt">₹—</span>
                     </div>
-                    <div class="flex justify-between items-center py-2 border-b border-gray-50">
-                        <span class="text-sm text-gray-600">Total Paid</span>
+                    <div class="flex justify-between items-center py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)">
+                        <span class="text-sm" style="color:var(--text2)">Total Paid</span>
                         <span class="fee-pill pill-paid" id="feePaidAmt">₹0</span>
                     </div>
                     <div class="flex justify-between items-center py-2">
-                        <span class="text-sm font-bold text-gray-800">Remaining Due</span>
+                        <span class="text-sm font-bold" style="color:var(--text)">Remaining Due</span>
                         <span class="fee-pill pill-due text-base" id="feeDueAmt">₹—</span>
                     </div>
-                    <button onclick="openPayModal()" id="payNowBtn" class="w-full mt-3 py-3.5 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-semibold text-base hover:opacity-90 transition active:scale-95 flex items-center justify-center gap-2">
+                    <button onclick="openPayModal()" id="payNowBtn" class="w-full mt-3 py-3.5 btn-primary flex items-center justify-center gap-2 text-base">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Pay Now
                     </button>
                 </div>
             </div>
             <div class="card p-5">
-                <h3 class="font-bold text-gray-800 mb-4">Payment History</h3>
+                <h3 class="sec-head mb-4">Payment History</h3>
                 <div id="paymentHistory" class="space-y-3">
                     <div class="skeleton h-14"></div>
                     <div class="skeleton h-14"></div>
@@ -374,7 +657,7 @@
 
         <!-- ANNOUNCEMENTS -->
         <div id="page-announcements" class="page space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800">Announcements</h2>
+            <h2 class="page-title">Announcements</h2>
             <div id="announcements" class="space-y-4">
                 <div class="skeleton h-28"></div>
                 <div class="skeleton h-28"></div>
@@ -384,7 +667,7 @@
 
         <!-- NOTIFICATIONS -->
         <div id="page-notifications" class="page space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800">Notifications</h2>
+            <h2 class="page-title">Notifications</h2>
             <div id="notificationsList" class="space-y-3">
                 <div class="skeleton h-16"></div>
                 <div class="skeleton h-16"></div>
@@ -393,15 +676,22 @@
 
         <!-- PROFILE -->
         <div id="page-profile" class="page space-y-4">
-            <h2 class="text-2xl font-bold text-gray-800">My Profile</h2>
+            <h2 class="page-title">My Profile</h2>
             <div class="card p-5 text-center">
                 <div class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-3xl font-bold mx-auto mb-3" id="profileAvatar">S</div>
-                <div class="text-xl font-bold text-gray-900" id="profileName">—</div>
-                <div class="text-sm text-gray-500" id="profileEmail">—</div>
+                <div style="font-size:1.25rem;font-weight:800;color:var(--text)" id="profileName">—</div>
+                <div class="text-sm" style="color:var(--text2)" id="profileEmail">—</div>
                 <div class="mt-2 flex justify-center gap-2 flex-wrap" id="profileTags"></div>
             </div>
             <div class="card p-5 space-y-4" id="profileDetails"></div>
-            <button onclick="logout()" class="w-full card p-4 flex items-center justify-center gap-3 text-red-600 font-semibold hover:bg-red-50 transition">
+            <!-- ── THEME TOGGLE ── -->
+            <button onclick="toggleTheme()" id="themeToggleBtn" class="w-full card p-4 flex items-center justify-center gap-3 font-semibold transition">
+                <span id="themeToggleIcon" class="text-xl">☀️</span>
+                <span id="themeToggleLabel" style="color:var(--text)">Switch to White Mode</span>
+                <span id="themeToggleBadge" class="ml-auto text-xs px-2 py-0.5 rounded-full" style="background:rgba(139,92,246,0.15);color:var(--purple3);border:1px solid rgba(139,92,246,0.25)">DARK</span>
+            </button>
+
+            <button onclick="logout()" class="w-full card p-4 flex items-center justify-center gap-3 font-semibold transition" style="color:#F87171">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 Sign Out
             </button>
@@ -496,6 +786,7 @@
             loadAnnouncements();
             loadNotifications();
             loadProfile();
+            loadStudyData();
         } catch (err) {
             console.error(err);
             showToast('Error loading your data', 'error');
@@ -550,31 +841,31 @@
         try {
             const snap = await db.collection('announcements').where('target','in',['all','students']).orderBy('createdAt','desc').limit(3).get();
             const el = document.getElementById('dashAnnouncements');
-            if (snap.empty) { el.innerHTML = '<p class="text-sm text-gray-400 text-center py-3">No announcements yet</p>'; return; }
+            if (snap.empty) { el.innerHTML = '<p class="text-sm text-center py-3" style="color:var(--text3)">No announcements yet</p>'; return; }
             el.innerHTML = snap.docs.map(doc => {
                 const d = doc.data();
-                return `<div class="flex gap-3 p-3 bg-gray-50 rounded-xl hover:bg-indigo-50 transition cursor-pointer" onclick="navigateTo('announcements')">
-                    <div class="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                return `<div class="ann-item flex gap-3 cursor-pointer" onclick="navigateTo('announcements')">
+                    <div class="w-2 h-2 rounded-full mt-2 flex-shrink-0" style="background:var(--purple2)"></div>
                     <div class="min-w-0">
-                        <div class="font-semibold text-sm text-gray-800 truncate">${d.title}</div>
-                        <div class="text-xs text-gray-500 truncate mt-0.5">${d.message}</div>
+                        <div class="font-semibold text-sm truncate" style="color:var(--text)">${d.title}</div>
+                        <div class="text-xs truncate mt-0.5" style="color:var(--text2)">${d.message}</div>
                     </div>
                 </div>`;
             }).join('');
-        } catch(e) { document.getElementById('dashAnnouncements').innerHTML = '<p class="text-sm text-red-400 text-center">Error loading</p>'; }
+        } catch(e) { document.getElementById('dashAnnouncements').innerHTML = '<p class="text-sm text-center" style="color:#FCA5A5">Error loading</p>'; }
     }
 
     async function loadDashPayments() {
         try {
             const snap = await db.collection('payments').where('studentId','==',currentUser.uid).orderBy('createdAt','desc').limit(3).get();
             const el = document.getElementById('dashPayments');
-            if (snap.empty) { el.innerHTML = '<p class="text-sm text-gray-400 text-center py-3">No payments yet</p>'; return; }
+            if (snap.empty) { el.innerHTML = '<p class="text-sm text-center py-3" style="color:var(--text3)">No payments yet</p>'; return; }
             el.innerHTML = snap.docs.map(doc => {
                 const d = doc.data();
-                const sc = d.status === 'approved' ? 'text-green-600 bg-green-100' : d.status === 'rejected' ? 'text-red-600 bg-red-100' : 'text-yellow-600 bg-yellow-100';
+                const sc = d.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : d.status === 'rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
                 const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '—';
-                return `<div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                    <div><div class="font-semibold text-sm text-gray-800">₹${d.amount?.toLocaleString()}</div><div class="text-xs text-gray-500">${date}</div></div>
+                return `<div class="pay-item">
+                    <div><div class="font-semibold text-sm" style="color:var(--text)">₹${d.amount?.toLocaleString()}</div><div class="text-xs" style="color:var(--text2)">${date}</div></div>
                     <span class="text-xs font-semibold px-3 py-1 rounded-full capitalize ${sc}">${d.status}</span>
                 </div>`;
             }).join('');
@@ -597,8 +888,8 @@
 
         if (!cls) {
             el.innerHTML = `<div class="card p-8 text-center"><div class="text-5xl mb-3">📚</div>
-                <h3 class="font-bold text-gray-700">Class not set</h3>
-                <p class="text-sm text-gray-500 mt-1">Contact your admin to set your class.</p></div>`;
+                <h3 class="font-bold" style="color:var(--text)">Class not set</h3>
+                <p class="text-sm mt-1" style="color:var(--text2)">Contact your admin to set your class.</p></div>`;
             return;
         }
 
@@ -609,8 +900,8 @@
             if (subSnap.empty) {
                 el.innerHTML = `<div class="card p-8 text-center">
                     <div class="text-5xl mb-3">📚</div>
-                    <h3 class="font-bold text-gray-700 mb-1">No subjects yet</h3>
-                    <p class="text-sm text-gray-500">Subjects for Class ${cls} will appear here once added by admin.</p></div>`;
+                    <h3 class="font-bold mb-1 sec-head">No subjects yet</h3>
+                    <p class="text-sm" style="color:var(--text2)">Subjects for Class ${cls} will appear here once added by admin.</p></div>`;
                 return;
             }
 
@@ -656,19 +947,19 @@
                         </div>
                     </div>
                     <div class="p-4 flex items-center justify-between">
-                        <div class="flex gap-4 text-sm text-gray-600">
+                        <div class="flex gap-4 text-sm" style="color:var(--text2)">
                             <span class="flex items-center gap-1"><span class="text-blue-500">🎥</span> Videos</span>
                             <span class="flex items-center gap-1"><span class="text-orange-500">📄</span> Notes</span>
                             <span class="flex items-center gap-1"><span class="text-green-500">📝</span> DPP</span>
                         </div>
-                        <span class="text-primary text-sm font-semibold">Open →</span>
+                        <span class="text-sm font-semibold" style="color:var(--purple2)">Open →</span>
                     </div>
                 </div>`;
             }).join('');
 
         } catch(e) {
             console.error(e);
-            el.innerHTML = '<div class="card p-6 text-center text-red-500">Error loading subjects: ' + e.message + '</div>';
+            el.innerHTML = '<div class="card p-6 text-center" style="color:#FCA5A5">Error loading subjects: ' + e.message + '</div>';
         }
     }
 
@@ -706,13 +997,13 @@
 
             document.getElementById('detailChapterList').innerHTML = currentChapters.map((ch, idx) => `
                 <div class="chapter-item" id="chitem-${ch.id}" onclick="selectChapter('${ch.id}')">
-                    <div class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-700 font-bold text-sm flex items-center justify-center flex-shrink-0">
+                    <div class="w-8 h-8 rounded-lg font-bold text-sm flex items-center justify-center flex-shrink-0" style="background:rgba(139,92,246,0.18);color:var(--purple3)">
                         ${ch.number || (idx + 1)}
                     </div>
                     <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-sm text-gray-800 truncate">${ch.name}</div>
+                        <div class="font-semibold text-sm truncate" style="color:var(--text)">${ch.name}</div>
                     </div>
-                    <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    <svg class="w-4 h-4 flex-shrink-0" style="color:var(--text3)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                 </div>`).join('');
 
         } catch(e) {
@@ -764,7 +1055,7 @@
             if (tabs.length === 0) {
                 document.getElementById('contentTypeTabs').innerHTML = '';
                 document.getElementById('chapterContentItems').innerHTML =
-                    '<div class="text-center py-6 text-gray-400"><p class="text-3xl mb-2">📭</p><p class="text-sm">No content uploaded for this chapter yet</p></div>';
+                    '<div class="text-center py-6" style="color:var(--text3)"><p class="text-3xl mb-2">📭</p><p class="text-sm" style="color:var(--text3)">No content uploaded for this chapter yet</p></div>';
                 return;
             }
 
@@ -820,10 +1111,10 @@
                     : '';
                 return `<div class="content-item-card" onclick="openContentViewer('${item.id}')">
                     ${thumb ? `<img src="${thumb}" alt="" class="w-16 h-10 object-cover rounded-lg flex-shrink-0 bg-gray-100">` :
-                              `<div class="w-16 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl">🎥</div>`}
+                              `<div class="w-16 h-10 rounded-lg flex items-center justify-center flex-shrink-0 text-2xl" style="background:rgba(14,165,233,0.15)">🎥</div>`}
                     <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-sm text-gray-800 truncate">${item.title || 'Untitled'}</div>
-                        <div class="text-xs text-gray-400 mt-0.5">YouTube Video</div>
+                        <div class="font-semibold text-sm truncate" style="color:var(--text)">${item.title || 'Untitled'}</div>
+                        <div class="text-xs mt-0.5" style="color:var(--text3)">YouTube Video</div>
                     </div>
                     <div class="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -836,11 +1127,11 @@
                 return `<div class="content-item-card" onclick="openPdfViewer('${encodeURIComponent(item.embedUrl || item.driveUrl || '')}', '${(item.title||'Document').replace(/'/g,"\\'")}', '${item.directUrl || item.driveUrl || ''}')">
                     <div class="w-10 h-10 ${type === 'dpp' ? 'bg-green-100' : 'bg-orange-100'} rounded-lg flex items-center justify-center flex-shrink-0 text-xl">${icon}</div>
                     <div class="flex-1 min-w-0">
-                        <div class="font-semibold text-sm text-gray-800 truncate">${item.title || 'Untitled'}</div>
-                        <div class="text-xs text-gray-400 mt-0.5">${item.fileName || (type === 'dpp' ? 'DPP Sheet' : 'Study Notes')} · PDF</div>
+                        <div class="font-semibold text-sm truncate" style="color:var(--text)">${item.title || 'Untitled'}</div>
+                        <div class="text-xs mt-0.5" style="color:var(--text2)">${item.fileName || (type === 'dpp' ? 'DPP Sheet' : 'Study Notes')} · PDF</div>
                     </div>
                     <div class="flex gap-2">
-                        <a href="${link}" target="_blank" onclick="event.stopPropagation()" class="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition" title="Open in Drive">
+                        <a href="${link}" target="_blank" onclick="event.stopPropagation()" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10 transition" style="background:rgba(139,92,246,0.15);color:var(--purple3)" title="Open in Drive">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                         </a>
                     </div>
@@ -875,7 +1166,7 @@
                     <div class="yt-embed-wrap mb-4">
                         <iframe src="${embedUrl}?rel=0&modestbranding=1" allowfullscreen allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
                     </div>
-                    <a href="${item.youtubeUrl || embedUrl}" target="_blank" class="flex items-center justify-center gap-2 w-full py-2.5 bg-red-600 text-white rounded-xl font-semibold text-sm hover:bg-red-700 transition">
+                    <a href="${item.youtubeUrl || embedUrl}" target="_blank" class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl font-semibold text-sm transition" style="background:linear-gradient(135deg,#B91C1C,#EF4444);color:white">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
                         Open on YouTube
                     </a>`;
@@ -890,10 +1181,10 @@
         document.getElementById('contentModalSubtitle').textContent = 'PDF Document';
         document.getElementById('contentModalBody').innerHTML = `
             <div class="flex gap-2 mb-4">
-                <a href="${embedUrl}" target="_blank" class="flex-1 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold text-sm text-center hover:bg-indigo-700 transition">📖 Open PDF</a>
-                ${downloadUrl ? `<a href="${downloadUrl}" target="_blank" class="flex-1 py-2.5 bg-gray-700 text-white rounded-xl font-semibold text-sm text-center hover:bg-gray-800 transition">⬇ Download</a>` : ''}
+                <a href="${embedUrl}" target="_blank" class="flex-1 py-2.5 btn-primary text-sm text-center">📖 Open PDF</a>
+                ${downloadUrl ? `<a href="${downloadUrl}" target="_blank" class="flex-1 py-2.5 btn-ghost text-sm text-center">⬇ Download</a>` : ''}
             </div>
-            <div class="bg-gray-50 rounded-xl p-4 text-center text-sm text-gray-500">
+            <div class="rounded-xl p-4 text-center text-sm" style="background:rgba(255,255,255,0.04);color:#6B8BAA">
                 <p class="text-2xl mb-2">📄</p>
                 <p>Click <strong>Open PDF</strong> to view this document in Google Drive.</p>
             </div>`;
@@ -918,7 +1209,7 @@
             const btn = document.getElementById('payNowBtn');
             btn.textContent = '✅ Fees Fully Paid';
             btn.disabled = true;
-            btn.className = 'w-full mt-3 py-3.5 bg-green-600 text-white rounded-xl font-semibold text-base cursor-not-allowed flex items-center justify-center gap-2';
+            btn.style.cssText = 'background:linear-gradient(135deg,#166534,#16a34a);color:white;border-radius:0.875rem;font-weight:700;cursor:not-allowed;width:100%;padding:0.875rem;margin-top:0.75rem;display:flex;align-items:center;justify-content:center;gap:0.5rem';
         }
         loadPaymentHistory();
     }
@@ -927,20 +1218,20 @@
         try {
             const snap = await db.collection('payments').where('studentId','==',currentUser.uid).orderBy('createdAt','desc').get();
             const el = document.getElementById('paymentHistory');
-            if (snap.empty) { el.innerHTML = '<div class="text-center py-6 text-gray-400"><p class="text-4xl mb-2">📭</p><p class="text-sm">No payment records yet</p></div>'; return; }
+            if (snap.empty) { el.innerHTML = '<div class="text-center py-6" style="color:var(--text3)"><p class="text-4xl mb-2">📭</p><p class="text-sm">No payment records yet</p></div>'; return; }
             el.innerHTML = snap.docs.map(doc => {
                 const d = doc.data();
-                const sc = d.status === 'approved' ? 'bg-green-100 text-green-700' : d.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700';
+                const sc = d.status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : d.status === 'rejected' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
                 const icon = d.status === 'approved' ? '✅' : d.status === 'rejected' ? '❌' : '⏳';
                 const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '—';
                 const proofLink = d.proofUrl ? `<a href="${d.proofUrl}" target="_blank" class="text-xs text-primary underline ml-2">View proof</a>` : '';
-                return `<div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+                return `<div class="pay-item rounded-xl">
                     <div>
-                        <div class="font-bold text-gray-900">₹${d.amount?.toLocaleString()}</div>
-                        <div class="text-xs text-gray-500 mt-0.5">${date} • <span class="capitalize">${d.mode || '—'}</span>${proofLink}</div>
-                        ${d.status === 'pending' ? '<div class="text-xs text-yellow-600 mt-1">⏳ Waiting for admin approval</div>' : ''}
-                        ${d.status === 'rejected' ? '<div class="text-xs text-red-600 mt-1">❌ Payment rejected — please contact admin</div>' : ''}
-                        ${d.status === 'approved' ? '<div class="text-xs text-green-600 mt-1">✅ Payment approved</div>' : ''}
+                        <div class="font-bold" style="color:var(--text)">₹${d.amount?.toLocaleString()}</div>
+                        <div class="text-xs mt-0.5" style="color:var(--text2)">${date} • <span class="capitalize">${d.mode || '—'}</span>${proofLink}</div>
+                        ${d.status === 'pending' ? '<div class="text-xs mt-1" style="color:#FCD34D">⏳ Waiting for admin approval</div>' : ''}
+                        ${d.status === 'rejected' ? '<div class="text-xs mt-1" style="color:#FCA5A5">❌ Payment rejected — please contact admin</div>' : ''}
+                        ${d.status === 'approved' ? '<div class="text-xs mt-1" style="color:#86EFAC">✅ Payment approved</div>' : ''}
                     </div>
                     <span class="text-sm font-semibold px-3 py-1 rounded-full ${sc}">${icon} ${d.status}</span>
                 </div>`;
@@ -1086,17 +1377,17 @@
         try {
             const snap = await db.collection('announcements').where('target','in',['all','students']).orderBy('isPinned','desc').orderBy('createdAt','desc').limit(20).get();
             const el = document.getElementById('announcements');
-            if (snap.empty) { el.innerHTML = '<div class="card p-8 text-center text-gray-400">No announcements yet</div>'; return; }
+            if (snap.empty) { el.innerHTML = '<div class="card p-8 text-center" style="color:var(--text3)">No announcements yet</div>'; return; }
             el.innerHTML = snap.docs.map(doc => {
                 const d = doc.data();
                 const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
-                return `<div class="card p-5 ${d.isPinned ? 'border-l-4 border-primary bg-indigo-50/50' : ''}">
+                return `<div class="card p-5" style="${d.isPinned ? 'border-left:3px solid var(--purple1);background:rgba(124,58,237,0.06)' : ''}">
                     <div class="flex items-start justify-between gap-3 mb-2">
-                        <h3 class="font-bold text-gray-900">${d.isPinned ? '📌 ' : ''}${d.title}</h3>
-                        ${d.isPinned ? '<span class="text-xs bg-primary text-white px-2 py-0.5 rounded-full flex-shrink-0">Pinned</span>' : ''}
+                        <h3 class="font-bold" style="color:var(--text)">${d.isPinned ? '📌 ' : ''}${d.title}</h3>
+                        ${d.isPinned ? '<span class="text-xs px-2 py-0.5 rounded-full flex-shrink-0" style="background:rgba(139,92,246,0.2);color:var(--purple3)">Pinned</span>' : ''}
                     </div>
-                    <p class="text-sm text-gray-600 leading-relaxed">${d.message}</p>
-                    <div class="text-xs text-gray-400 mt-3">${date}</div>
+                    <p class="text-sm leading-relaxed" style="color:var(--text2)">${d.message}</p>
+                    <div class="text-xs mt-3" style="color:var(--text3)">${date}</div>
                 </div>`;
             }).join('');
         } catch(e) { document.getElementById('announcements').innerHTML = '<div class="card p-6 text-center text-red-500">Error loading</div>'; }
@@ -1112,19 +1403,19 @@
             if (unread.length > 0) { badge.textContent = unread.length > 9 ? '9+' : unread.length; badge.classList.remove('hidden'); }
             else badge.classList.add('hidden');
 
-            if (snap.empty) { el.innerHTML = '<div class="card p-8 text-center text-gray-400">No notifications</div>'; return; }
+            if (snap.empty) { el.innerHTML = '<div class="card p-8 text-center" style="color:var(--text3)">No notifications</div>'; return; }
             el.innerHTML = snap.docs.map(doc => {
                 const d = doc.data();
                 const icons = { payment:'💳', admission:'🎓', announcement:'📢', approval:'✅' };
                 const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
-                return `<div class="card p-4 flex gap-3 ${!d.read ? 'border-l-4 border-primary' : ''}" onclick="markNotifRead('${doc.id}')">
+                return `<div class="card p-4 flex gap-3" style="${!d.read ? 'border-left:3px solid #0EA5E9' : ''}" onclick="markNotifRead('${doc.id}')">
                     <div class="w-10 h-10 rounded-full ${!d.read ? 'bg-primary/10' : 'bg-gray-100'} flex items-center justify-center text-lg flex-shrink-0">${icons[d.type] || '🔔'}</div>
                     <div class="flex-1 min-w-0">
                         <div class="font-semibold text-sm ${!d.read ? 'text-gray-900' : 'text-gray-600'}">${d.title}</div>
-                        <div class="text-xs text-gray-500 mt-0.5 line-clamp-2">${d.message}</div>
-                        <div class="text-xs text-gray-400 mt-1">${date}</div>
+                        <div class="text-xs mt-0.5" style="color:#6B8BAA;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${d.message}</div>
+                        <div class="text-xs mt-1" style="color:var(--text3)">${date}</div>
                     </div>
-                    ${!d.read ? '<div class="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>' : ''}
+                    ${!d.read ? '<div class="w-2 h-2 rounded-full mt-2 flex-shrink-0" style="background:var(--purple2)"></div>' : ''}
                 </div>`;
             }).join('');
             unread.forEach(doc => doc.ref.update({ read: true }).catch(() => {}));
@@ -1148,23 +1439,23 @@
         document.getElementById('profileName').textContent   = name;
         document.getElementById('profileEmail').textContent  = email;
         document.getElementById('profileTags').innerHTML = `
-            <span class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-xs font-semibold">Class ${cls}</span>
+            <span class="tag-purple">Class ${cls}</span>
             <span class="capitalize px-3 py-1 ${mode === 'online' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'} rounded-full text-xs font-semibold">${mode}</span>
             <span class="uppercase px-3 py-1 ${board.toLowerCase() === 'cbse' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-700'} rounded-full text-xs font-semibold">${board}</span>`;
 
         const { base, offer, net, paid, remaining } = getFeeBreakdown();
         document.getElementById('profileDetails').innerHTML = `
             <div class="space-y-3 text-sm">
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Full Name</span><span class="font-medium text-gray-800">${name}</span></div>
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Email</span><span class="font-medium text-gray-800 text-right max-w-xs truncate">${email}</span></div>
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Phone</span><span class="font-medium text-gray-800">${phone}</span></div>
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Class</span><span class="font-medium text-gray-800">Class ${cls}</span></div>
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Mode</span><span class="font-medium capitalize text-gray-800">${mode}</span></div>
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Board</span><span class="font-medium uppercase text-gray-800">${board}</span></div>
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Annual Fee</span><span class="font-bold text-purple-700">₹${base.toLocaleString()}</span></div>
-                ${offer > 0 ? `<div class="flex justify-between py-2 border-b border-gray-50"><span class="text-orange-600">Special Offer</span><span class="font-bold text-orange-700">-₹${offer.toLocaleString()}</span></div>` : ''}
-                <div class="flex justify-between py-2 border-b border-gray-50"><span class="text-gray-500">Paid</span><span class="font-bold text-green-700">₹${paid.toLocaleString()}</span></div>
-                <div class="flex justify-between py-2"><span class="font-semibold text-gray-700">Remaining Due</span><span class="font-bold text-red-700">₹${remaining.toLocaleString()}</span></div>
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Full Name</span><span style="font-weight:500;color:var(--text)">${name}</span></div>
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Email</span><span style="font-weight:500;color:var(--text);text-align:right;max-width:16rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${email}</span></div>
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Phone</span><span style="font-weight:500;color:var(--text)">${phone}</span></div>
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Class</span><span style="font-weight:500;color:var(--text)">Class ${cls}</span></div>
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Mode</span><span style="font-weight:500;color:var(--text);text-transform:capitalize">${mode}</span></div>
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Board</span><span style="font-weight:500;color:var(--text);text-transform:uppercase">${board}</span></div>
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Annual Fee</span><span style="font-weight:700;color:var(--purple3)">₹${base.toLocaleString()}</span></div>
+                ${offer > 0 ? `<div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:#FCD34D">Special Offer</span><span class="font-bold" style="color:#FCD34D">-₹${offer.toLocaleString()}</span></div>` : ''}
+                <div class="flex justify-between py-2" style="border-bottom:1px solid rgba(139,92,246,0.1)"><span style="color:var(--text2)">Paid</span><span style="font-weight:700;color:#86EFAC">₹${paid.toLocaleString()}</span></div>
+                <div class="flex justify-between py-2"><span style="font-weight:600;color:var(--text)">Remaining Due</span><span style="font-weight:700;color:#FCA5A5">₹${remaining.toLocaleString()}</span></div>
             </div>`;
     }
 
@@ -1180,6 +1471,7 @@
 
         // Reset course view when navigating away and back
         if (page === 'courses') {
+        if (page === 'dashboard') { setTimeout(drawNebulaGraph, 100); }
             document.getElementById('subjectsList').style.display = 'block';
             document.getElementById('subjectDetailPanel').style.display = 'none';
         }
@@ -1190,8 +1482,8 @@
 
     function showToast(msg, type = 'success') {
         const t = document.getElementById('toast');
-        const colors = { success: '#16A34A', error: '#DC2626', warning: '#D97706', info: '#2563EB' };
-        t.style.background = colors[type] || colors.success;
+        const colors = { success: 'linear-gradient(135deg,#166534,#16A34A)', error: 'linear-gradient(135deg,#7F1D1D,#DC2626)', warning: 'linear-gradient(135deg,#78350F,#D97706)', info: 'linear-gradient(135deg,#4C1D95,#7C3AED)' };
+        t.style.background = colors[type] || colors.success; t.style.borderColor = "rgba(139,92,246,0.3)";
         t.textContent = msg;
         t.classList.add('show');
         setTimeout(() => t.classList.remove('show'), 3500);
@@ -1202,6 +1494,416 @@
         await auth.signOut();
         window.location.href = 'login.html';
     }
+
+    // ══════════════════════════════════════════════════════════════
+    //  STUDY TIMER, STREAK & NEBULA GRAPH
+    // ══════════════════════════════════════════════════════════════
+
+    let sessionStartTime  = null;
+    let sessionSaveTimer  = null;
+    let liveTimerInterval = null;
+    let studyData         = {};   // { "2024-01-15": seconds, ... }
+
+    // ── Date helpers ─────────────────────────────────────────────
+    function todayKey() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    function dateKey(d) {
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    function fmtHr(seconds) {
+        if (seconds < 60) return seconds + 's';
+        if (seconds < 3600) return (seconds/60).toFixed(0) + 'm';
+        const h = Math.floor(seconds/3600);
+        const m = Math.floor((seconds%3600)/60);
+        return h + 'h ' + (m > 0 ? m + 'm' : '');
+    }
+    function fmtTimer(seconds) {
+        const h = Math.floor(seconds/3600);
+        const m = Math.floor((seconds%3600)/60);
+        const s = seconds % 60;
+        return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    }
+
+    // ── Start session when user arrives ──────────────────────────
+    function startStudySession() {
+        sessionStartTime = Date.now();
+        liveTimerInterval = setInterval(updateLiveTimer, 1000);
+        // Auto-save every 60s in case page closes
+        sessionSaveTimer = setInterval(() => saveSessionChunk(), 60000);
+        // Save on tab hidden / page unload
+        document.addEventListener('visibilitychange', onVisibilityChange);
+        window.addEventListener('beforeunload', onBeforeUnload);
+    }
+
+    function updateLiveTimer() {
+        if (!sessionStartTime) return;
+        // Show today's TOTAL = saved Firebase seconds + this session's current seconds
+        const sessionElapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+        const savedToday     = studyData[todayKey()] || 0;
+        const totalToday     = savedToday + sessionElapsed;
+        const el = document.getElementById('liveTimer');
+        if (el) el.textContent = fmtTimer(totalToday);
+        // Update today stat live too
+        const el1 = document.getElementById('studyTodayHr');
+        if (el1) el1.textContent = fmtHr(totalToday);
+    }
+
+    function onVisibilityChange() {
+        if (document.hidden) saveSessionChunk();
+        else sessionStartTime = Date.now(); // reset start when returning
+    }
+    function onBeforeUnload() { saveSessionChunk(); }
+
+    async function saveSessionChunk() {
+        if (!sessionStartTime || !currentUser) return;
+        const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
+        if (elapsed < 5) return; // ignore micro-sessions
+        sessionStartTime = Date.now(); // reset for next chunk
+
+        const key = todayKey();
+        try {
+            const ref = db.collection('studySessions').doc(currentUser.uid);
+            await ref.set({
+                [`days.${key}`]: firebase.firestore.FieldValue.increment(elapsed),
+                total:           firebase.firestore.FieldValue.increment(elapsed),
+                lastUpdated:     firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            // Update local cache
+            studyData[key] = (studyData[key] || 0) + elapsed;
+            renderStudyStats();
+            renderStreakDots();
+            drawNebulaGraph();
+        } catch(e) { console.warn('Study session save failed', e); }
+    }
+
+    // ── Load study history from Firestore ─────────────────────────
+    async function loadStudyData() {
+        if (!currentUser) return;
+        try {
+            const doc = await db.collection('studySessions').doc(currentUser.uid).get();
+            if (doc.exists) {
+                studyData = doc.data().days || {};
+            }
+        } catch(e) { studyData = {}; }
+        renderStudyStats();
+        renderStreakDots();
+        drawNebulaGraph();
+        loadAdminFeedback();
+        startStudySession();
+    }
+
+    // ── Render stats row ──────────────────────────────────────────
+    function renderStudyStats() {
+        const today = todayKey();
+        let weekSec = 0;
+        let totalSec = 0;
+        const now = new Date();
+        for (const [k, v] of Object.entries(studyData)) {
+            totalSec += v;
+            const d = new Date(k);
+            const diff = Math.floor((now - d) / 86400000);
+            if (diff < 7) weekSec += v;
+        }
+        const todaySec = studyData[today] || 0;
+        const el1 = document.getElementById('studyTodayHr');
+        const el2 = document.getElementById('studyWeekHr');
+        const el3 = document.getElementById('studyTotalHr');
+        if (el1) el1.textContent = todaySec ? fmtHr(todaySec) : '0m';
+        if (el2) el2.textContent = fmtHr(weekSec);
+        if (el3) el3.textContent = fmtHr(totalSec);
+    }
+
+    // ── Streak calculation ────────────────────────────────────────
+    function calcStreak() {
+        const keys = Object.keys(studyData).filter(k => studyData[k] > 60).sort().reverse();
+        if (!keys.length) return 0;
+        let streak = 0;
+        let check  = new Date();
+        check.setHours(0,0,0,0);
+        for (let i = 0; i < 365; i++) {
+            const k = dateKey(check);
+            if (studyData[k] && studyData[k] > 60) {
+                streak++;
+                check.setDate(check.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
+
+    function renderStreakDots() {
+        const streak = calcStreak();
+        const sc = document.getElementById('streakCount');
+        const sm = document.getElementById('streakMsg');
+        const se = document.getElementById('streakEmoji');
+        if (sc) sc.textContent = streak;
+        if (sm) sm.textContent = streak === 0 ? 'Start your streak today! Open the app daily.' :
+                                  streak < 3  ? 'Great start! Keep going 💪' :
+                                  streak < 7  ? 'On fire! ' + streak + ' days strong 🔥' :
+                                  streak < 14 ? 'Amazing streak! 🚀 Keep it up!' :
+                                               'Legendary! ' + streak + ' day streak! 👑';
+        if (se) se.textContent = streak === 0 ? '💤' : streak < 3 ? '✨' : streak < 7 ? '🔥' : streak < 14 ? '🚀' : '👑';
+
+        // Last 7 days dots
+        const dotsEl = document.getElementById('streakDots');
+        if (!dotsEl) return;
+        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        let html = '';
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
+            const k = dateKey(d);
+            const active = studyData[k] && studyData[k] > 60;
+            const isToday = i === 0;
+            html += `<div class="flex flex-col items-center gap-1 flex-1">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all
+                    ${active ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/40' : isToday ? 'border-2 border-purple-400 text-purple-300' : 'bg-white/10 text-white/30'}">
+                    ${active ? '✓' : dayNames[d.getDay()][0]}
+                </div>
+                <div class="text-xs" style="color:${active ? '#c084fc' : '#4a4070'}">${dayNames[d.getDay()]}</div>
+            </div>`;
+        }
+        dotsEl.innerHTML = html;
+    }
+
+    // ── Nebula Graph ──────────────────────────────────────────────
+    function drawNebulaGraph() {
+        const canvas = document.getElementById('nebulaCanvas');
+        if (!canvas) return;
+
+        // Build 14-day dataset
+        const days = 14;
+        const labels = [];
+        const values = [];
+        let maxVal = 0;
+        const now = new Date();
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(now); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
+            const k = dateKey(d);
+            const secs = (studyData[k] || 0);
+            const hrs  = secs / 3600;
+            labels.push(d.getDate() + '/' + (d.getMonth()+1));
+            values.push(hrs);
+            if (hrs > maxVal) maxVal = hrs;
+        }
+
+        // Best day label
+        const bestIdx = values.indexOf(Math.max(...values));
+        const bdEl = document.getElementById('bestDayLabel');
+        if (bdEl) bdEl.textContent = maxVal > 0 ? fmtHr(Math.round(maxVal * 3600)) + ' on ' + labels[bestIdx] : 'No data yet';
+
+        // X-axis labels (every other)
+        const xlEl = document.getElementById('nebulaXLabels');
+        if (xlEl) xlEl.innerHTML = labels.map((l,i) => `<span>${i % 2 === 0 ? l : ''}</span>`).join('');
+
+        const W = canvas.offsetWidth || 400;
+        const H = 180;
+        canvas.width  = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, W, H);
+
+        const pad = { top: 20, right: 20, bottom: 10, left: 10 };
+        const gW  = W - pad.left - pad.right;
+        const gH  = H - pad.top  - pad.bottom;
+
+        const yMax = maxVal > 0 ? maxVal * 1.25 : 4;
+
+        // Background nebula glow blobs
+        const blobs = [
+            { x: W * 0.2, y: H * 0.5, r: 80, c: 'rgba(99,50,180,0.18)' },
+            { x: W * 0.6, y: H * 0.3, r: 60, c: 'rgba(180,50,220,0.14)' },
+            { x: W * 0.85, y: H * 0.6, r: 50, c: 'rgba(50,130,220,0.12)' },
+        ];
+        blobs.forEach(b => {
+            const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+            grad.addColorStop(0, b.c); grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
+        });
+
+        // Draw star particles
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        const starPositions = [[30,15],[80,40],[150,10],[220,50],[310,20],[370,45],[W-40,18],[W-90,38]];
+        starPositions.forEach(([sx,sy]) => { ctx.beginPath(); ctx.arc(sx, sy, 0.8, 0, Math.PI*2); ctx.fill(); });
+
+        // Gridlines (faint)
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.lineWidth = 1;
+        [0.25, 0.5, 0.75, 1].forEach(f => {
+            const y = pad.top + gH * (1 - f);
+            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+        });
+
+        if (values.every(v => v === 0)) {
+            ctx.fillStyle = 'rgba(160,140,220,0.5)';
+            ctx.font = '13px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Start studying to see your progress graph!', W/2, H/2);
+            return;
+        }
+
+        const xStep = gW / (days - 1);
+
+        const pts = values.map((v, i) => ({
+            x: pad.left + i * xStep,
+            y: pad.top + gH * (1 - v / yMax)
+        }));
+
+        // Filled area gradient under curve
+        const areaGrad = ctx.createLinearGradient(0, pad.top, 0, H);
+        areaGrad.addColorStop(0,   'rgba(139,92,246,0.55)');
+        areaGrad.addColorStop(0.5, 'rgba(167,60,220,0.25)');
+        areaGrad.addColorStop(1,   'rgba(76,29,149,0.0)');
+
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            const cp1x = (pts[i-1].x + pts[i].x) / 2, cp1y = pts[i-1].y;
+            const cp2x = (pts[i-1].x + pts[i].x) / 2, cp2y = pts[i].y;
+            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, pts[i].x, pts[i].y);
+        }
+        ctx.lineTo(pts[pts.length-1].x, H - pad.bottom);
+        ctx.lineTo(pts[0].x, H - pad.bottom);
+        ctx.closePath();
+        ctx.fillStyle = areaGrad;
+        ctx.fill();
+
+        // Glow line
+        ctx.save();
+        ctx.shadowBlur  = 18;
+        ctx.shadowColor = '#a855f7';
+        ctx.strokeStyle = '#c084fc';
+        ctx.lineWidth   = 2.5;
+        ctx.lineCap     = 'round';
+        ctx.lineJoin    = 'round';
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 1; i < pts.length; i++) {
+            const cp1x = (pts[i-1].x + pts[i].x) / 2, cp1y = pts[i-1].y;
+            const cp2x = (pts[i-1].x + pts[i].x) / 2, cp2y = pts[i].y;
+            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, pts[i].x, pts[i].y);
+        }
+        ctx.stroke();
+        ctx.restore();
+
+        // Data points with glow
+        pts.forEach((pt, i) => {
+            if (values[i] === 0) return;
+            ctx.save();
+            ctx.shadowBlur  = 12;
+            ctx.shadowColor = '#e879f9';
+            ctx.fillStyle   = '#f0abfc';
+            ctx.beginPath(); ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI*2); ctx.fill();
+            ctx.restore();
+        });
+    }
+
+    // ── Admin Feedback ────────────────────────────────────────────
+    async function loadAdminFeedback() {
+        const el = document.getElementById('adminFeedbackList');
+        if (!el || !currentUser) return;
+        try {
+            const snap = await db.collection('adminFeedback')
+                .where('studentId', '==', currentUser.uid)
+                .orderBy('createdAt', 'desc')
+                .limit(5)
+                .get();
+
+            if (snap.empty) {
+                el.innerHTML = `<div class="feedback-card p-4 flex items-start gap-3">
+                    <div class="text-2xl">💬</div>
+                    <div>
+                        <div class="font-semibold text-white text-sm">No feedback yet</div>
+                        <div class="text-xs mt-0.5" style="color:var(--text2)">Admin feedback and comments will appear here.</div>
+                    </div>
+                </div>`;
+                return;
+            }
+
+            const icons = { great: '⭐', good: '👍', improve: '💡', warning: '⚠️', default: '💬' };
+            el.innerHTML = snap.docs.map(doc => {
+                const d = doc.data();
+                const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
+                const icon = icons[d.type] || icons.default;
+                const ratingStars = d.rating ? '★'.repeat(d.rating) + '☆'.repeat(5 - d.rating) : '';
+                return `<div class="feedback-card p-4">
+                    <div class="flex items-start gap-3">
+                        <div class="text-2xl flex-shrink-0">${icon}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-2">
+                                <div class="font-semibold text-sm text-white">${d.adminName || 'Admin'}</div>
+                                <div class="text-xs flex-shrink-0" style="color:var(--text3)">${date}</div>
+                            </div>
+                            ${ratingStars ? `<div class="text-yellow-400 text-sm mt-0.5 tracking-wider">${ratingStars}</div>` : ''}
+                            <div class="text-sm mt-1.5 leading-relaxed" style="color:var(--purple3)">${d.message}</div>
+                            ${d.subject ? `<div class="mt-2 inline-block text-xs px-2 py-0.5 rounded-full" style="background:rgba(139,92,246,0.3);color:#e9d5ff">${d.subject}</div>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        } catch(e) {
+            el.innerHTML = `<div class="feedback-card p-4 flex items-start gap-3">
+                <div class="text-2xl">💬</div>
+                <div class="font-semibold text-white text-sm">No feedback yet</div>
+            </div>`;
+        }
+    }
+
+    // Resize handler for graph
+    window.addEventListener('resize', () => {
+        if (document.getElementById('page-dashboard').classList.contains('active')) {
+            drawNebulaGraph();
+        }
+    });
+
+
+    // ══════════════════════════════════════════════════════════════
+    //  THEME TOGGLE (dark ↔ white)
+    // ══════════════════════════════════════════════════════════════
+    let isLightMode = false;
+
+    function applyTheme(light) {
+        isLightMode = light;
+        const html  = document.documentElement;
+        const btn   = document.getElementById('themeToggleBtn');
+        const icon  = document.getElementById('themeToggleIcon');
+        const label = document.getElementById('themeToggleLabel');
+        const badge = document.getElementById('themeToggleBadge');
+
+        if (light) {
+            html.classList.add('light');
+            if (icon)  icon.textContent  = '🌙';
+            if (label) { label.textContent = 'Switch to Dark Mode'; label.style.color = 'var(--text)'; }
+            if (badge) { badge.textContent = 'LIGHT'; badge.style.background = 'rgba(99,102,241,0.12)'; badge.style.color = 'var(--indigo2)'; }
+            if (btn)   btn.style.borderColor = 'rgba(14,165,233,0.2)';
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#F0F6FF');
+        } else {
+            html.classList.remove('light');
+            if (icon)  icon.textContent  = '☀️';
+            if (label) { label.textContent = 'Switch to White Mode'; label.style.color = 'var(--text)'; }
+            if (badge) { badge.textContent = 'DARK'; badge.style.background = 'rgba(139,92,246,0.15)'; badge.style.color = 'var(--purple3)'; }
+            if (btn)   btn.style.borderColor = '';
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#111117');
+        }
+        try { localStorage.setItem('msTheme', light ? 'light' : 'dark'); } catch(e) {}
+        // Redraw nebula graph in new theme colours
+        setTimeout(drawNebulaGraph, 50);
+    }
+
+    function toggleTheme() {
+        applyTheme(!isLightMode);
+    }
+
+    // Restore saved theme on load
+    (function() {
+        try {
+            const saved = localStorage.getItem('msTheme');
+            if (saved === 'light') applyTheme(true);
+        } catch(e) {}
+    })();
+
     </script>
 </body>
 </html>
