@@ -1578,434 +1578,517 @@
         window.location.href = 'login.html';
     }
 
-    // ══════════════════════════════════════════════════════════════
-    //  STUDY TIMER, STREAK & NEBULA GRAPH
-    // ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════
+//  STUDY TIMER, STREAK & NEBULA GRAPH  —  FIXED VERSION
+//
+//  HOW TO APPLY:
+//  In your HTML, find the comment:
+//    //  STUDY TIMER, STREAK & NEBULA GRAPH
+//  Delete everything from that comment down to (and including):
+//    startStudySession();
+//  inside the loadStudyData() function.
+//  Then paste this entire file in its place.
+// ══════════════════════════════════════════════════════════════
 
-    let sessionStartTime  = null;
-    let sessionSaveTimer  = null;
-    let liveTimerInterval = null;
-    let studyData         = {};   // { "2024-01-15": seconds, ... }
+let sessionStartTime  = null;
+let sessionSaveTimer  = null;
+let liveTimerInterval = null;
+let studyData         = {};   // { "YYYY-MM-DD": totalSavedSeconds }
 
-    // ── Date helpers ─────────────────────────────────────────────
-    function todayKey() {
-        const d = new Date();
-        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+// _sessionBase = studyData[today] at the moment this session started.
+// We keep it fixed for the lifetime of the session so todayTotal()
+// never double-counts flushed increments.
+let _sessionBase = 0;
+
+// ── Date helpers ──────────────────────────────────────────────
+function todayKey() {
+    const d = new Date();
+    return d.getFullYear() + '-'
+         + String(d.getMonth() + 1).padStart(2, '0') + '-'
+         + String(d.getDate()).padStart(2, '0');
+}
+function dateKey(d) {
+    return d.getFullYear() + '-'
+         + String(d.getMonth() + 1).padStart(2, '0') + '-'
+         + String(d.getDate()).padStart(2, '0');
+}
+function fmtHr(seconds) {
+    if (seconds < 60)   return seconds + 's';
+    if (seconds < 3600) return Math.floor(seconds / 60) + 'm';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    return h + 'h' + (m > 0 ? ' ' + m + 'm' : '');
+}
+function fmtTimer(seconds) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return String(h).padStart(2, '0') + ':'
+         + String(m).padStart(2, '0') + ':'
+         + String(s).padStart(2, '0');
+}
+
+// ── LocalStorage helpers ──────────────────────────────────────
+const LS_TODAY_KEY = 'ms_study_today';
+const LS_ALL_KEY   = 'ms_study_all';   // ← NEW: persists ALL days for streak
+
+function lsReadToday() {
+    try {
+        const raw = localStorage.getItem(LS_TODAY_KEY);
+        if (!raw) return 0;
+        const obj = JSON.parse(raw);
+        return obj.date === todayKey() ? (obj.seconds || 0) : 0;
+    } catch (e) { return 0; }
+}
+function lsWriteToday(secs) {
+    try { localStorage.setItem(LS_TODAY_KEY, JSON.stringify({ date: todayKey(), seconds: secs })); } catch (e) {}
+}
+function lsReadAllDays() {
+    try { const r = localStorage.getItem(LS_ALL_KEY); return r ? JSON.parse(r) : {}; } catch (e) { return {}; }
+}
+function lsWriteAllDays(days) {
+    try { localStorage.setItem(LS_ALL_KEY, JSON.stringify(days)); } catch (e) {}
+}
+
+// ── Core helpers ──────────────────────────────────────────────
+// Raw seconds the timer has been running since startStudySession()
+function liveSessionSecs() {
+    return sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
+}
+
+// Accurate "today" total: fixed base (loaded at session start) + live seconds.
+// This NEVER double-counts even when we flush and update studyData[today].
+function todayTotal() {
+    return _sessionBase + liveSessionSecs();
+}
+
+// ── Start session ─────────────────────────────────────────────
+function startStudySession() {
+    // Capture what Firebase/localStorage already saved for today.
+    _sessionBase      = studyData[todayKey()] || 0;
+    sessionStartTime  = Date.now();
+
+    liveTimerInterval = setInterval(updateLiveTimer, 1000);
+    sessionSaveTimer  = setInterval(flushToFirebase, 30000);
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('pagehide',       onPageHide);
+    window.addEventListener('beforeunload',   onBeforeUnload);
+}
+
+// ── Live timer tick (every 1 s) ───────────────────────────────
+let _lsTickCounter = 0;
+function updateLiveTimer() {
+    const total = todayTotal();
+
+    const timerEl = document.getElementById('liveTimer');
+    if (timerEl) timerEl.textContent = fmtTimer(total);
+
+    const todayEl = document.getElementById('studyTodayHr');
+    if (todayEl) todayEl.textContent = fmtHr(total);
+
+    // Write to localStorage every 10 s
+    _lsTickCounter++;
+    if (_lsTickCounter % 10 === 0) {
+        lsWriteToday(total);
+        // Also update the all-days cache with latest today value
+        const allDays = lsReadAllDays();
+        allDays[todayKey()] = total;
+        lsWriteAllDays(allDays);
     }
-    function dateKey(d) {
-        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// ── Visibility / unload ───────────────────────────────────────
+function onVisibilityChange() {
+    if (document.hidden) {
+        // Tab going to background — save immediately
+        lsWriteToday(todayTotal());
+        const allDays = lsReadAllDays();
+        allDays[todayKey()] = todayTotal();
+        lsWriteAllDays(allDays);
+        flushToFirebase();
     }
-    function fmtHr(seconds) {
-        if (seconds < 60) return seconds + 's';
-        if (seconds < 3600) return (seconds/60).toFixed(0) + 'm';
-        const h = Math.floor(seconds/3600);
-        const m = Math.floor((seconds%3600)/60);
-        return h + 'h ' + (m > 0 ? m + 'm' : '');
-    }
-    function fmtTimer(seconds) {
-        const h = Math.floor(seconds/3600);
-        const m = Math.floor((seconds%3600)/60);
-        const s = seconds % 60;
-        return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-    }
+    // ← NO sessionStartTime reset when tab comes back.
+    //   The timer keeps running continuously — no restart flash.
+}
+function onBeforeUnload() {
+    lsWriteToday(todayTotal());
+    const allDays = lsReadAllDays();
+    allDays[todayKey()] = todayTotal();
+    lsWriteAllDays(allDays);
+    flushToFirebase();
+}
+function onPageHide() { onBeforeUnload(); }
 
-    // ─────────────────────────────────────────────────────────────
-    //  STUDY TIMER  (localStorage backup + Firebase persistence)
-    //
-    //  Logic:
-    //  • Every second: update liveTimer = firebase_today + live_elapsed
-    //  • Every 5s: write to localStorage so data survives refresh/close
-    //  • Every 30s: flush to Firebase (increment) + reset chunk start
-    //  • On tab hide / page close: flush immediately to both
-    //  • On load: read localStorage FIRST (instant) then merge Firebase
-    // ─────────────────────────────────────────────────────────────
+// ── Flush to Firebase ─────────────────────────────────────────
+// Uses SET (not FieldValue.increment) so multiple sessions on the
+// same day can never double-count.  The source of truth is always
+// _sessionBase + liveSessionSecs(), not an ever-growing server counter.
+let _lastFlushedSecs = 0;   // liveSessionSecs() at last flush
 
-    const LS_STUDY_KEY = 'ms_study_backup';
+async function flushToFirebase() {
+    if (!currentUser || !sessionStartTime) return;
 
-    function lsReadToday() {
-        try {
-            const raw = localStorage.getItem(LS_STUDY_KEY);
-            if (!raw) return 0;
-            const obj = JSON.parse(raw);
-            if (obj.date !== todayKey()) return 0; // different day
-            return obj.seconds || 0;
-        } catch(e) { return 0; }
-    }
+    const curSecs  = liveSessionSecs();
+    const newSecs  = curSecs - _lastFlushedSecs;
+    if (newSecs < 5) return;                  // nothing worth saving yet
 
-    function lsWriteToday(totalSeconds) {
-        try {
-            localStorage.setItem(LS_STUDY_KEY, JSON.stringify({
-                date: todayKey(), seconds: totalSeconds
-            }));
-        } catch(e) {}
-    }
+    _lastFlushedSecs = curSecs;               // advance the watermark
 
-    function startStudySession() {
-        sessionStartTime = Date.now();
-        liveTimerInterval = setInterval(updateLiveTimer, 1000);
-        // Flush to Firebase every 30s (reliable; async ok here since not on close)
-        sessionSaveTimer  = setInterval(() => flushToFirebase(), 30000);
-        document.addEventListener('visibilitychange', onVisibilityChange);
-        window.addEventListener('pagehide', onPageHide);      // reliable on mobile
-        window.addEventListener('beforeunload', onBeforeUnload); // desktop
-    }
+    const key   = todayKey();
+    const total = todayTotal();               // accurate total for today
 
-    function updateLiveTimer() {
-        if (!sessionStartTime) return;
-        const sessionElapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-        const savedToday     = studyData[todayKey()] || 0;
-        const totalToday     = savedToday + sessionElapsed;
+    // Optimistically update local state
+    studyData[key] = total;
+    lsWriteToday(total);
+    const allDays = lsReadAllDays();
+    allDays[key] = total;
+    lsWriteAllDays(allDays);
 
-        const el = document.getElementById('liveTimer');
-        if (el) el.textContent = fmtTimer(totalToday);
-        const el1 = document.getElementById('studyTodayHr');
-        if (el1) el1.textContent = fmtHr(totalToday);
-
-        // Write to localStorage every 5s (every 5 ticks)
-        if (sessionElapsed % 5 === 0) lsWriteToday(totalToday);
-    }
-
-    function onVisibilityChange() {
-        if (document.hidden) {
-            syncToLocalStorageNow();
-            flushToFirebase();
-        } else {
-            sessionStartTime = Date.now(); // reset chunk start
-        }
-    }
-
-    function syncToLocalStorageNow() {
-        if (!sessionStartTime) return;
-        const elapsed    = Math.floor((Date.now() - sessionStartTime) / 1000);
-        const savedToday = studyData[todayKey()] || 0;
-        lsWriteToday(savedToday + elapsed);
-    }
-
-    function onBeforeUnload() { syncToLocalStorageNow(); flushToFirebase(); }
-    function onPageHide()     { syncToLocalStorageNow(); flushToFirebase(); }
-
-    async function flushToFirebase() {
-        if (!sessionStartTime || !currentUser) return;
-        const elapsed = Math.floor((Date.now() - sessionStartTime) / 1000);
-        if (elapsed < 5) return;
-        sessionStartTime = Date.now(); // reset chunk
-
-        const key = todayKey();
-        try {
-            await db.collection('studySessions').doc(currentUser.uid).set({
-                [`days.${key}`]: firebase.firestore.FieldValue.increment(elapsed),
-                total:           firebase.firestore.FieldValue.increment(elapsed),
-                lastUpdated:     firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-            studyData[key] = (studyData[key] || 0) + elapsed;
-            renderStudyStats();
-            renderStreakDots();
-            drawNebulaGraph();
-        } catch(e) { console.warn('Study flush failed', e); }
-    }
-
-    // ── Load study history ─────────────────────────────────────────
-    async function loadStudyData() {
-        if (!currentUser) return;
-
-        // Step 1: Instantly show localStorage data (no wait)
-        const lsToday = lsReadToday();
-        if (lsToday > 0) {
-            studyData[todayKey()] = lsToday;
-            renderStudyStats();
-        }
-
-        // Step 2: Load from Firebase (may have more data from other devices/sessions)
-        try {
-            const doc = await db.collection('studySessions').doc(currentUser.uid).get();
-            if (doc.exists) {
-                const fbDays    = doc.data().days || {};
-                const todayKey_ = todayKey();
-                // Merge: take max of localStorage and Firebase for today
-                // (localStorage may have unsaved seconds from last session)
-                const fbToday   = fbDays[todayKey_] || 0;
-                fbDays[todayKey_] = Math.max(fbToday, lsToday);
-                studyData = fbDays;
-            }
-        } catch(e) { /* keep localStorage data */ }
+    try {
+        // SET today's value (not increment) — idempotent & correct
+        await db.collection('studySessions').doc(currentUser.uid).set({
+            [`days.${key}`]: total,
+            lastUpdated:     firebase.firestore.FieldValue.serverTimestamp(),
+            lastStudyDate:   key
+        }, { merge: true });
 
         renderStudyStats();
         renderStreakDots();
         drawNebulaGraph();
-        loadAdminFeedback();
-        startStudySession();
+    } catch (e) {
+        console.warn('Study flush failed:', e.message);
+        // Roll back the watermark so we retry these seconds next flush
+        _lastFlushedSecs -= newSecs;
+    }
+}
+
+// ── Load study history ────────────────────────────────────────
+async function loadStudyData() {
+    if (!currentUser) return;
+
+    // ── Step 1: Instant display from localStorage (no network wait) ──
+    const lsAll   = lsReadAllDays();
+    const lsToday = lsReadToday();
+
+    if (Object.keys(lsAll).length > 0 || lsToday > 0) {
+        studyData = { ...lsAll };
+        // If dedicated today key is fresher, use it
+        if (lsToday > (studyData[todayKey()] || 0)) {
+            studyData[todayKey()] = lsToday;
+        }
+        renderStudyStats();
+        renderStreakDots();
+        drawNebulaGraph();
     }
 
-    // ── Render stats row ──────────────────────────────────────────
-    function renderStudyStats() {
-        const today   = todayKey();
-        const now     = new Date();
-        // Include current live session in all counts
-        const liveSec = sessionStartTime ? Math.floor((Date.now() - sessionStartTime) / 1000) : 0;
+    // ── Step 2: Firebase (authoritative — may have data from other devices) ──
+    try {
+        const doc = await db.collection('studySessions').doc(currentUser.uid).get();
+        if (doc.exists) {
+            const fbDays = doc.data().days || {};
+            const todayK = todayKey();
 
-        let weekSec  = 0;
-        let totalSec = 0;
-        for (const [k, v] of Object.entries(studyData)) {
-            totalSec += v;
-            const d    = new Date(k);
-            const diff = Math.floor((now - d) / 86400000);
-            if (diff < 7) weekSec += v;
+            // Merge: for every day take the max of Firebase vs localStorage
+            const merged = { ...fbDays };
+            Object.keys(lsAll).forEach(k => {
+                merged[k] = Math.max(merged[k] || 0, lsAll[k] || 0);
+            });
+            // For today specifically, also honour the dedicated LS key
+            merged[todayK] = Math.max(merged[todayK] || 0, lsToday);
+
+            studyData = merged;
+            lsWriteAllDays(merged);   // keep LS in sync with Firebase
         }
-        const savedToday = studyData[today] || 0;
-        const todaySec   = savedToday + liveSec;
-        weekSec  += liveSec; // add live seconds to week
-        totalSec += liveSec; // and total
-
-        const el1 = document.getElementById('studyTodayHr');
-        const el2 = document.getElementById('studyWeekHr');
-        const el3 = document.getElementById('studyTotalHr');
-        // el1 is also updated live by updateLiveTimer, skip to avoid double update
-        if (el1) el1.textContent = fmtHr(todaySec);
-        if (el2) el2.textContent = fmtHr(weekSec);
-        if (el3) el3.textContent = fmtHr(totalSec);
+    } catch (e) {
+        console.warn('Could not load study history from Firebase:', e.message);
+        // We still have localStorage data — keep going
     }
 
-    // ── Streak calculation ────────────────────────────────────────
-    function calcStreak() {
-        // Build effective data including current live session
-        const effective = { ...studyData };
-        if (sessionStartTime) {
-            const sessionSec = Math.floor((Date.now() - sessionStartTime) / 1000);
-            const key = todayKey();
-            effective[key] = (effective[key] || 0) + sessionSec;
-        }
+    renderStudyStats();
+    renderStreakDots();
+    drawNebulaGraph();
+    loadAdminFeedback();
+    startStudySession();   // starts AFTER studyData is populated ← important
+}
 
-        let streak = 0;
-        let check  = new Date();
-        check.setHours(0, 0, 0, 0);
-        for (let i = 0; i < 365; i++) {
-            const k = dateKey(check);
-            if (effective[k] && effective[k] > 30) { // 30s threshold (not 60) so today counts quickly
-                streak++;
-                check.setDate(check.getDate() - 1);
-            } else {
-                break;
-            }
-        }
-        return streak;
+// ── Stats row ─────────────────────────────────────────────────
+function renderStudyStats() {
+    const now      = new Date();
+    const liveExtra = liveSessionSecs();  // seconds not yet in studyData[today]
+
+    let weekSec  = 0;
+    let totalSec = 0;
+
+    for (const [k, v] of Object.entries(studyData)) {
+        totalSec += v;
+        const d    = new Date(k + 'T00:00:00');
+        const diff = Math.floor((now - d) / 86400000);
+        if (diff < 7) weekSec += v;
     }
 
-    function renderStreakDots() {
-        const streak = calcStreak();
-        const sc = document.getElementById('streakCount');
-        const sm = document.getElementById('streakMsg');
-        const se = document.getElementById('streakEmoji');
-        if (sc) sc.textContent = streak;
-        if (sm) sm.textContent = streak === 0 ? 'Start your streak today! Open the app daily.' :
-                                  streak < 3  ? 'Great start! Keep going 💪' :
-                                  streak < 7  ? 'On fire! ' + streak + ' days strong 🔥' :
-                                  streak < 14 ? 'Amazing streak! 🚀 Keep it up!' :
-                                               'Legendary! ' + streak + ' day streak! 👑';
-        if (se) se.textContent = streak === 0 ? '💤' : streak < 3 ? '✨' : streak < 7 ? '🔥' : streak < 14 ? '🚀' : '👑';
+    // Add the live session seconds that haven't been flushed yet
+    // (studyData[today] holds the last flushed value; live adds on top)
+    const unflused = todayTotal() - (studyData[todayKey()] || 0);
+    weekSec  += unflused;
+    totalSec += unflused;
 
-        // Last 7 days dots
-        const dotsEl = document.getElementById('streakDots');
-        if (!dotsEl) return;
-        const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        let html = '';
-        for (let i = 6; i >= 0; i--) {
-            const d = new Date(); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
-            const k = dateKey(d);
-            const active = studyData[k] && studyData[k] > 60;
-            const isToday = i === 0;
-            html += `<div class="flex flex-col items-center gap-1 flex-1">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all
-                    ${active ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/40' : isToday ? 'border-2 border-purple-400 text-purple-300' : 'bg-white/10 text-white/30'}">
-                    ${active ? '✓' : dayNames[d.getDay()][0]}
+    const el2 = document.getElementById('studyWeekHr');
+    const el3 = document.getElementById('studyTotalHr');
+    if (el2) el2.textContent = fmtHr(weekSec);
+    if (el3) el3.textContent = fmtHr(totalSec);
+    // studyTodayHr is updated every second by updateLiveTimer — no need to set here
+}
+
+// ── Streak ────────────────────────────────────────────────────
+function calcStreak() {
+    // Build a view that includes the live session for today
+    const effective = { ...studyData };
+    effective[todayKey()] = todayTotal();
+
+    let streak = 0;
+    const check = new Date();
+    check.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 365; i++) {
+        const k = dateKey(check);
+        if ((effective[k] || 0) >= 60) {   // 1-minute threshold
+            streak++;
+            check.setDate(check.getDate() - 1);
+        } else {
+            break;
+        }
+    }
+    return streak;
+}
+
+function renderStreakDots() {
+    const streak = calcStreak();
+
+    const sc = document.getElementById('streakCount');
+    const sm = document.getElementById('streakMsg');
+    const se = document.getElementById('streakEmoji');
+    if (sc) sc.textContent = streak;
+    if (sm) sm.textContent =
+        streak === 0  ? 'Start your streak today! Open the app daily.' :
+        streak < 3    ? 'Great start! Keep going 💪' :
+        streak < 7    ? 'On fire! ' + streak + ' days strong 🔥' :
+        streak < 14   ? 'Amazing streak! 🚀 Keep it up!' :
+                        'Legendary! ' + streak + ' day streak! 👑';
+    if (se) se.textContent =
+        streak === 0 ? '💤' : streak < 3 ? '✨' : streak < 7 ? '🔥' : streak < 14 ? '🚀' : '👑';
+
+    // Last 7 days dots
+    const dotsEl = document.getElementById('streakDots');
+    if (!dotsEl) return;
+
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    let html = '';
+    for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        d.setHours(0, 0, 0, 0);
+        const k      = dateKey(d);
+        const isToday = i === 0;
+        // For today use live total; for past days use studyData
+        const secs   = isToday ? todayTotal() : (studyData[k] || 0);
+        const active = secs >= 60;
+
+        html += `<div class="flex flex-col items-center gap-1 flex-1">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all
+                ${active
+                    ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/40'
+                    : isToday
+                        ? 'border-2 border-purple-400 text-purple-300'
+                        : 'bg-white/10 text-white/30'}">
+                ${active ? '✓' : dayNames[d.getDay()][0]}
+            </div>
+            <div class="text-xs" style="color:${active ? '#c084fc' : '#4a4070'}">${dayNames[d.getDay()]}</div>
+        </div>`;
+    }
+    dotsEl.innerHTML = html;
+}
+
+// ── Nebula Graph ──────────────────────────────────────────────
+function drawNebulaGraph() {
+    const canvas = document.getElementById('nebulaCanvas');
+    if (!canvas) return;
+
+    const days   = 14;
+    const labels = [];
+    const values = [];
+    let maxVal   = 0;
+    const now    = new Date();
+
+    for (let i = days - 1; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        d.setHours(0, 0, 0, 0);
+        const k    = dateKey(d);
+        // For today use the live total
+        const secs = i === 0 ? todayTotal() : (studyData[k] || 0);
+        const hrs  = secs / 3600;
+        labels.push(d.getDate() + '/' + (d.getMonth() + 1));
+        values.push(hrs);
+        if (hrs > maxVal) maxVal = hrs;
+    }
+
+    const bestIdx = values.indexOf(Math.max(...values));
+    const bdEl = document.getElementById('bestDayLabel');
+    if (bdEl) bdEl.textContent = maxVal > 0 ? fmtHr(Math.round(maxVal * 3600)) + ' on ' + labels[bestIdx] : 'No data yet';
+
+    const xlEl = document.getElementById('nebulaXLabels');
+    if (xlEl) xlEl.innerHTML = labels.map((l, i) => `<span>${i % 2 === 0 ? l : ''}</span>`).join('');
+
+    const W = canvas.offsetWidth || 400;
+    const H = 180;
+    canvas.width  = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, W, H);
+
+    const pad  = { top: 20, right: 20, bottom: 10, left: 10 };
+    const gW   = W - pad.left - pad.right;
+    const gH   = H - pad.top  - pad.bottom;
+    const yMax = maxVal > 0 ? maxVal * 1.25 : 4;
+
+    // Background nebula blobs
+    [
+        { x: W * 0.2,  y: H * 0.5, r: 80, c: 'rgba(99,50,180,0.18)'  },
+        { x: W * 0.6,  y: H * 0.3, r: 60, c: 'rgba(180,50,220,0.14)' },
+        { x: W * 0.85, y: H * 0.6, r: 50, c: 'rgba(50,130,220,0.12)' },
+    ].forEach(b => {
+        const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+        g.addColorStop(0, b.c); g.addColorStop(1, 'transparent');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+    });
+
+    // Star particles
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    [[30,15],[80,40],[150,10],[220,50],[310,20],[370,45],[W-40,18],[W-90,38]]
+        .forEach(([sx, sy]) => { ctx.beginPath(); ctx.arc(sx, sy, 0.8, 0, Math.PI * 2); ctx.fill(); });
+
+    // Gridlines
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+    [0.25, 0.5, 0.75, 1].forEach(f => {
+        const y = pad.top + gH * (1 - f);
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
+    });
+
+    if (values.every(v => v === 0)) {
+        ctx.fillStyle = 'rgba(160,140,220,0.5)';
+        ctx.font = '13px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Start studying to see your progress graph!', W / 2, H / 2);
+        return;
+    }
+
+    const xStep = gW / (days - 1);
+    const pts   = values.map((v, i) => ({
+        x: pad.left + i * xStep,
+        y: pad.top  + gH * (1 - v / yMax)
+    }));
+
+    // Filled gradient under curve
+    const areaGrad = ctx.createLinearGradient(0, pad.top, 0, H);
+    areaGrad.addColorStop(0,   'rgba(139,92,246,0.55)');
+    areaGrad.addColorStop(0.5, 'rgba(167,60,220,0.25)');
+    areaGrad.addColorStop(1,   'rgba(76,29,149,0.0)');
+
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+        const cx = (pts[i-1].x + pts[i].x) / 2;
+        ctx.bezierCurveTo(cx, pts[i-1].y, cx, pts[i].y, pts[i].x, pts[i].y);
+    }
+    ctx.lineTo(pts[pts.length-1].x, H - pad.bottom);
+    ctx.lineTo(pts[0].x, H - pad.bottom);
+    ctx.closePath();
+    ctx.fillStyle = areaGrad;
+    ctx.fill();
+
+    // Glow line
+    ctx.save();
+    ctx.shadowBlur = 18; ctx.shadowColor = '#a855f7';
+    ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < pts.length; i++) {
+        const cx = (pts[i-1].x + pts[i].x) / 2;
+        ctx.bezierCurveTo(cx, pts[i-1].y, cx, pts[i].y, pts[i].x, pts[i].y);
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // Data-point dots
+    pts.forEach((pt, i) => {
+        if (values[i] === 0) return;
+        ctx.save();
+        ctx.shadowBlur = 12; ctx.shadowColor = '#e879f9';
+        ctx.fillStyle = '#f0abfc';
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+    });
+}
+
+// ── Admin Feedback ────────────────────────────────────────────
+async function loadAdminFeedback() {
+    const el = document.getElementById('adminFeedbackList');
+    if (!el || !currentUser) return;
+    try {
+        const snap = await db.collection('adminFeedback')
+            .where('studentId', '==', currentUser.uid)
+            .orderBy('createdAt', 'desc')
+            .limit(5)
+            .get();
+
+        if (snap.empty) {
+            el.innerHTML = `<div class="feedback-card p-4 flex items-start gap-3">
+                <div class="text-2xl">💬</div>
+                <div>
+                    <div class="font-semibold text-white text-sm">No feedback yet</div>
+                    <div class="text-xs mt-0.5" style="color:var(--text2)">Admin feedback and comments will appear here.</div>
                 </div>
-                <div class="text-xs" style="color:${active ? '#c084fc' : '#4a4070'}">${dayNames[d.getDay()]}</div>
             </div>`;
-        }
-        dotsEl.innerHTML = html;
-    }
-
-    // ── Nebula Graph ──────────────────────────────────────────────
-    function drawNebulaGraph() {
-        const canvas = document.getElementById('nebulaCanvas');
-        if (!canvas) return;
-
-        // Build 14-day dataset
-        const days = 14;
-        const labels = [];
-        const values = [];
-        let maxVal = 0;
-        const now = new Date();
-        for (let i = days - 1; i >= 0; i--) {
-            const d = new Date(now); d.setDate(d.getDate() - i); d.setHours(0,0,0,0);
-            const k = dateKey(d);
-            const secs = (studyData[k] || 0);
-            const hrs  = secs / 3600;
-            labels.push(d.getDate() + '/' + (d.getMonth()+1));
-            values.push(hrs);
-            if (hrs > maxVal) maxVal = hrs;
-        }
-
-        // Best day label
-        const bestIdx = values.indexOf(Math.max(...values));
-        const bdEl = document.getElementById('bestDayLabel');
-        if (bdEl) bdEl.textContent = maxVal > 0 ? fmtHr(Math.round(maxVal * 3600)) + ' on ' + labels[bestIdx] : 'No data yet';
-
-        // X-axis labels (every other)
-        const xlEl = document.getElementById('nebulaXLabels');
-        if (xlEl) xlEl.innerHTML = labels.map((l,i) => `<span>${i % 2 === 0 ? l : ''}</span>`).join('');
-
-        const W = canvas.offsetWidth || 400;
-        const H = 180;
-        canvas.width  = W;
-        canvas.height = H;
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, W, H);
-
-        const pad = { top: 20, right: 20, bottom: 10, left: 10 };
-        const gW  = W - pad.left - pad.right;
-        const gH  = H - pad.top  - pad.bottom;
-
-        const yMax = maxVal > 0 ? maxVal * 1.25 : 4;
-
-        // Background nebula glow blobs
-        const blobs = [
-            { x: W * 0.2, y: H * 0.5, r: 80, c: 'rgba(99,50,180,0.18)' },
-            { x: W * 0.6, y: H * 0.3, r: 60, c: 'rgba(180,50,220,0.14)' },
-            { x: W * 0.85, y: H * 0.6, r: 50, c: 'rgba(50,130,220,0.12)' },
-        ];
-        blobs.forEach(b => {
-            const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
-            grad.addColorStop(0, b.c); grad.addColorStop(1, 'transparent');
-            ctx.fillStyle = grad; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2); ctx.fill();
-        });
-
-        // Draw star particles
-        ctx.fillStyle = 'rgba(255,255,255,0.5)';
-        const starPositions = [[30,15],[80,40],[150,10],[220,50],[310,20],[370,45],[W-40,18],[W-90,38]];
-        starPositions.forEach(([sx,sy]) => { ctx.beginPath(); ctx.arc(sx, sy, 0.8, 0, Math.PI*2); ctx.fill(); });
-
-        // Gridlines (faint)
-        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-        ctx.lineWidth = 1;
-        [0.25, 0.5, 0.75, 1].forEach(f => {
-            const y = pad.top + gH * (1 - f);
-            ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W - pad.right, y); ctx.stroke();
-        });
-
-        if (values.every(v => v === 0)) {
-            ctx.fillStyle = 'rgba(160,140,220,0.5)';
-            ctx.font = '13px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('Start studying to see your progress graph!', W/2, H/2);
             return;
         }
 
-        const xStep = gW / (days - 1);
-
-        const pts = values.map((v, i) => ({
-            x: pad.left + i * xStep,
-            y: pad.top + gH * (1 - v / yMax)
-        }));
-
-        // Filled area gradient under curve
-        const areaGrad = ctx.createLinearGradient(0, pad.top, 0, H);
-        areaGrad.addColorStop(0,   'rgba(139,92,246,0.55)');
-        areaGrad.addColorStop(0.5, 'rgba(167,60,220,0.25)');
-        areaGrad.addColorStop(1,   'rgba(76,29,149,0.0)');
-
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) {
-            const cp1x = (pts[i-1].x + pts[i].x) / 2, cp1y = pts[i-1].y;
-            const cp2x = (pts[i-1].x + pts[i].x) / 2, cp2y = pts[i].y;
-            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, pts[i].x, pts[i].y);
-        }
-        ctx.lineTo(pts[pts.length-1].x, H - pad.bottom);
-        ctx.lineTo(pts[0].x, H - pad.bottom);
-        ctx.closePath();
-        ctx.fillStyle = areaGrad;
-        ctx.fill();
-
-        // Glow line
-        ctx.save();
-        ctx.shadowBlur  = 18;
-        ctx.shadowColor = '#a855f7';
-        ctx.strokeStyle = '#c084fc';
-        ctx.lineWidth   = 2.5;
-        ctx.lineCap     = 'round';
-        ctx.lineJoin    = 'round';
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) {
-            const cp1x = (pts[i-1].x + pts[i].x) / 2, cp1y = pts[i-1].y;
-            const cp2x = (pts[i-1].x + pts[i].x) / 2, cp2y = pts[i].y;
-            ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, pts[i].x, pts[i].y);
-        }
-        ctx.stroke();
-        ctx.restore();
-
-        // Data points with glow
-        pts.forEach((pt, i) => {
-            if (values[i] === 0) return;
-            ctx.save();
-            ctx.shadowBlur  = 12;
-            ctx.shadowColor = '#e879f9';
-            ctx.fillStyle   = '#f0abfc';
-            ctx.beginPath(); ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI*2); ctx.fill();
-            ctx.restore();
-        });
-    }
-
-    // ── Admin Feedback ────────────────────────────────────────────
-    async function loadAdminFeedback() {
-        const el = document.getElementById('adminFeedbackList');
-        if (!el || !currentUser) return;
-        try {
-            const snap = await db.collection('adminFeedback')
-                .where('studentId', '==', currentUser.uid)
-                .orderBy('createdAt', 'desc')
-                .limit(5)
-                .get();
-
-            if (snap.empty) {
-                el.innerHTML = `<div class="feedback-card p-4 flex items-start gap-3">
-                    <div class="text-2xl">💬</div>
-                    <div>
-                        <div class="font-semibold text-white text-sm">No feedback yet</div>
-                        <div class="text-xs mt-0.5" style="color:var(--text2)">Admin feedback and comments will appear here.</div>
-                    </div>
-                </div>`;
-                return;
-            }
-
-            const icons = { great: '⭐', good: '👍', improve: '💡', warning: '⚠️', default: '💬' };
-            el.innerHTML = snap.docs.map(doc => {
-                const d = doc.data();
-                const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
-                const icon = icons[d.type] || icons.default;
-                const ratingStars = d.rating ? '★'.repeat(d.rating) + '☆'.repeat(5 - d.rating) : '';
-                return `<div class="feedback-card p-4">
-                    <div class="flex items-start gap-3">
-                        <div class="text-2xl flex-shrink-0">${icon}</div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between gap-2">
-                                <div class="font-semibold text-sm text-white">${d.adminName || 'Admin'}</div>
-                                <div class="text-xs flex-shrink-0" style="color:var(--text3)">${date}</div>
-                            </div>
-                            ${ratingStars ? `<div class="text-yellow-400 text-sm mt-0.5 tracking-wider">${ratingStars}</div>` : ''}
-                            <div class="text-sm mt-1.5 leading-relaxed" style="color:var(--purple3)">${d.message}</div>
-                            ${d.subject ? `<div class="mt-2 inline-block text-xs px-2 py-0.5 rounded-full" style="background:rgba(139,92,246,0.3);color:#e9d5ff">${d.subject}</div>` : ''}
+        const icons = { great:'⭐', good:'👍', improve:'💡', warning:'⚠️', default:'💬' };
+        el.innerHTML = snap.docs.map(doc => {
+            const d    = doc.data();
+            const date = d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : '';
+            const icon = icons[d.type] || icons.default;
+            const stars = d.rating ? '★'.repeat(d.rating) + '☆'.repeat(5 - d.rating) : '';
+            return `<div class="feedback-card p-4">
+                <div class="flex items-start gap-3">
+                    <div class="text-2xl flex-shrink-0">${icon}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="font-semibold text-sm text-white">${d.adminName || 'Admin'}</div>
+                            <div class="text-xs flex-shrink-0" style="color:var(--text3)">${date}</div>
                         </div>
+                        ${stars ? `<div class="text-yellow-400 text-sm mt-0.5 tracking-wider">${stars}</div>` : ''}
+                        <div class="text-sm mt-1.5 leading-relaxed" style="color:var(--purple3)">${d.message}</div>
+                        ${d.subject ? `<div class="mt-2 inline-block text-xs px-2 py-0.5 rounded-full" style="background:rgba(139,92,246,0.3);color:#e9d5ff">${d.subject}</div>` : ''}
                     </div>
-                </div>`;
-            }).join('');
-        } catch(e) {
-            el.innerHTML = `<div class="feedback-card p-4 flex items-start gap-3">
-                <div class="text-2xl">💬</div>
-                <div class="font-semibold text-white text-sm">No feedback yet</div>
+                </div>
             </div>`;
-        }
+        }).join('');
+    } catch (e) {
+        el.innerHTML = `<div class="feedback-card p-4 flex items-start gap-3">
+            <div class="text-2xl">💬</div>
+            <div class="font-semibold text-white text-sm">No feedback yet</div>
+        </div>`;
     }
+}
+
+// Resize handler for graph
+window.addEventListener('resize', () => {
+    if (document.getElementById('page-dashboard')?.classList.contains('active')) {
+        drawNebulaGraph();
+    }
+});
 
     // Resize handler for graph
     window.addEventListener('resize', () => {
