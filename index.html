@@ -6,32 +6,32 @@
 <title>MINDSKYRA Institute – Master Your Future</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ═══════════ THEME TOKENS ═══════════ */
 :root{
   --violet:#8b5cf6;--violet2:#7c3aed;--indigo:#6366f1;
-  --accent:#a78bfa;--gold:#f59e0b;
-  --sidebar-w:268px;--radius:16px;
-  --transition:.32s cubic-bezier(.4,0,.2,1);
+  --accent:#a78bfa;--gold:#f59e0b;--cyan:#06b6d4;
+  --sidebar-w:280px;--radius:20px;
+  --transition:.4s cubic-bezier(.4,0,.2,1);
 }
 [data-theme="dark"]{
-  --bg:#08080f;--bg2:#0f0f1a;--bg3:#141422;
-  --surface:#191927;--surface2:#1f1f30;
-  --border:rgba(139,92,246,0.14);--border2:rgba(255,255,255,0.06);
-  --text:#eeeaf8;--text2:#9b94b8;--text3:#5f587a;
-  --glow:0 0 50px rgba(139,92,246,0.22);
-  --shadow:0 4px 30px rgba(0,0,0,0.4);
-  --card-glow:0 8px 40px rgba(124,58,237,0.18);
+  --bg:#030305;--bg2:#0a0a12;--bg3:#12121c;
+  --surface:#161622;--surface2:#1e1e2d;
+  --border:rgba(139,92,246,0.12);--border2:rgba(255,255,255,0.05);
+  --text:#f5f3ff;--text2:#a5a0c0;--text3:#6b6680;
+  --glow:0 0 60px rgba(139,92,246,0.25);
+  --shadow:0 8px 40px rgba(0,0,0,0.5);
+  --card-glow:0 12px 50px rgba(124,58,237,0.2);
 }
 [data-theme="light"]{
-  --bg:#f0effe;--bg2:#ffffff;--bg3:#e8e5ff;
-  --surface:#ffffff;--surface2:#f0effe;
-  --border:rgba(139,92,246,0.18);--border2:rgba(0,0,0,0.07);
+  --bg:#f8f7ff;--bg2:#ffffff;--bg3:#ede9fe;
+  --surface:#ffffff;--surface2:#f5f3ff;
+  --border:rgba(139,92,246,0.15);--border2:rgba(0,0,0,0.06);
   --text:#1a1535;--text2:#5c5380;--text3:#9b94b8;
   --glow:0 0 50px rgba(139,92,246,0.15);
-  --shadow:0 4px 24px rgba(100,80,200,0.1);
-  --card-glow:0 8px 40px rgba(124,58,237,0.12);
+  --shadow:0 8px 30px rgba(100,80,200,0.12);
+  --card-glow:0 12px 40px rgba(124,58,237,0.12);
 }
 
 /* ═══════════ RESET ═══════════ */
@@ -45,575 +45,772 @@ body{
 }
 h1,h2,h3,h4,h5{font-family:'Outfit',sans-serif;}
 a{text-decoration:none;}
+img{max-width:100%;height:auto;}
+
+/* ═══════════ ATOMIC PARTICLE ANIMATION ═══════════ */
+.atom-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  overflow:hidden;
+}
+.nucleus{
+  position:absolute;top:50%;left:50%;
+  width:300px;height:300px;transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,0.4) 0%,rgba(99,102,241,0.2) 40%,transparent 70%);
+  animation:pulseNucleus 4s ease-in-out infinite;
+}
+@keyframes pulseNucleus{
+  0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6;}
+  50%{transform:translate(-50%,-50%) scale(1.2);opacity:0.9;}
+}
+.orbit-ring{
+  position:absolute;border:1px solid rgba(139,92,246,0.15);
+  border-radius:50%;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.orbit-1{width:600px;height:600px;animation:rotateOrbit 20s linear infinite;}
+.orbit-2{width:900px;height:900px;animation:rotateOrbit 30s linear infinite reverse;}
+.orbit-3{width:1200px;height:1200px;animation:rotateOrbit 40s linear infinite;}
+@keyframes rotateOrbit{0%{transform:translate(-50%,-50%) rotate(0deg);}100%{transform:translate(-50%,-50%) rotate(360deg);}}
+.electron{
+  position:absolute;width:12px;height:12px;
+  background:radial-gradient(circle,var(--accent),var(--violet2));
+  border-radius:50%;box-shadow:0 0 20px var(--accent);
+  animation:electronPulse 2s ease-in-out infinite;
+}
+@keyframes electronPulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.3);opacity:0.7;}}
+.e1{top:-6px;left:50%;transform:translateX(-50%);}
+.e2{top:50%;right:-6px;transform:translateY(-50%);}
+.e3{bottom:-6px;left:50%;transform:translateX(-50%);}
+.e4{top:50%;left:-6px;transform:translateY(-50%);}
+.proton{
+  position:absolute;width:8px;height:8px;
+  background:var(--gold);border-radius:50%;
+  box-shadow:0 0 15px var(--gold);
+  animation:floatParticle 6s ease-in-out infinite;
+}
+@keyframes floatParticle{
+  0%,100%{transform:translate(0,0);opacity:0.3;}
+  50%{transform:translate(30px,-30px);opacity:1;}
+}
+.neutron{
+  position:absolute;width:6px;height:6px;
+  background:var(--cyan);border-radius:50%;
+  box-shadow:0 0 12px var(--cyan);
+  animation:floatParticle 8s ease-in-out infinite reverse;
+}
+.p1{top:20%;left:10%;animation-delay:0s;}
+.p2{top:60%;right:15%;animation-delay:2s;}
+.p3{bottom:30%;left:20%;animation-delay:4s;}
+.n1{top:30%;right:25%;animation-delay:1s;}
+.n2{bottom:20%;right:30%;animation-delay:3s;}
+.n3{top:70%;left:15%;animation-delay:5s;}
 
 /* ═══════════ SIDEBAR ═══════════ */
 .sidebar{
   position:fixed;top:0;left:0;width:var(--sidebar-w);height:100vh;
   background:var(--bg2);border-right:1px solid var(--border);
   z-index:200;display:flex;flex-direction:column;
-  transition:transform .38s cubic-bezier(.77,0,.18,1),background var(--transition),border-color var(--transition);
-  overflow:hidden;
+  transition:transform .4s cubic-bezier(.77,0,.18,1),background var(--transition);
+  overflow:hidden;backdrop-filter:blur(20px);
 }
-.s-logo{padding:22px 22px 18px;border-bottom:1px solid var(--border);}
-.s-logo-row{display:flex;align-items:center;gap:10px;}
+.s-logo{padding:24px 24px 20px;border-bottom:1px solid var(--border);}
+.s-logo-row{display:flex;align-items:center;gap:12px;}
 .logo-box{
-  width:38px;height:38px;border-radius:11px;flex-shrink:0;
+  width:42px;height:42px;border-radius:12px;
   background:linear-gradient(135deg,var(--violet2),var(--indigo));
   display:flex;align-items:center;justify-content:center;
-  font-family:'Outfit',sans-serif;font-weight:900;font-size:19px;color:#fff;
-  box-shadow:0 4px 14px rgba(124,58,237,0.4);
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:20px;color:#fff;
+  box-shadow:0 4px 20px rgba(124,58,237,0.5);
+  animation:logoGlow 3s ease-in-out infinite;
+  flex-shrink:0;
 }
+@keyframes logoGlow{0%,100%{box-shadow:0 4px 20px rgba(124,58,237,0.5);}50%{box-shadow:0 4px 30px rgba(124,58,237,0.8);}}
 .logo-txt{
-  font-family:'Outfit',sans-serif;font-weight:900;font-size:15px;letter-spacing:.5px;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:16px;letter-spacing:0.5px;
   background:linear-gradient(90deg,var(--accent),var(--indigo));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.s-nav{flex:1;padding:12px 0;overflow-y:auto;scrollbar-width:none;}
+.s-nav{flex:1;padding:16px 0;overflow-y:auto;scrollbar-width:none;}
 .s-nav::-webkit-scrollbar{display:none;}
 .nav-grp{
-  font-size:9.5px;font-weight:700;letter-spacing:2.5px;
-  color:var(--text3);padding:10px 22px 4px;text-transform:uppercase;
+  font-size:10px;font-weight:700;letter-spacing:3px;
+  color:var(--text3);padding:12px 24px 6px;text-transform:uppercase;
   font-family:'Outfit',sans-serif;
 }
 .nav-a{
-  display:flex;align-items:center;gap:11px;
-  padding:10px 22px;color:var(--text2);
-  font-size:13.5px;font-weight:500;cursor:pointer;
-  transition:all .2s;border-left:2px solid transparent;
-  text-decoration:none;
+  display:flex;align-items:center;gap:12px;
+  padding:12px 24px;color:var(--text2);
+  font-size:14px;font-weight:500;cursor:pointer;
+  transition:all .25s;border-left:3px solid transparent;
+  text-decoration:none;margin:2px 12px;border-radius:0 12px 12px 0;
 }
 .nav-a:hover,.nav-a.active{
-  color:var(--text);background:rgba(139,92,246,0.08);
+  color:var(--text);background:linear-gradient(90deg,rgba(139,92,246,0.15),transparent);
   border-left-color:var(--violet);
 }
-.nav-a svg{width:17px;height:17px;flex-shrink:0;opacity:.7;}
+.nav-a svg{width:18px;height:18px;flex-shrink:0;opacity:.7;}
 .nav-a:hover svg,.nav-a.active svg{opacity:1;}
 .nav-badge{
-  margin-left:auto;font-size:9px;font-weight:700;
+  margin-left:auto;font-size:10px;font-weight:700;
   background:var(--violet);color:#fff;
-  padding:2px 7px;border-radius:20px;
+  padding:3px 10px;border-radius:20px;
   font-family:'Outfit',sans-serif;
+  white-space:nowrap;
 }
-.s-bottom{padding:14px 22px 18px;border-top:1px solid var(--border);flex-shrink:0;}
+.s-bottom{padding:16px 24px 20px;border-top:1px solid var(--border);flex-shrink:0;}
 .theme-row{
   display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:14px;
+  margin-bottom:16px;
 }
-.theme-row span{font-size:12.5px;color:var(--text2);font-weight:500;}
-/* ── Theme Toggle ── */
+.theme-row span{font-size:13px;color:var(--text2);font-weight:500;}
 .tog{
-  width:46px;height:26px;background:var(--surface2);border:1px solid var(--border);
+  width:50px;height:28px;background:var(--surface2);border:1px solid var(--border);
   border-radius:30px;cursor:pointer;display:flex;align-items:center;
-  padding:3px;position:relative;transition:background .3s,border-color .3s;
-  flex-shrink:0;
+  padding:3px;position:relative;transition:all .3s;flex-shrink:0;
 }
 .tog-ball{
-  width:18px;height:18px;border-radius:50%;
+  width:20px;height:20px;border-radius:50%;
   background:linear-gradient(135deg,var(--violet),var(--indigo));
-  transition:transform .32s cubic-bezier(.34,1.56,.64,1);
-  flex-shrink:0;box-shadow:0 2px 8px rgba(124,58,237,0.45);
-  position:relative;z-index:1;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 2px 10px rgba(124,58,237,0.5);
 }
-[data-theme="light"] .tog-ball{transform:translateX(20px);}
+[data-theme="light"] .tog-ball{transform:translateX(22px);}
 .tog-icon{
-  position:absolute;font-size:11px;
+  position:absolute;font-size:12px;
   transition:opacity .25s;pointer-events:none;
 }
-.i-moon{right:5px;opacity:1;}
-.i-sun{left:5px;opacity:0;}
+.i-moon{right:6px;opacity:1;}
+.i-sun{left:6px;opacity:0;}
 [data-theme="light"] .i-moon{opacity:0;}
 [data-theme="light"] .i-sun{opacity:1;}
 .s-cta{
-  width:100%;padding:12px;border:none;border-radius:12px;
+  width:100%;padding:14px;border:none;border-radius:14px;
   background:linear-gradient(135deg,var(--violet2),var(--indigo));
-  color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:13.5px;
-  cursor:pointer;transition:opacity .2s,transform .2s;letter-spacing:.3px;
+  color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;
+  cursor:pointer;transition:all .25s;letter-spacing:0.5px;
+  box-shadow:0 4px 20px rgba(124,58,237,0.4);
 }
-.s-cta:hover{opacity:.9;transform:translateY(-1px);}
+.s-cta:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(124,58,237,0.6);}
 
 /* ═══════════ MOBILE TOPNAV ═══════════ */
 .topnav{
   display:none;position:fixed;top:0;left:0;right:0;z-index:150;
   background:var(--bg2);border-bottom:1px solid var(--border);
-  padding:0 16px;height:58px;align-items:center;justify-content:space-between;
-  transition:background var(--transition);
+  padding:0 16px;height:64px;align-items:center;justify-content:space-between;
+  transition:all var(--transition);backdrop-filter:blur(20px);
 }
-.topnav-r{display:flex;align-items:center;gap:10px;}
+.topnav-r{display:flex;align-items:center;gap:8px;}
 .hamburger{
-  background:none;border:1px solid var(--border2);border-radius:9px;
-  padding:7px;cursor:pointer;color:var(--text);
+  background:none;border:1px solid var(--border2);border-radius:10px;
+  padding:8px;cursor:pointer;color:var(--text);
   display:flex;align-items:center;justify-content:center;
-  transition:border-color .2s;
+  transition:all .2s;min-width:40px;min-height:40px;
 }
-.hamburger:hover{border-color:var(--violet);}
+.hamburger:hover{border-color:var(--violet);background:rgba(139,92,246,0.1);}
 .s-overlay{
   display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.55);z-index:190;
-  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  background:rgba(0,0,0,.7);z-index:190;
+  backdrop-filter:blur(8px);
 }
 
 /* ═══════════ LAYOUT ═══════════ */
-.main{margin-left:var(--sidebar-w);min-height:100vh;}
-section{padding:84px 52px;}
+.main{margin-left:var(--sidebar-w);min-height:100vh;position:relative;z-index:1;}
+section{padding:100px 60px;}
 
 /* ═══════════ HERO ═══════════ */
 .hero{
-  min-height:100vh;display:flex;align-items:center;
-  position:relative;overflow:hidden;padding:110px 52px 90px;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:120px 60px 100px;
+  text-align:center;
 }
-.h-bg{position:absolute;inset:0;z-index:0;}
-.h-grad{
-  position:absolute;inset:0;
-  background:linear-gradient(135deg,#0c052a 0%,#16093f 35%,#1a0b50 60%,#0e1440 100%);
-}
-[data-theme="light"] .h-grad{
-  background:linear-gradient(135deg,#3920a2 0%,#5435c9 40%,#6447d6 70%,#4c31b7 100%);
-}
-.h-mesh{
-  position:absolute;inset:0;
-  background:
-    radial-gradient(ellipse 70% 55% at 70% 40%,rgba(139,92,246,0.28) 0%,transparent 65%),
-    radial-gradient(ellipse 45% 45% at 90% 85%,rgba(99,102,241,0.18) 0%,transparent 60%),
-    radial-gradient(ellipse 35% 35% at 12% 25%,rgba(167,139,250,0.14) 0%,transparent 60%);
-}
-.h-grid{
-  position:absolute;inset:0;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.035) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,0.035) 1px,transparent 1px);
-  background-size:55px 55px;
-}
-.h-orb{
-  position:absolute;border-radius:50%;
-  filter:blur(75px);animation:floatO 7s ease-in-out infinite;pointer-events:none;
-}
-.o1{width:450px;height:450px;background:rgba(124,58,237,0.2);top:-80px;right:80px;}
-.o2{width:280px;height:280px;background:rgba(99,102,241,0.16);bottom:60px;right:-40px;animation-delay:2.5s;}
-.o3{width:180px;height:180px;background:rgba(245,158,11,0.09);top:200px;left:20px;animation-delay:5s;}
-@keyframes floatO{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-22px) scale(1.04);}}
-
-.h-content{position:relative;z-index:1;max-width:720px;}
+.h-content{position:relative;z-index:2;max-width:900px;width:100%;}
 .h-badge{
-  display:inline-flex;align-items:center;gap:9px;
-  padding:8px 18px;border-radius:40px;
-  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.22);
-  color:rgba(255,255,255,0.9);font-size:13px;font-weight:500;margin-bottom:28px;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 24px;border-radius:50px;
+  background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.3);
+  color:var(--accent);font-size:14px;font-weight:600;margin-bottom:32px;
+  backdrop-filter:blur(10px);animation:badgePulse 3s ease-in-out infinite;
 }
-.ldot{
-  width:7px;height:7px;background:#22c55e;border-radius:50%;
-  box-shadow:0 0 8px #22c55e;animation:ldotP 2s ease infinite;
-}
-@keyframes ldotP{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.7;transform:scale(1.4);}}
+@keyframes badgePulse{0%,100%{box-shadow:0 0 20px rgba(139,92,246,0.2);}50%{box-shadow:0 0 40px rgba(139,92,246,0.4);}}
 .hero h1{
-  font-size:clamp(38px,5.5vw,74px);font-weight:900;
-  line-height:1.04;letter-spacing:-2px;color:#fff;margin-bottom:22px;
+  font-size:clamp(36px,6vw,80px);font-weight:900;
+  line-height:1.05;letter-spacing:-2px;margin-bottom:24px;
 }
 .hero h1 .g{
-  background:linear-gradient(130deg,#c4b5fd 0%,#a78bfa 30%,#818cf8 60%,#fbbf24 100%);
+  background:linear-gradient(135deg,var(--accent) 0%,var(--indigo) 50%,var(--gold) 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-  background-size:200% auto;animation:shimr 4s linear infinite;
+  background-size:200% auto;animation:gradientShift 5s ease infinite;
 }
-@keyframes shimr{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
+@keyframes gradientShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 .h-sub{
-  font-size:17px;color:rgba(255,255,255,0.72);
-  line-height:1.75;margin-bottom:38px;max-width:580px;font-weight:400;
+  font-size:18px;color:var(--text2);
+  line-height:1.8;margin-bottom:40px;max-width:600px;margin-left:auto;margin-right:auto;
 }
-.h-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.h-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;}
 .btn-p{
-  padding:14px 30px;background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  padding:16px 36px;background:linear-gradient(135deg,var(--violet2),var(--indigo));
   border:none;border-radius:50px;color:#fff;
-  font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;cursor:pointer;
-  transition:all .25s;display:inline-flex;align-items:center;gap:8px;
-  box-shadow:0 8px 32px rgba(124,58,237,0.48);letter-spacing:.2px;
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:16px;cursor:pointer;
+  transition:all .3s;display:inline-flex;align-items:center;gap:10px;
+  box-shadow:0 8px 40px rgba(124,58,237,0.5);letter-spacing:0.5px;
+  white-space:nowrap;
 }
-.btn-p:hover{transform:translateY(-2px);box-shadow:0 14px 42px rgba(124,58,237,0.65);}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 12px 50px rgba(124,58,237,0.7);}
 .btn-o{
-  padding:13px 28px;background:rgba(255,255,255,0.1);
-  border:1px solid rgba(255,255,255,0.26);border-radius:50px;color:#fff;
-  font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;
-  cursor:pointer;transition:all .25s;backdrop-filter:blur(8px);
+  padding:15px 32px;background:transparent;
+  border:2px solid var(--border);border-radius:50px;color:var(--text);
+  font-family:'Outfit',sans-serif;font-weight:600;font-size:16px;
+  cursor:pointer;transition:all .3s;backdrop-filter:blur(10px);
+  white-space:nowrap;
 }
-.btn-o:hover{background:rgba(255,255,255,0.2);}
-.btn-s{
-  padding:13px 28px;background:var(--surface);border:1px solid var(--border);
-  border-radius:50px;color:var(--text);
-  font-family:'Outfit',sans-serif;font-weight:600;font-size:15px;
-  cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;
+.btn-o:hover{border-color:var(--violet);background:rgba(139,92,246,0.1);color:var(--accent);}
+.h-stats{
+  display:flex;gap:0;justify-content:center;margin-top:60px;flex-wrap:wrap;
 }
-.btn-s:hover{border-color:var(--violet);color:var(--accent);}
-
-.h-stats{display:flex;gap:0;margin-top:52px;flex-wrap:wrap;}
-.stat{display:flex;flex-direction:column;padding:0 28px;}
-.stat:first-child{padding-left:0;}
+.stat{display:flex;flex-direction:column;padding:0 32px;position:relative;}
+.stat::after{
+  content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);
+  width:1px;height:40px;background:linear-gradient(180deg,transparent,var(--border),transparent);
+}
+.stat:last-child::after{display:none;}
 .stat-v{
-  font-family:'Outfit',sans-serif;font-size:30px;font-weight:900;
-  color:#fff;letter-spacing:-1px;
+  font-family:'Outfit',sans-serif;font-size:36px;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--indigo));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-1px;
 }
-.stat-l{font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;font-weight:500;}
-.stat-sep{width:1px;background:rgba(255,255,255,0.15);align-self:stretch;margin:4px 0;}
+.stat-l{font-size:13px;color:var(--text3);margin-top:6px;font-weight:500;}
 
 /* ═══════════ SECTION SHARED ═══════════ */
 .s-lbl{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
-  color:var(--violet);margin-bottom:14px;font-family:'Outfit',sans-serif;
+  display:inline-flex;align-items:center;gap:10px;
+  font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--violet);margin-bottom:16px;font-family:'Outfit',sans-serif;
 }
 .s-lbl::before{
-  content:'';width:22px;height:2px;
+  content:'';width:30px;height:2px;
   background:linear-gradient(90deg,var(--violet),var(--indigo));border-radius:2px;
 }
 .s-title{
-  font-size:clamp(26px,3.5vw,44px);font-weight:800;
-  line-height:1.1;letter-spacing:-1.2px;margin-bottom:14px;
+  font-size:clamp(28px,4vw,52px);font-weight:800;
+  line-height:1.1;letter-spacing:-1.5px;margin-bottom:16px;
 }
-.s-sub{font-size:16px;color:var(--text2);line-height:1.8;max-width:620px;}
-.s-hdr{margin-bottom:52px;}
+.s-sub{font-size:17px;color:var(--text2);line-height:1.8;max-width:650px;}
+.s-hdr{margin-bottom:60px;text-align:center;}
+.s-hdr .s-sub{margin-left:auto;margin-right:auto;}
 
 /* ═══════════ COURSES ═══════════ */
-#courses{background:var(--bg);}
-.c-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(275px,1fr));gap:18px;}
+#courses{background:var(--bg);position:relative;}
+.c-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;}
 .c-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:20px;padding:28px;cursor:pointer;
-  transition:all .32s;position:relative;overflow:hidden;
+  border-radius:24px;padding:32px;cursor:pointer;
+  transition:all .4s;position:relative;overflow:hidden;
 }
-.c-card::after{
+.c-card::before{
   content:'';position:absolute;inset:0;
-  background:var(--ch,linear-gradient(135deg,rgba(139,92,246,0.06),transparent));
-  opacity:0;transition:opacity .3s;
+  background:linear-gradient(135deg,var(--ch,transparent),transparent);
+  opacity:0;transition:opacity .4s;
 }
-.c-card:hover{transform:translateY(-5px);border-color:var(--violet);box-shadow:var(--card-glow);}
-.c-card:hover::after{opacity:1;}
+.c-card:hover{transform:translateY(-8px) scale(1.02);border-color:var(--violet);box-shadow:var(--card-glow);}
+.c-card:hover::before{opacity:1;}
 .c-num{
-  font-family:'Outfit',sans-serif;font-size:50px;font-weight:900;
+  font-family:'Outfit',sans-serif;font-size:56px;font-weight:900;
   background:var(--cg,linear-gradient(135deg,var(--accent),var(--indigo)));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
   line-height:1;letter-spacing:-2px;
 }
-.c-stg{font-size:12.5px;color:var(--text2);margin:6px 0 14px;font-weight:500;}
+.c-stg{font-size:14px;color:var(--text2);margin:8px 0 18px;font-weight:500;}
 .c-tag{
-  display:inline-block;padding:4px 11px;border-radius:20px;
-  font-size:11px;font-weight:700;letter-spacing:.3px;
+  display:inline-block;padding:6px 14px;border-radius:30px;
+  font-size:12px;font-weight:700;letter-spacing:0.5px;
   background:rgba(139,92,246,0.1);color:var(--accent);
-  border:1px solid rgba(139,92,246,0.22);margin-bottom:14px;
+  border:1px solid rgba(139,92,246,0.25);margin-bottom:18px;
   font-family:'Outfit',sans-serif;
 }
-.c-feats{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:22px;}
-.c-feats li{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--text2);}
-.c-feats li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--violet);flex-shrink:0;}
+.c-feats{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.c-feats li{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);}
+.c-feats li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--violet);flex-shrink:0;}
 .c-btn{
-  width:100%;padding:11px;border:1px solid var(--border);background:transparent;
-  border-radius:11px;color:var(--text);
-  font-family:'Outfit',sans-serif;font-weight:700;font-size:13.5px;
-  cursor:pointer;transition:all .25s;letter-spacing:.2px;
+  width:100%;padding:14px;border:2px solid var(--border);background:transparent;
+  border-radius:14px;color:var(--text);
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:14px;
+  cursor:pointer;transition:all .3s;letter-spacing:0.5px;
 }
 .c-btn:hover{background:var(--violet2);border-color:var(--violet2);color:#fff;}
 .c-new{
-  position:absolute;top:16px;right:16px;
+  position:absolute;top:20px;right:20px;
   background:var(--gold);color:#000;
-  font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:20px;
-  font-family:'Outfit',sans-serif;letter-spacing:.5px;
+  font-size:10px;font-weight:800;padding:4px 12px;border-radius:20px;
+  font-family:'Outfit',sans-serif;letter-spacing:0.5px;
+  animation:pulseNew 2s ease-in-out infinite;
 }
+@keyframes pulseNew{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
 
 /* ═══════════ FEATURES ═══════════ */
-#features{background:var(--bg2);}
-.f-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:16px;}
+#features{background:var(--bg2);position:relative;}
+.f-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
 .f-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:18px;padding:26px;transition:all .28s;
+  border-radius:20px;padding:30px;transition:all .35s;
+  position:relative;overflow:hidden;
 }
-.f-card:hover{border-color:var(--violet);transform:translateY(-3px);box-shadow:var(--shadow);}
-.f-icon{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:20px;}
-.f-card h3{font-size:16px;font-weight:700;margin-bottom:9px;letter-spacing:-.2px;}
-.f-card p{font-size:13.5px;color:var(--text2);line-height:1.7;}
+.f-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--violet),var(--indigo),var(--accent));
+  transform:scaleX(0);transition:transform .35s;
+}
+.f-card:hover{border-color:var(--violet);transform:translateY(-5px);box-shadow:var(--shadow);}
+.f-card:hover::before{transform:scaleX(1);}
+.f-icon{
+  width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:22px;font-size:26px;background:var(--bg2);
+  border:1px solid var(--border);transition:all .3s;
+}
+.f-card:hover .f-icon{
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  transform:scale(1.1);border-color:transparent;
+}
+.f-card h3{font-size:18px;font-weight:700;margin-bottom:12px;letter-spacing:-0.3px;}
+.f-card p{font-size:14px;color:var(--text2);line-height:1.7;}
 
 /* ═══════════ FEES ═══════════ */
-#fees{background:var(--bg);}
-.fee-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px;}
+#fees{background:var(--bg);position:relative;}
+.fee-tabs{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:48px;}
 .fee-tab{
-  padding:9px 20px;border-radius:40px;
-  border:1px solid var(--border);background:var(--surface);
+  padding:11px 22px;border-radius:50px;
+  border:2px solid var(--border);background:var(--surface);
   color:var(--text2);font-family:'Outfit',sans-serif;
-  font-size:13px;font-weight:600;cursor:pointer;transition:all .22s;
+  font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;
+  white-space:nowrap;
 }
-.fee-tab.active,.fee-tab:hover{background:var(--violet2);border-color:var(--violet2);color:#fff;}
+.fee-tab.active,.fee-tab:hover{
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  border-color:transparent;color:#fff;
+  box-shadow:0 4px 20px rgba(124,58,237,0.4);
+}
 .fee-panel{display:none;}
-.fee-panel.active{display:block;}
-.fee-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.fee-panel.active{display:block;animation:fadeIn .5s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.fee-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px;}
 .fee-card{
-  background:var(--surface);border-radius:18px;padding:22px 20px 18px;
-  border:2px solid transparent;transition:all .28s;position:relative;overflow:hidden;
+  background:var(--surface);border-radius:24px;padding:28px;
+  border:2px solid transparent;transition:all .35s;position:relative;overflow:hidden;
 }
-.fee-card.c1-3{border-color:rgba(59,130,246,0.4);box-shadow:0 0 0 1px rgba(59,130,246,0.1);}
-.fee-card.c4-8{border-color:rgba(139,92,246,0.45);box-shadow:0 0 0 1px rgba(139,92,246,0.1);}
-.fee-card.c9-12{border-color:rgba(236,72,153,0.45);box-shadow:0 0 0 1px rgba(236,72,153,0.1);}
-.fee-card:hover{transform:translateY(-4px);box-shadow:var(--card-glow);}
-.fee-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.fee-class-name{font-family:'Outfit',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px;}
+.fee-card.c1-5{border-color:rgba(34,197,94,0.4);background:linear-gradient(145deg,rgba(34,197,94,0.05),transparent);}
+.fee-card.c6-8{border-color:rgba(59,130,246,0.4);background:linear-gradient(145deg,rgba(59,130,246,0.05),transparent);}
+.fee-card.c9-10{border-color:rgba(139,92,246,0.4);background:linear-gradient(145deg,rgba(139,92,246,0.05),transparent);}
+.fee-card.c11-12{border-color:rgba(236,72,153,0.4);background:linear-gradient(145deg,rgba(236,72,153,0.05),transparent);}
+.fee-card:hover{transform:translateY(-6px);box-shadow:var(--card-glow);}
+.fee-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.fee-class-name{font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;letter-spacing:-0.5px;}
 .fee-set-badge{
-  font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;
-  font-family:'Outfit',sans-serif;letter-spacing:.5px;
+  font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;
+  font-family:'Outfit',sans-serif;letter-spacing:0.5px;background:var(--surface2);
 }
-.fee-card.c1-3 .fee-set-badge{background:rgba(59,130,246,0.2);color:#60a5fa;}
-.fee-card.c4-8 .fee-set-badge{background:rgba(139,92,246,0.2);color:var(--accent);}
-.fee-card.c9-12 .fee-set-badge{background:rgba(236,72,153,0.2);color:#f472b6;}
-.fee-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.fee-row-label{font-size:13px;color:var(--text2);}
-.fee-row-val{font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;}
-.fee-row-val.annual{font-size:17px;color:var(--text);}
-.fee-divider{height:1px;background:var(--border2);margin:10px 0;}
-.fee-row-val.online{color:#818cf8;}
+.fee-card.c1-5 .fee-set-badge{color:#4ade80;}
+.fee-card.c6-8 .fee-set-badge{color:#60a5fa;}
+.fee-card.c9-10 .fee-set-badge{color:var(--accent);}
+.fee-card.c11-12 .fee-set-badge{color:#f472b6;}
+.fee-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.fee-row-label{font-size:14px;color:var(--text2);}
+.fee-row-val{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;}
+.fee-row-val.annual{font-size:24px;background:linear-gradient(135deg,var(--accent),var(--indigo));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.fee-divider{height:1px;background:var(--border2);margin:16px 0;}
+.fee-row-val.online{color:#60a5fa;}
 .fee-row-val.offline{color:var(--text2);}
-.fee-sub-label{font-size:11.5px;color:var(--text3);}
 .fee-stream-tag{
-  display:inline-block;padding:2px 9px;border-radius:20px;
-  font-size:10px;font-weight:700;letter-spacing:.3px;font-family:'Outfit',sans-serif;
-  margin-bottom:6px;
+  display:inline-block;padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;letter-spacing:0.5px;font-family:'Outfit',sans-serif;
+  margin-bottom:12px;
 }
-.stream-sci{background:rgba(239,68,68,0.12);color:#f87171;}
-.stream-com{background:rgba(245,158,11,0.12);color:var(--gold);}
+.stream-sci{background:rgba(239,68,68,0.15);color:#f87171;}
+.stream-com{background:rgba(245,158,11,0.15);color:var(--gold);}
 
 /* ═══════════ LIBRARY ═══════════ */
-#library{background:var(--bg2);}
-.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:13px;}
+#library{background:var(--bg2);position:relative;}
+.lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px;}
 .lib-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:14px;padding:18px;
-  display:flex;flex-direction:column;gap:7px;cursor:pointer;transition:all .25s;
+  border-radius:18px;padding:24px;
+  display:flex;flex-direction:column;gap:10px;cursor:pointer;transition:all .35s;
+  position:relative;overflow:hidden;
 }
-.lib-card:hover{border-color:var(--violet);background:rgba(139,92,246,0.06);transform:translateY(-2px);}
-.lib-em{font-size:26px;}
-.lib-t{font-size:13.5px;font-weight:700;font-family:'Outfit',sans-serif;}
-.lib-m{font-size:12px;color:var(--text3);}
+.lib-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(139,92,246,0.1),transparent);
+  opacity:0;transition:opacity .35s;
+}
+.lib-card:hover{border-color:var(--violet);transform:translateY(-4px) scale(1.02);}
+.lib-card:hover::before{opacity:1;}
+.lib-em{font-size:32px;transition:transform .3s;}
+.lib-card:hover .lib-em{transform:scale(1.2) rotate(5deg);}
+.lib-t{font-size:15px;font-weight:700;font-family:'Outfit',sans-serif;}
+.lib-m{font-size:13px;color:var(--text3);}
 .lib-f{
-  display:inline-block;padding:2px 8px;border-radius:20px;
-  font-size:10px;font-weight:700;background:rgba(34,197,94,0.1);color:#4ade80;
-  font-family:'Outfit',sans-serif;letter-spacing:.5px;width:fit-content;
+  display:inline-block;padding:4px 12px;border-radius:20px;
+  font-size:11px;font-weight:700;background:rgba(34,197,94,0.15);color:#4ade80;
+  font-family:'Outfit',sans-serif;letter-spacing:0.5px;width:fit-content;
 }
 
 /* ═══════════ WELLNESS ═══════════ */
-#wellness{background:var(--bg);}
-.w-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+#wellness{background:var(--bg);position:relative;}
+.w-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;}
 .w-big{
   grid-row:span 2;
-  background:linear-gradient(140deg,rgba(139,92,246,0.12) 0%,rgba(99,102,241,0.07) 100%);
-  border:1px solid rgba(139,92,246,0.25);border-radius:20px;padding:34px;
+  background:linear-gradient(145deg,rgba(139,92,246,0.08) 0%,rgba(99,102,241,0.04) 100%);
+  border:1px solid rgba(139,92,246,0.2);border-radius:24px;padding:40px;
   display:flex;flex-direction:column;justify-content:space-between;
-  transition:border-color .3s;
+  transition:all .4s;
 }
-.w-big:hover{border-color:rgba(139,92,246,0.45);}
-.w-big h3{font-size:24px;font-weight:800;line-height:1.25;letter-spacing:-.5px;margin-top:14px;}
-.w-big p{font-size:14px;color:var(--text2);line-height:1.75;margin-top:12px;margin-bottom:22px;}
-.w-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.w-big:hover{border-color:rgba(139,92,246,0.4);box-shadow:var(--card-glow);}
+.w-big h3{font-size:26px;font-weight:800;line-height:1.2;letter-spacing:-0.5px;margin-top:20px;}
+.w-big p{font-size:15px;color:var(--text2);line-height:1.8;margin-top:16px;margin-bottom:28px;}
+.w-tags{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
 .w-tag{
-  padding:5px 13px;border-radius:20px;
-  background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.22);
-  font-size:11.5px;color:var(--accent);font-weight:600;font-family:'Outfit',sans-serif;
+  padding:8px 16px;border-radius:30px;
+  background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.25);
+  font-size:13px;color:var(--accent);font-weight:600;font-family:'Outfit',sans-serif;
+  transition:all .3s;
 }
+.w-tag:hover{background:rgba(139,92,246,0.2);transform:translateY(-2px);}
 .w-sm{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:16px;padding:22px;transition:all .25s;
+  border-radius:20px;padding:28px;transition:all .35s;
 }
-.w-sm:hover{border-color:var(--violet);transform:translateY(-2px);}
-.w-em{font-size:30px;margin-bottom:12px;display:block;}
-.w-sm h4{font-size:15px;font-weight:700;margin-bottom:7px;font-family:'Outfit',sans-serif;}
-.w-sm p{font-size:13px;color:var(--text2);line-height:1.65;}
+.w-sm:hover{border-color:var(--violet);transform:translateY(-4px);box-shadow:var(--shadow);}
+.w-em{font-size:36px;margin-bottom:16px;display:block;transition:transform .3s;}
+.w-sm:hover .w-em{transform:scale(1.15);}
+.w-sm h4{font-size:17px;font-weight:700;margin-bottom:10px;font-family:'Outfit',sans-serif;}
+.w-sm p{font-size:14px;color:var(--text2);line-height:1.7;}
 
 /* ═══════════ TESTIMONIALS ═══════════ */
-#testimonials{background:var(--bg2);}
-.t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;}
+#testimonials{background:var(--bg2);position:relative;}
+.t-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;}
 .t-card{
   background:var(--surface);border:1px solid var(--border);
-  border-radius:18px;padding:26px;transition:all .28s;
+  border-radius:24px;padding:32px;transition:all .4s;
+  position:relative;overflow:hidden;
 }
-.t-card:hover{border-color:var(--violet);transform:translateY(-3px);box-shadow:var(--glow);}
-.stars{color:var(--gold);font-size:12px;letter-spacing:3px;margin-bottom:10px;}
-.tq{font-size:44px;color:var(--violet);line-height:.9;margin-bottom:8px;font-family:'Outfit',sans-serif;opacity:.45;}
-.t-txt{font-size:13.5px;color:var(--text2);line-height:1.75;margin-bottom:18px;font-style:italic;}
-.t-auth{display:flex;align-items:center;gap:11px;}
+.t-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--gold),var(--violet),var(--indigo));
+  transform:scaleX(0);transition:transform .4s;
+}
+.t-card:hover{border-color:var(--violet);transform:translateY(-6px);box-shadow:var(--glow);}
+.t-card:hover::before{transform:scaleX(1);}
+.stars{color:var(--gold);font-size:14px;letter-spacing:3px;margin-bottom:14px;}
+.tq{font-size:56px;color:var(--violet);line-height:0.8;margin-bottom:12px;font-family:'Outfit',sans-serif;opacity:0.3;}
+.t-txt{font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:24px;font-style:italic;}
+.t-auth{display:flex;align-items:center;gap:14px;}
 .t-av{
-  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  width:48px;height:48px;border-radius:50%;flex-shrink:0;
   background:linear-gradient(135deg,var(--violet2),var(--indigo));
   display:flex;align-items:center;justify-content:center;
-  font-family:'Outfit',sans-serif;font-weight:900;font-size:16px;color:#fff;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:18px;color:#fff;
+  box-shadow:0 4px 15px rgba(124,58,237,0.4);
 }
-.t-name{font-weight:700;font-size:13.5px;}
-.t-cls{font-size:11.5px;color:var(--text3);margin-top:1px;}
+.t-name{font-weight:700;font-size:15px;}
+.t-cls{font-size:13px;color:var(--text3);margin-top:2px;}
 
 /* ═══════════ ABOUT ═══════════ */
 #about{
   background:var(--bg);
-  display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
 }
-.ab-txt p{font-size:15px;color:var(--text2);line-height:1.8;margin-bottom:15px;}
-.ab-btns{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px;}
-.ab-vis{position:relative;height:420px;}
+.ab-txt p{font-size:16px;color:var(--text2);line-height:1.9;margin-bottom:18px;}
+.ab-btns{display:flex;gap:16px;flex-wrap:wrap;margin-top:32px;}
+
+/* About visual - desktop floating cards */
+.ab-vis{position:relative;height:480px;}
 .acard{
-  position:absolute;border-radius:18px;padding:22px;
+  position:absolute;border-radius:20px;padding:28px;
   border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow);
+  transition:all .4s;
 }
-.ac1{width:260px;top:0;left:0;}
+.acard:hover{transform:translateY(-8px) scale(1.05);box-shadow:var(--card-glow);}
+.ac1{width:280px;top:0;left:0;}
 .ac2{
-  width:230px;top:90px;left:150px;
-  background:linear-gradient(135deg,rgba(139,92,246,0.16),rgba(99,102,241,0.07));
+  width:260px;top:100px;left:180px;
+  background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(99,102,241,0.08));
   border-color:rgba(139,92,246,0.3);
 }
-.ac3{width:210px;top:250px;left:30px;background:var(--surface2);}
+.ac3{width:240px;top:300px;left:40px;background:var(--surface2);}
 .ac-v{
-  font-family:'Outfit',sans-serif;font-size:34px;font-weight:900;letter-spacing:-1.5px;
+  font-family:'Outfit',sans-serif;font-size:42px;font-weight:900;letter-spacing:-2px;
   background:linear-gradient(135deg,var(--accent),var(--indigo));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
 }
-.ac-l{font-size:13px;color:var(--text2);margin-top:4px;}
+.ac-l{font-size:14px;color:var(--text2);margin-top:6px;}
+
+/* ═══════════ CTA SECTION ═══════════ */
+#cta{
+  background:linear-gradient(135deg,var(--violet2),var(--indigo));
+  padding:100px 60px;text-align:center;position:relative;overflow:hidden;
+}
+#cta::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.cta-content{position:relative;z-index:2;}
+.cta-content h2{
+  font-size:clamp(30px,5vw,56px);font-weight:900;color:#fff;
+  margin-bottom:20px;letter-spacing:-1px;
+}
+.cta-content p{font-size:18px;color:rgba(255,255,255,0.85);margin-bottom:40px;max-width:600px;margin-left:auto;margin-right:auto;}
+.cta-btn{
+  padding:18px 48px;background:#fff;color:var(--violet2);
+  border:none;border-radius:50px;font-family:'Outfit',sans-serif;
+  font-weight:800;font-size:16px;cursor:pointer;transition:all .3s;
+  box-shadow:0 8px 30px rgba(0,0,0,0.3);
+}
+.cta-btn:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
 
 /* ═══════════ FOOTER ═══════════ */
 footer{
   background:var(--bg2);border-top:1px solid var(--border);
-  padding:60px 52px 32px;transition:background var(--transition);
+  padding:80px 60px 40px;position:relative;
 }
-.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:48px;}
-.ft-brand p{font-size:14px;color:var(--text2);line-height:1.75;margin-top:12px;max-width:260px;}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:50px;margin-bottom:60px;}
+.ft-brand p{font-size:15px;color:var(--text2);line-height:1.8;margin-top:16px;max-width:300px;}
 .ft-col h5{
-  font-family:'Outfit',sans-serif;font-weight:700;font-size:13.5px;
-  margin-bottom:16px;color:var(--text);letter-spacing:.3px;
+  font-family:'Outfit',sans-serif;font-weight:700;font-size:15px;
+  margin-bottom:20px;color:var(--text);letter-spacing:0.5px;
 }
-.ft-col a{display:block;color:var(--text2);font-size:13.5px;margin-bottom:10px;transition:color .2s;}
-.ft-col a:hover{color:var(--accent);}
-.ft-col li{font-size:13.5px;color:var(--text2);margin-bottom:10px;list-style:none;}
+.ft-col a{display:block;color:var(--text2);font-size:14px;margin-bottom:12px;transition:all .25s;}
+.ft-col a:hover{color:var(--accent);transform:translateX(4px);}
+.ft-col li{font-size:14px;color:var(--text2);margin-bottom:12px;list-style:none;}
 .ft-bot{
-  border-top:1px solid var(--border);padding-top:24px;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  border-top:1px solid var(--border);padding-top:28px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;
 }
 .ft-bot p{font-size:13px;color:var(--text3);}
 
 /* ═══════════ CHATBOT ═══════════ */
 .ct-btn{
-  position:fixed;bottom:28px;right:28px;z-index:500;
-  width:58px;height:58px;border-radius:50%;
+  position:fixed;bottom:24px;right:24px;z-index:500;
+  width:60px;height:60px;border-radius:50%;
   background:linear-gradient(135deg,var(--violet2),var(--indigo));
   border:none;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 32px rgba(124,58,237,0.52);transition:all .3s;
+  box-shadow:0 8px 40px rgba(124,58,237,0.6);transition:all .35s;
+  animation:chatPulse 3s ease-in-out infinite;
 }
-.ct-btn:hover{transform:scale(1.1);box-shadow:0 12px 44px rgba(124,58,237,0.72);}
+@keyframes chatPulse{0%,100%{box-shadow:0 8px 40px rgba(124,58,237,0.6);}50%{box-shadow:0 8px 50px rgba(124,58,237,0.8);}}
+.ct-btn:hover{transform:scale(1.1) rotate(5deg);box-shadow:0 12px 50px rgba(124,58,237,0.8);}
 .ct-btn svg{width:26px;height:26px;color:#fff;}
 .ct-ping{
-  position:absolute;top:1px;right:1px;
-  width:14px;height:14px;background:#22c55e;
-  border-radius:50%;border:2px solid var(--bg);
+  position:absolute;top:2px;right:2px;
+  width:16px;height:16px;background:#22c55e;
+  border-radius:50%;border:3px solid var(--bg);
   animation:ctping 2.5s ease infinite;
 }
-@keyframes ctping{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.5);opacity:.6;}}
+@keyframes ctping{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.6);opacity:0.5;}}
 .ct-win{
-  position:fixed;bottom:100px;right:28px;
-  width:365px;background:var(--bg2);
-  border:1px solid var(--border);border-radius:22px;
-  box-shadow:0 24px 80px rgba(0,0,0,.5);z-index:500;
-  display:none;flex-direction:column;overflow:hidden;max-height:570px;
-  transition:background var(--transition);
+  position:fixed;bottom:100px;right:24px;
+  width:380px;background:var(--bg2);
+  border:1px solid var(--border);border-radius:28px;
+  box-shadow:0 30px 100px rgba(0,0,0,.6);z-index:500;
+  display:none;flex-direction:column;overflow:hidden;max-height:580px;
+  transition:all var(--transition);
 }
-.ct-win.open{display:flex;animation:ctup .3s ease;}
-@keyframes ctup{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+.ct-win.open{display:flex;animation:ctup .4s cubic-bezier(.34,1.56,.64,1);}
+@keyframes ctup{from{opacity:0;transform:translateY(30px) scale(0.9);}to{opacity:1;transform:translateY(0) scale(1);}}
 .ct-head{
   background:linear-gradient(135deg,var(--violet2),var(--indigo));
-  padding:16px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;
+  padding:18px 20px;display:flex;align-items:center;gap:14px;
 }
 .ct-av{
-  width:38px;height:38px;border-radius:50%;
+  width:44px;height:44px;border-radius:50%;
   background:rgba(255,255,255,0.2);
   display:flex;align-items:center;justify-content:center;
-  font-family:'Outfit',sans-serif;font-weight:900;font-size:17px;color:#fff;flex-shrink:0;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:18px;color:#fff;
+  flex-shrink:0;
 }
-.ct-inf h4{font-family:'Outfit',sans-serif;font-size:14.5px;font-weight:700;color:#fff;}
-.ct-inf p{font-size:11px;color:rgba(255,255,255,0.65);margin-top:1px;}
-.ct-cls{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;padding:4px;}
-.ct-cls:hover{color:#fff;}
+.ct-inf h4{font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;color:#fff;}
+.ct-inf p{font-size:12px;color:rgba(255,255,255,0.7);}
+.ct-cls{margin-left:auto;background:none;border:none;color:rgba(255,255,255,.8);cursor:pointer;padding:6px;transition:all .2s;flex-shrink:0;}
+.ct-cls:hover{color:#fff;transform:rotate(90deg);}
 .ct-msgs{
   flex:1;overflow-y:auto;padding:16px;
-  display:flex;flex-direction:column;gap:11px;min-height:300px;
+  display:flex;flex-direction:column;gap:14px;min-height:300px;
   scrollbar-width:thin;scrollbar-color:var(--surface2) transparent;
 }
-.ct-msgs::-webkit-scrollbar{width:4px;}
-.ct-msgs::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:2px;}
+.ct-msgs::-webkit-scrollbar{width:6px;}
+.ct-msgs::-webkit-scrollbar-thumb{background:var(--surface2);border-radius:3px;}
 .msg{
-  max-width:82%;padding:11px 14px;border-radius:15px;
-  font-size:13.5px;line-height:1.65;
-  animation:min .3s ease;white-space:pre-wrap;
+  max-width:88%;padding:12px 16px;border-radius:18px;
+  font-size:13px;line-height:1.7;animation:msgIn .4s cubic-bezier(.34,1.56,.64,1);
+  word-wrap:break-word;
 }
-@keyframes min{from{opacity:0;transform:translateY(7px);}to{opacity:1;transform:translateY(0);}}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px) scale(0.95);}to{opacity:1;transform:translateY(0) scale(1);}}
 .msg.bot{background:var(--surface);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;}
 .msg.usr{background:linear-gradient(135deg,var(--violet2),var(--indigo));color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
 .typing{
-  display:flex;gap:5px;align-items:center;padding:11px 14px;
-  background:var(--surface);border-radius:15px;border-bottom-left-radius:4px;align-self:flex-start;
+  display:flex;gap:6px;align-items:center;padding:14px 18px;
+  background:var(--surface);border-radius:18px;border-bottom-left-radius:4px;align-self:flex-start;
 }
-.typing span{width:7px;height:7px;background:var(--text3);border-radius:50%;animation:tdk 1.3s ease infinite;}
+.typing span{width:8px;height:8px;background:var(--text3);border-radius:50%;animation:tdk 1.4s ease infinite;}
 .typing span:nth-child(2){animation-delay:.2s;}
 .typing span:nth-child(3){animation-delay:.4s;}
-@keyframes tdk{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
+@keyframes tdk{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-8px);}}
 .ct-quick{
-  padding:8px 14px;display:flex;gap:6px;overflow-x:auto;
-  scrollbar-width:none;flex-shrink:0;border-top:1px solid var(--border);
+  padding:10px 14px;display:flex;gap:8px;overflow-x:auto;
+  scrollbar-width:none;border-top:1px solid var(--border);background:var(--bg3);
 }
 .ct-quick::-webkit-scrollbar{display:none;}
 .qb{
-  white-space:nowrap;padding:6px 12px;
+  white-space:nowrap;padding:7px 14px;
   border:1px solid var(--border);background:var(--surface);
-  border-radius:20px;color:var(--text2);font-size:12px;font-weight:500;
-  cursor:pointer;transition:all .2s;flex-shrink:0;
+  border-radius:24px;color:var(--text2);font-size:12px;font-weight:500;
+  cursor:pointer;transition:all .25s;
   font-family:'Plus Jakarta Sans',sans-serif;
 }
-.qb:hover{border-color:var(--violet);color:var(--accent);background:rgba(139,92,246,0.07);}
-.ct-row{border-top:1px solid var(--border);padding:12px 14px;display:flex;gap:8px;align-items:center;flex-shrink:0;}
+.qb:hover{border-color:var(--violet);color:var(--accent);background:rgba(139,92,246,0.1);transform:translateY(-2px);}
+.ct-row{border-top:1px solid var(--border);padding:14px;display:flex;gap:10px;align-items:center;background:var(--bg2);}
 .ct-inp{
-  flex:1;background:var(--surface);border:1px solid var(--border);
-  border-radius:11px;padding:10px 14px;color:var(--text);
-  font-size:13.5px;outline:none;transition:border-color .2s;
-  font-family:'Plus Jakarta Sans',sans-serif;
+  flex:1;background:var(--surface);border:2px solid var(--border);
+  border-radius:14px;padding:11px 16px;color:var(--text);
+  font-size:14px;outline:none;transition:all .25s;
+  font-family:'Plus Jakarta Sans',sans-serif;min-width:0;
 }
-.ct-inp:focus{border-color:var(--violet);}
+.ct-inp:focus{border-color:var(--violet);box-shadow:0 0 20px rgba(139,92,246,0.2);}
 .ct-inp::placeholder{color:var(--text3);}
 .ct-snd{
-  width:38px;height:38px;border-radius:11px;background:var(--violet2);
+  width:42px;height:42px;border-radius:12px;background:var(--violet2);
   border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  color:#fff;transition:all .2s;flex-shrink:0;
+  color:#fff;transition:all .25s;flex-shrink:0;
 }
-.ct-snd:hover{background:var(--violet);transform:scale(1.06);}
+.ct-snd:hover{background:var(--violet);transform:scale(1.08) rotate(5deg);}
 
-/* ═══════════ REVEAL ═══════════ */
-.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease;}
+/* ═══════════ REVEAL ANIMATION ═══════════ */
+.reveal{opacity:0;transform:translateY(40px);transition:all .8s cubic-bezier(.4,0,.2,1);}
 .reveal.visible{opacity:1;transform:translateY(0);}
 
-/* ═══════════ RESPONSIVE ═══════════ */
-@media(max-width:960px){
+/* ═══════════ RESPONSIVE — 1200px ═══════════ */
+@media(max-width:1200px){
+  section{padding:100px 40px;}
+  .hero{padding:120px 40px 100px;}
+  #about{gap:50px;}
+  .ab-vis{height:420px;}
+  .ac2{left:140px;}
+  .ft-grid{grid-template-columns:1.5fr 1fr 1fr 1fr;gap:32px;}
+}
+
+/* ═══════════ RESPONSIVE — 1024px ═══════════ */
+@media(max-width:1024px){
   .sidebar{transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .s-overlay.open{display:block;}
   .topnav{display:flex;}
-  .main{margin-left:0;padding-top:58px;}
-  section{padding:60px 22px;}
-  .hero{padding:80px 22px 60px;}
+  .main{margin-left:0;}
+  section{padding:80px 36px;}
+  .hero{padding:104px 36px 80px;}
   .w-grid{grid-template-columns:1fr;}
   .w-big{grid-row:auto;}
-  #about{grid-template-columns:1fr;gap:36px;padding:60px 22px;}
-  .ft-grid{grid-template-columns:1fr 1fr;gap:24px;}
-  footer{padding:48px 22px 28px;}
+  #about{grid-template-columns:1fr;gap:40px;padding:80px 36px;}
+  .ab-vis{height:auto;position:relative;}
+  .acard{position:relative;top:auto;left:auto;width:100%;margin-bottom:16px;}
+  .acard:last-child{margin-bottom:0;}
+  .ac2{left:auto;}
+  .ft-grid{grid-template-columns:1fr 1fr;gap:36px;}
+  .ct-win{width:calc(100vw - 32px);right:16px;}
 }
-@media(max-width:640px){
-  .hero h1{font-size:36px;letter-spacing:-.5px;}
-  .ft-grid{grid-template-columns:1fr;}
-  .ab-vis{height:300px;}
-  .ac1{width:200px;}
-  .ac2{width:175px;left:110px;}
-  .ac3{width:168px;top:180px;}
-  .ct-win{right:10px;left:10px;width:auto;}
-  .h-stats{gap:0;}
-  .stat{padding:0 16px;}
+
+/* ═══════════ RESPONSIVE — 768px ═══════════ */
+@media(max-width:768px){
+  section{padding:60px 20px;}
+  .hero{padding:80px 20px 60px;min-height:auto;padding-top:96px;}
+  .hero h1{font-size:clamp(30px,8vw,48px);letter-spacing:-1px;}
+  .h-badge{font-size:12px;padding:8px 18px;}
+  .h-sub{font-size:16px;}
+  .h-btns{flex-direction:column;align-items:center;gap:12px;}
+  .btn-p,.btn-o{width:100%;max-width:320px;justify-content:center;}
+  .h-stats{gap:16px;margin-top:40px;}
+  .stat{padding:16px 20px;flex-direction:row;align-items:center;gap:12px;
+        background:var(--surface);border:1px solid var(--border);border-radius:16px;
+        width:calc(50% - 8px);}
+  .stat::after{display:none;}
+  .stat-v{font-size:26px;}
+  .stat-l{font-size:12px;margin-top:0;}
+  .s-hdr{margin-bottom:40px;}
+  .s-title{font-size:clamp(26px,6vw,40px);letter-spacing:-1px;}
+  .s-sub{font-size:15px;}
+  .c-grid{grid-template-columns:1fr;gap:16px;}
+  .f-grid{grid-template-columns:1fr;gap:16px;}
+  .fee-grid{grid-template-columns:1fr;gap:16px;}
+  .fee-tabs{gap:8px;}
+  .fee-tab{font-size:13px;padding:9px 16px;}
+  .t-grid{grid-template-columns:1fr;gap:16px;}
+  .lib-grid{grid-template-columns:repeat(2,1fr);gap:14px;}
+  .lib-card{padding:18px;}
+  .ft-grid{grid-template-columns:1fr;gap:28px;}
+  footer{padding:50px 20px 32px;}
+  .ft-brand p{max-width:100%;}
+  #about{padding:60px 20px;}
+  .ab-btns{flex-direction:column;}
+  .ab-btns .btn-p,.ab-btns .btn-o{width:100%;text-align:center;justify-content:center;}
+  #cta{padding:60px 20px;}
+  .cta-content h2{font-size:clamp(26px,7vw,40px);}
+  .cta-content p{font-size:16px;}
+  .cta-btn{padding:15px 36px;font-size:15px;}
+  .w-grid{grid-template-columns:1fr;gap:16px;}
+  .w-big{padding:28px;}
+  .w-big h3{font-size:22px;}
+  .ct-btn{bottom:20px;right:20px;width:54px;height:54px;}
+  .ct-win{bottom:90px;right:16px;width:calc(100vw - 32px);max-height:70vh;}
+  .ct-msgs{min-height:200px;}
+}
+
+/* ═══════════ RESPONSIVE — 480px ═══════════ */
+@media(max-width:480px){
+  section{padding:50px 16px;}
+  .hero{padding:84px 16px 50px;}
+  .hero h1{font-size:28px;letter-spacing:-0.5px;}
+  .h-badge{font-size:11px;padding:7px 14px;gap:6px;}
+  .h-sub{font-size:14px;line-height:1.7;}
+  .h-stats{flex-direction:column;align-items:stretch;gap:10px;margin-top:32px;}
+  .stat{width:100%;padding:14px 18px;}
+  .stat-v{font-size:24px;}
+  .lib-grid{grid-template-columns:1fr;gap:12px;}
+  .c-num{font-size:44px;}
+  .fee-tabs{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;
+            -webkit-overflow-scrolling:touch;scrollbar-width:none;}
+  .fee-tabs::-webkit-scrollbar{display:none;}
+  .fee-tab{flex-shrink:0;}
+  .t-txt{font-size:14px;}
+  .w-big .btn-p{font-size:14px;padding:14px 20px;}
+  .topnav{padding:0 14px;}
+  .topnav .s-cta{display:none;}
+  footer{padding:40px 16px 28px;}
+  .ft-bot{flex-direction:column;align-items:flex-start;gap:8px;}
+  .ct-win{width:calc(100vw - 24px);right:12px;left:12px;border-radius:20px;}
+  .ct-btn{right:16px;bottom:16px;}
+  #cta{padding:50px 16px;}
+  .cta-btn{width:100%;max-width:300px;}
+}
+
+/* ═══════════ RESPONSIVE — 360px ═══════════ */
+@media(max-width:360px){
+  .hero h1{font-size:24px;}
+  .s-title{font-size:24px;}
+  .logo-txt{font-size:14px;}
+  .c-num{font-size:36px;}
 }
 </style>
 </head>
 <body>
+
+<!-- ATOMIC BACKGROUND -->
+<div class="atom-bg">
+  <div class="nucleus"></div>
+  <div class="orbit-ring orbit-1"><div class="electron e1"></div><div class="electron e3"></div></div>
+  <div class="orbit-ring orbit-2"><div class="electron e2"></div><div class="electron e4"></div></div>
+  <div class="orbit-ring orbit-3"></div>
+  <div class="proton p1"></div><div class="proton p2"></div><div class="proton p3"></div>
+  <div class="neutron n1"></div><div class="neutron n2"></div><div class="neutron n3"></div>
+</div>
 
 <!-- OVERLAY -->
 <div class="s-overlay" id="overlay" onclick="closeSB()"></div>
@@ -627,16 +824,18 @@ footer{
     </div>
   </div>
   <nav class="s-nav">
-    <div class="nav-grp">Main</div>
+    <div class="nav-grp">Menu</div>
     <a class="nav-a active" href="#hero" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Home</a>
     <a class="nav-a" href="#courses" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Courses</a>
     <a class="nav-a" href="#features" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Features</a>
     <a class="nav-a" href="#fees" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>Fee Structure</a>
     <a class="nav-a" href="#library" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"/></svg>Free Library<span class="nav-badge">Free</span></a>
-    <div class="nav-grp" style="margin-top:6px;">More</div>
     <a class="nav-a" href="#wellness" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>Mental Wellness</a>
     <a class="nav-a" href="#testimonials" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>Testimonials</a>
     <a class="nav-a" href="#about" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>About Us</a>
+    <div class="nav-grp" style="margin-top:10px;">Account</div>
+    <a class="nav-a" href="login.html" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>Login</a>
+    <a class="nav-a" href="login.html" onclick="closeSB()"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>Sign Up<span class="nav-badge" style="background:var(--gold);color:#000;">New</span></a>
   </nav>
   <div class="s-bottom">
     <div class="theme-row">
@@ -647,21 +846,22 @@ footer{
         <div class="tog-ball"></div>
       </button>
     </div>
-    <button class="s-cta" onclick="window.location.href='login.html'">Login / Sign Up →</button>
+    <button class="s-cta" onclick="window.location.href='login.html'">Get Started Free →</button>
   </div>
 </aside>
 
 <!-- ══════ MOBILE TOPNAV ══════ -->
 <nav class="topnav" id="topnav">
   <div class="s-logo-row">
-    <div class="logo-box">M</div>
+    <div class="logo-box" style="width:36px;height:36px;font-size:17px;">M</div>
     <span class="logo-txt">MINDSKYRA</span>
   </div>
   <div class="topnav-r">
-    <button class="tog" onclick="toggleTheme()" aria-label="Toggle theme">
+    <button class="s-cta" style="padding:9px 18px;font-size:12px;border-radius:10px;" onclick="window.location.href='login.html'">Sign Up</button>
+    <button class="tog" style="width:44px;height:26px;" onclick="toggleTheme()" aria-label="Toggle theme">
       <span class="tog-icon i-moon">🌙</span>
       <span class="tog-icon i-sun">☀️</span>
-      <div class="tog-ball"></div>
+      <div class="tog-ball" style="width:16px;height:16px;"></div>
     </button>
     <button class="hamburger" onclick="toggleSB()">
       <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -674,55 +874,89 @@ footer{
 
 <!-- HERO -->
 <section class="hero" id="hero">
-  <div class="h-bg">
-    <div class="h-grad"></div><div class="h-mesh"></div><div class="h-grid"></div>
-    <div class="h-orb o1"></div><div class="h-orb o2"></div><div class="h-orb o3"></div>
-  </div>
   <div class="h-content reveal">
-    <div class="h-badge"><span class="ldot"></span><span id="activeLearners">2,847</span>&nbsp;students learning right now</div>
+    <div class="h-badge">🚀 Launch Your Learning Journey Today</div>
     <h1>Master Your Future<br>with <span class="g">MINDSKYRA</span></h1>
-    <p class="h-sub">India's most advanced learning platform for Classes 3–12. Live &amp; recorded classes, AI-powered skills, expert faculty — online &amp; offline.</p>
+    <p class="h-sub">India's most advanced learning platform for Classes 3–12. Live & recorded classes, AI-powered skills, expert faculty — online & offline.</p>
     <div class="h-btns">
-      <button class="btn-p" onclick="goTo('courses')">Explore Courses <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
-      <button class="btn-o" onclick="goTo('library')">Free Library</button>
+      <button class="btn-p" onclick="window.location.href='login.html'">Get Started Free <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></button>
+      <button class="btn-o" onclick="goTo('courses')">Explore Courses</button>
     </div>
     <div class="h-stats">
-      <div class="stat"><span class="stat-v">15K+</span><span class="stat-l">Students</span></div>
-      <div class="stat-sep"></div>
-      <div class="stat"><span class="stat-v">98%</span><span class="stat-l">Success Rate</span></div>
-      <div class="stat-sep"></div>
-      <div class="stat"><span class="stat-v">50+</span><span class="stat-l">Expert Teachers</span></div>
-      <div class="stat-sep"></div>
-      <div class="stat"><span class="stat-v">4.9★</span><span class="stat-l">App Rating</span></div>
+      <div class="stat"><span class="stat-v">1.5K+</span><span class="stat-l">Students</span></div>
+      <div class="stat"><span class="stat-v">99.99%</span><span class="stat-l">Success Rate</span></div>
+      <div class="stat"><span class="stat-v">5</span><span class="stat-l">Expert Teachers</span></div>
+      <div class="stat"><span class="stat-v">5.0★</span><span class="stat-l">Google Rating</span></div>
     </div>
   </div>
 </section>
 
 <!-- COURSES -->
 <section id="courses">
-  <div class="s-hdr reveal"><div class="s-lbl">Curriculum</div><h2 class="s-title">Choose Your Class</h2><p class="s-sub">Board-aligned curriculum for every stage — from foundational concepts to JEE/NEET competitive excellence.</p></div>
+  <div class="s-hdr reveal">
+    <div class="s-lbl">Curriculum</div>
+    <h2 class="s-title">Choose Your Class</h2>
+    <p class="s-sub">Board-aligned curriculum for every stage — from foundational concepts to JEE/NEET competitive excellence.</p>
+  </div>
   <div class="c-grid">
-    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(99,102,241,0.08),transparent);--cg:linear-gradient(135deg,#818cf8,#6366f1);" onclick="goTo('fees')"><div class="c-num">3–5</div><div class="c-stg">Foundation Stage</div><ul class="c-feats"><li>Basic Concepts &amp; Fundamentals</li><li>Interactive &amp; Visual Learning</li><li>Activity-based Worksheets</li></ul><button class="c-btn">View Courses →</button></div>
-    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(34,197,94,0.07),transparent);--cg:linear-gradient(135deg,#4ade80,#22c55e);" onclick="goTo('fees')"><div class="c-num">6–8</div><div class="c-stg">Middle School</div><ul class="c-feats"><li>Deep Concept Building</li><li>Competitive Exam Preparation</li><li>Olympiad &amp; Science Fairs</li></ul><button class="c-btn">View Courses →</button></div>
-    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(139,92,246,0.08),transparent);--cg:linear-gradient(135deg,#c4b5fd,#8b5cf6);" onclick="goTo('fees')"><div class="c-num">9–10</div><div class="c-stg">Board Preparation</div><ul class="c-feats"><li>CBSE &amp; State Boards</li><li>Chapter-wise DPPs &amp; Tests</li><li>Mock Board Examinations</li></ul><button class="c-btn">View Courses →</button></div>
-    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(239,68,68,0.07),transparent);--cg:linear-gradient(135deg,#f87171,#ef4444);" onclick="goTo('fees')"><div class="c-num">11–12</div><div class="c-stg">Science Stream</div><div class="c-tag">PCM / PCB</div><ul class="c-feats"><li>JEE Main &amp; Advanced Prep</li><li>NEET / AIIMS Foundation</li><li>Virtual Lab Practicals</li></ul><button class="c-btn">View Courses →</button></div>
-    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(245,158,11,0.07),transparent);--cg:linear-gradient(135deg,#fbbf24,#f59e0b);" onclick="goTo('fees')"><div class="c-num">11–12</div><div class="c-stg">Commerce Stream</div><div class="c-tag">Accounts / Eco / BST</div><ul class="c-feats"><li>CA Foundation Prep</li><li>Business Studies &amp; Economics</li><li>Case Study Workshops</li></ul><button class="c-btn">View Courses →</button></div>
-    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(236,72,153,0.08),transparent);--cg:linear-gradient(135deg,#f472b6,#a78bfa);"><div class="c-new">NEW</div><div class="c-num" style="font-size:32px;letter-spacing:-1px;">LERNVO AI</div><div class="c-stg">Skills Platform</div><ul class="c-feats"><li>Spoken English Mastery</li><li>AI &amp; Coding Skills</li><li>Personality Development</li></ul><button class="c-btn">Coming Soon →</button></div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(34,197,94,0.1),transparent);--cg:linear-gradient(135deg,#4ade80,#22c55e);" onclick="window.location.href='login.html'">
+      <div class="c-num">3–5</div>
+      <div class="c-stg">Foundation Stage</div>
+      <ul class="c-feats"><li>Basic Concepts & Fundamentals</li><li>Interactive & Visual Learning</li><li>Activity-based Worksheets</li></ul>
+      <button class="c-btn">Join Now →</button>
+    </div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(59,130,246,0.1),transparent);--cg:linear-gradient(135deg,#60a5fa,#3b82f6);" onclick="window.location.href='login.html'">
+      <div class="c-num">6–8</div>
+      <div class="c-stg">Middle School</div>
+      <ul class="c-feats"><li>Deep Concept Building</li><li>Competitive Exam Preparation</li><li>Olympiad & Science Fairs</li></ul>
+      <button class="c-btn">Join Now →</button>
+    </div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(139,92,246,0.1),transparent);--cg:linear-gradient(135deg,#c4b5fd,#8b5cf6);" onclick="window.location.href='login.html'">
+      <div class="c-num">9–10</div>
+      <div class="c-stg">Board Preparation</div>
+      <ul class="c-feats"><li>CBSE & State Boards</li><li>Chapter-wise DPPs & Tests</li><li>Mock Board Examinations</li></ul>
+      <button class="c-btn">Join Now →</button>
+    </div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(239,68,68,0.1),transparent);--cg:linear-gradient(135deg,#f87171,#ef4444);" onclick="window.location.href='login.html'">
+      <div class="c-num">11–12</div>
+      <div class="c-stg">Science Stream</div>
+      <div class="c-tag">PCM / PCB</div>
+      <ul class="c-feats"><li>JEE Main & Advanced Prep</li><li>NEET / AIIMS Foundation</li><li>Virtual Lab Practicals</li></ul>
+      <button class="c-btn">Join Now →</button>
+    </div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(245,158,11,0.1),transparent);--cg:linear-gradient(135deg,#fbbf24,#f59e0b);" onclick="window.location.href='login.html'">
+      <div class="c-num">11–12</div>
+      <div class="c-stg">Commerce Stream</div>
+      <div class="c-tag">Accounts / Eco / BST</div>
+      <ul class="c-feats"><li>CA Foundation Prep</li><li>Business Studies & Economics</li><li>Case Study Workshops</li></ul>
+      <button class="c-btn">Join Now →</button>
+    </div>
+    <div class="c-card reveal" style="--ch:linear-gradient(135deg,rgba(236,72,153,0.1),transparent);--cg:linear-gradient(135deg,#f472b6,#ec4899);">
+      <div class="c-new">NEW</div>
+      <div class="c-num" style="font-size:clamp(24px,4vw,36px);letter-spacing:-1px;">LERNVO AI</div>
+      <div class="c-stg">Skills Platform</div>
+      <ul class="c-feats"><li>Spoken English Mastery</li><li>AI & Coding Skills</li><li>Personality Development</li></ul>
+      <button class="c-btn">Coming Soon →</button>
+    </div>
   </div>
 </section>
 
 <!-- FEATURES -->
 <section id="features">
-  <div class="s-hdr reveal"><div class="s-lbl">Why MINDSKYRA</div><h2 class="s-title">Everything You Need to Excel</h2><p class="s-sub">A complete learning ecosystem built for the modern Indian student — powerful, flexible, and designed for results.</p></div>
+  <div class="s-hdr reveal">
+    <div class="s-lbl">Why MINDSKYRA</div>
+    <h2 class="s-title">Everything You Need to Excel</h2>
+    <p class="s-sub">A complete learning ecosystem built for the modern Indian student — powerful, flexible, and designed for results.</p>
+  </div>
   <div class="f-grid">
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(99,102,241,0.1);">🎥</div><h3>Live &amp; Recorded Classes</h3><p>Attend live sessions with top educators or replay recordings anytime. Never miss a lesson, ever.</p></div>
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(34,197,94,0.1);">📚</div><h3>Rich Study Material</h3><p>Chapter-wise PDFs, DPPs, formula sheets and NCERT solutions — organized and instantly searchable.</p></div>
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(139,92,246,0.1);">📊</div><h3>Progress Analytics</h3><p>Detailed dashboards tracking test scores, study hours, weak areas, and improvement trends.</p></div>
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(245,158,11,0.1);">👨‍👩‍👧</div><h3>Parent Connect</h3><p>Real-time SMS &amp; app alerts for attendance, fee reminders, exam schedules, and performance reports.</p></div>
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(239,68,68,0.1);">🧪</div><h3>Virtual Lab &amp; Practicals</h3><p>Simulated physics, chemistry &amp; biology experiments accessible from any device — learn by doing.</p></div>
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(236,72,153,0.1);">🤖</div><h3>AI Doubt Engine</h3><p>Ask any doubt 24/7 — get instant AI answers followed by teacher verification during live hours.</p></div>
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(16,185,129,0.1);">📝</div><h3>Mock Test Series</h3><p>Hundreds of chapter tests, full-length mocks and previous year papers with AI-graded analysis.</p></div>
-    <div class="f-card reveal"><div class="f-icon" style="background:rgba(99,102,241,0.1);">📶</div><h3>Offline Mode</h3><p>Download videos and notes to study without internet — perfect for all connectivity conditions.</p></div>
+    <div class="f-card reveal"><div class="f-icon">🎥</div><h3>Live & Recorded Classes</h3><p>Attend live sessions with top educators or replay recordings anytime. Never miss a lesson, ever.</p></div>
+    <div class="f-card reveal"><div class="f-icon">📚</div><h3>Rich Study Material</h3><p>Chapter-wise PDFs, DPPs, formula sheets and NCERT solutions — organized and instantly searchable.</p></div>
+    <div class="f-card reveal"><div class="f-icon">📊</div><h3>Progress Analytics</h3><p>Detailed dashboards tracking test scores, study hours, weak areas, and improvement trends.</p></div>
+    <div class="f-card reveal"><div class="f-icon">👨‍👩‍👧</div><h3>Parent Connect</h3><p>Real-time SMS & app alerts for attendance, fee reminders, exam schedules, and performance reports.</p></div>
+    <div class="f-card reveal"><div class="f-icon">🧪</div><h3>Virtual Lab & Practicals</h3><p>Simulated physics, chemistry & biology experiments accessible from any device — learn by doing.</p></div>
+    <div class="f-card reveal"><div class="f-icon">🤖</div><h3>AI Doubt Engine</h3><p>Ask any doubt 24/7 — get instant AI answers followed by teacher verification during live hours.</p></div>
+    <div class="f-card reveal"><div class="f-icon">📝</div><h3>Mock Test Series</h3><p>Hundreds of chapter tests, full-length mocks and previous year papers with AI-graded analysis.</p></div>
+    <div class="f-card reveal"><div class="f-icon">📶</div><h3>Offline Mode</h3><p>Download videos and notes to study without internet — perfect for all connectivity conditions.</p></div>
   </div>
 </section>
 
@@ -733,230 +967,151 @@ footer{
     <h2 class="s-title">Transparent Fee Structure</h2>
     <p class="s-sub">No hidden charges. Annual fee shown. Online is 10% of annual fee. All plans include Free Library access.</p>
   </div>
-
-  <!-- Stream Tabs -->
   <div class="fee-tabs reveal">
     <button class="fee-tab active" onclick="switchTab('all',this)">All Classes</button>
     <button class="fee-tab" onclick="switchTab('1-5',this)">Class 1–5</button>
-    <button class="fee-tab" onclick="switchTab('6-10',this)">Class 6–10</button>
+    <button class="fee-tab" onclick="switchTab('6-8',this)">Class 6–8</button>
+    <button class="fee-tab" onclick="switchTab('9-10',this)">Class 9–10</button>
     <button class="fee-tab" onclick="switchTab('11-12',this)">Class 11–12</button>
   </div>
 
   <!-- ALL CLASSES panel -->
   <div class="fee-panel active" id="panel-all">
     <div class="fee-grid reveal">
-
-      <!-- Class 1 -->
-      <div class="fee-card c1-3">
-        <div class="fee-card-head"><span class="fee-class-name">Class 1</span><span class="fee-set-badge">SET</span></div>
+      <div class="fee-card c1-5" onclick="window.location.href='login.html'" style="cursor:pointer;">
+        <div class="fee-card-head"><span class="fee-class-name">Class 1–3</span><span class="fee-set-badge">SET</span></div>
         <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div>
         <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div>
+        <div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div>
+        <div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div>
       </div>
-
-      <!-- Class 2 -->
-      <div class="fee-card c1-3">
-        <div class="fee-card-head"><span class="fee-class-name">Class 2</span><span class="fee-set-badge">SET</span></div>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div>
-      </div>
-
-      <!-- Class 3 -->
-      <div class="fee-card c1-3">
-        <div class="fee-card-head"><span class="fee-class-name">Class 3</span><span class="fee-set-badge">SET</span></div>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div>
-      </div>
-
-      <!-- Class 4 -->
-      <div class="fee-card c1-3">
-        <div class="fee-card-head"><span class="fee-class-name">Class 4</span><span class="fee-set-badge">SET</span></div>
+      <div class="fee-card c1-5" onclick="window.location.href='login.html'" style="cursor:pointer;">
+        <div class="fee-card-head"><span class="fee-class-name">Class 4–5</span><span class="fee-set-badge">SET</span></div>
         <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹8,000</span></div>
         <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹800</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹8,000</span></div>
+        <div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹800</span></div>
+        <div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹8,000</span></div>
       </div>
-
-      <!-- Class 5 -->
-      <div class="fee-card c4-8">
-        <div class="fee-card-head"><span class="fee-class-name">Class 5</span><span class="fee-set-badge">SET</span></div>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹10,000</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,000</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹10,000</span></div>
-      </div>
-
-      <!-- Class 6 -->
-      <div class="fee-card c4-8">
-        <div class="fee-card-head"><span class="fee-class-name">Class 6</span><span class="fee-set-badge">SET</span></div>
+      <div class="fee-card c6-8" onclick="window.location.href='login.html'" style="cursor:pointer;">
+        <div class="fee-card-head"><span class="fee-class-name">Class 6–8</span><span class="fee-set-badge">SET</span></div>
         <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹12,000</span></div>
         <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,200</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹12,000</span></div>
+        <div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹1,200</span></div>
+        <div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹12,000</span></div>
       </div>
-
-      <!-- Class 7 -->
-      <div class="fee-card c4-8">
-        <div class="fee-card-head"><span class="fee-class-name">Class 7</span><span class="fee-set-badge">SET</span></div>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹14,000</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,400</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹14,000</span></div>
-      </div>
-
-      <!-- Class 8 -->
-      <div class="fee-card c4-8">
-        <div class="fee-card-head"><span class="fee-class-name">Class 8</span><span class="fee-set-badge">SET</span></div>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹15,000</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,500</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹15,000</span></div>
-      </div>
-
-      <!-- Class 9 -->
-      <div class="fee-card c9-12">
-        <div class="fee-card-head"><span class="fee-class-name">Class 9</span><span class="fee-set-badge">SET</span></div>
+      <div class="fee-card c9-10" onclick="window.location.href='login.html'" style="cursor:pointer;">
+        <div class="fee-card-head"><span class="fee-class-name">Class 9–10</span><span class="fee-set-badge">SET</span></div>
         <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹18,000</span></div>
         <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,800</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹18,000</span></div>
+        <div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹1,800</span></div>
+        <div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹18,000</span></div>
       </div>
-
-      <!-- Class 10 -->
-      <div class="fee-card c9-12">
-        <div class="fee-card-head"><span class="fee-class-name">Class 10</span><span class="fee-set-badge">SET</span></div>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹22,500</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,250</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹22,500</span></div>
-      </div>
-
-      <!-- Class 11 Science -->
-      <div class="fee-card c9-12">
+      <div class="fee-card c11-12" onclick="window.location.href='login.html'" style="cursor:pointer;">
         <div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div>
         <span class="fee-stream-tag stream-sci">⚗️ Science</span>
         <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹45,000</span></div>
         <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,500</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹45,000</span></div>
+        <div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹4,500</span></div>
+        <div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹45,000</span></div>
       </div>
-
-      <!-- Class 11 Commerce -->
-      <div class="fee-card c9-12">
+      <div class="fee-card c11-12" onclick="window.location.href='login.html'" style="cursor:pointer;">
         <div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div>
         <span class="fee-stream-tag stream-com">💼 Commerce</span>
         <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹25,000</span></div>
         <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,500</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹25,000</span></div>
+        <div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹2,500</span></div>
+        <div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹25,000</span></div>
       </div>
+    </div>
+  </div>
 
-      <!-- Class 12 Science -->
-      <div class="fee-card c9-12">
-        <div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div>
-        <span class="fee-stream-tag stream-sci">⚗️ Science</span>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹48,000</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,800</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹48,000</span></div>
-      </div>
-
-      <!-- Class 12 Commerce -->
-      <div class="fee-card c9-12">
-        <div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div>
-        <span class="fee-stream-tag stream-com">💼 Commerce</span>
-        <div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹35,000</span></div>
-        <div class="fee-divider"></div>
-        <div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹3,500</span></div>
-        <div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹35,000</span></div>
-      </div>
-
-    </div><!-- end fee-grid -->
-  </div><!-- end panel-all -->
-
-  <!-- 1-5 panel -->
+  <!-- Other panels -->
   <div class="fee-panel" id="panel-1-5">
     <div class="fee-grid reveal">
-      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 1</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div></div>
-      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 2</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div></div>
-      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 3</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div></div>
-      <div class="fee-card c1-3"><div class="fee-card-head"><span class="fee-class-name">Class 4</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹8,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹800</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹8,000</span></div></div>
-      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 5</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹10,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,000</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹10,000</span></div></div>
+      <div class="fee-card c1-5" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 1–3</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹5,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹500</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹5,000</span></div></div>
+      <div class="fee-card c1-5" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 4–5</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹8,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹800</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹8,000</span></div></div>
     </div>
   </div>
-
-  <!-- 6-10 panel -->
-  <div class="fee-panel" id="panel-6-10">
+  <div class="fee-panel" id="panel-6-8">
     <div class="fee-grid reveal">
-      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 6</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹12,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,200</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹12,000</span></div></div>
-      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 7</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹14,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,400</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹14,000</span></div></div>
-      <div class="fee-card c4-8"><div class="fee-card-head"><span class="fee-class-name">Class 8</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹15,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹15,000</span></div></div>
-      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 9</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹18,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹1,800</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹18,000</span></div></div>
-      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 10</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹22,500</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,250</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹22,500</span></div></div>
+      <div class="fee-card c6-8" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 6</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹12,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹1,200</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹12,000</span></div></div>
+      <div class="fee-card c6-8" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 7</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹14,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹1,400</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹14,000</span></div></div>
+      <div class="fee-card c6-8" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 8</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹15,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹1,500</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹15,000</span></div></div>
     </div>
   </div>
-
-  <!-- 11-12 panel -->
+  <div class="fee-panel" id="panel-9-10">
+    <div class="fee-grid reveal">
+      <div class="fee-card c9-10" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 9</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹18,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹1,800</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹18,000</span></div></div>
+      <div class="fee-card c9-10" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 10</span><span class="fee-set-badge">SET</span></div><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹22,500</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹2,250</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹22,500</span></div></div>
+    </div>
+  </div>
   <div class="fee-panel" id="panel-11-12">
     <div class="fee-grid reveal">
-      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-sci">⚗️ Science</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹45,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹45,000</span></div></div>
-      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 11</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-com">💼 Commerce</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹25,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹2,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹25,000</span></div></div>
-      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-sci">⚗️ Science</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹48,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹4,800</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹48,000</span></div></div>
-      <div class="fee-card c9-12"><div class="fee-card-head"><span class="fee-class-name">Class 12</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-com">💼 Commerce</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹35,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-sub-label">Online (10%)</span><span class="fee-row-val online">₹3,500</span></div><div class="fee-row"><span class="fee-sub-label">Offline</span><span class="fee-row-val offline">₹35,000</span></div></div>
+      <div class="fee-card c11-12" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 11 Science</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-sci">⚗️ PCM/PCB</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹45,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹4,500</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹45,000</span></div></div>
+      <div class="fee-card c11-12" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 11 Commerce</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-com">💼 Commerce</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹25,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹2,500</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹25,000</span></div></div>
+      <div class="fee-card c11-12" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 12 Science</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-sci">⚗️ PCM/PCB</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹48,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹4,800</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹48,000</span></div></div>
+      <div class="fee-card c11-12" onclick="window.location.href='login.html'" style="cursor:pointer;"><div class="fee-card-head"><span class="fee-class-name">Class 12 Commerce</span><span class="fee-set-badge">SET</span></div><span class="fee-stream-tag stream-com">💼 Commerce</span><div class="fee-row"><span class="fee-row-label">Annual Fee</span><span class="fee-row-val annual">₹35,000</span></div><div class="fee-divider"></div><div class="fee-row"><span class="fee-row-label">Online (10%)</span><span class="fee-row-val online">₹3,500</span></div><div class="fee-row"><span class="fee-row-label">Offline</span><span class="fee-row-val offline">₹35,000</span></div></div>
     </div>
   </div>
 
-  <p style="font-size:13px;color:var(--text3);margin-top:18px;">* EMI options available. 15% sibling discount. Merit-based scholarships for top performers.</p>
+  <p style="font-size:14px;color:var(--text3);margin-top:24px;text-align:center;">* EMI options available. 15% sibling discount. Merit-based scholarships for top performers.</p>
 </section>
 
 <!-- LIBRARY -->
 <section id="library">
-  <div class="s-hdr reveal"><div class="s-lbl">Free Access</div><h2 class="s-title">Free Learning Library</h2><p class="s-sub">Sign up for free and instantly unlock hundreds of resources — no credit card, no catch.</p></div>
-  <div class="lib-grid">
-    <div class="lib-card reveal"><div class="lib-em">📄</div><div class="lib-t">NCERT Notes</div><div class="lib-m">All subjects · Classes 6–12</div><span class="lib-f">FREE</span></div>
-    <div class="lib-card reveal"><div class="lib-em">🎬</div><div class="lib-t">Sample Lectures</div><div class="lib-m">50+ free videos</div><span class="lib-f">FREE</span></div>
-    <div class="lib-card reveal"><div class="lib-em">❓</div><div class="lib-t">Chapter Q&amp;A</div><div class="lib-m">Expert-solved answers</div><span class="lib-f">FREE</span></div>
-    <div class="lib-card reveal"><div class="lib-em">📝</div><div class="lib-t">Practice Tests</div><div class="lib-m">1000+ MCQs, chapter-wise</div><span class="lib-f">FREE</span></div>
-    <div class="lib-card reveal"><div class="lib-em">📐</div><div class="lib-t">Formula Sheets</div><div class="lib-m">Physics, Chemistry, Maths</div><span class="lib-f">FREE</span></div>
-    <div class="lib-card reveal"><div class="lib-em">📅</div><div class="lib-t">Study Planner</div><div class="lib-m">Board exam countdown</div><span class="lib-f">FREE</span></div>
-    <div class="lib-card reveal"><div class="lib-em">🏆</div><div class="lib-t">PYQ Papers</div><div class="lib-m">Previous year questions</div><span class="lib-f">FREE</span></div>
-    <div class="lib-card reveal"><div class="lib-em">🌐</div><div class="lib-t">Live Q&amp;A Sessions</div><div class="lib-m">Weekly · All students</div><span class="lib-f">FREE</span></div>
+  <div class="s-hdr reveal">
+    <div class="s-lbl">Free Access</div>
+    <h2 class="s-title">Free Learning Library</h2>
+    <p class="s-sub">Sign up for free and instantly unlock hundreds of resources — no credit card, no catch.</p>
   </div>
-  <div style="text-align:center;margin-top:44px;" class="reveal">
-    <button class="btn-p">Unlock Free Content — Sign Up Now</button>
+  <div class="lib-grid">
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">📄</div><div class="lib-t">NCERT Notes</div><div class="lib-m">All subjects · Classes 6–12</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">🎬</div><div class="lib-t">Sample Lectures</div><div class="lib-m">50+ free videos</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">❓</div><div class="lib-t">Chapter Q&A</div><div class="lib-m">Expert-solved answers</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">📝</div><div class="lib-t">Practice Tests</div><div class="lib-m">1000+ MCQs, chapter-wise</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">📐</div><div class="lib-t">Formula Sheets</div><div class="lib-m">Physics, Chemistry, Maths</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">📅</div><div class="lib-t">Study Planner</div><div class="lib-m">Board exam countdown</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">🏆</div><div class="lib-t">PYQ Papers</div><div class="lib-m">Previous year questions</div><span class="lib-f">FREE</span></div>
+    <div class="lib-card reveal" onclick="window.location.href='login.html'"><div class="lib-em">🌐</div><div class="lib-t">Live Q&A Sessions</div><div class="lib-m">Weekly · All students</div><span class="lib-f">FREE</span></div>
+  </div>
+  <div style="text-align:center;margin-top:50px;" class="reveal">
+    <button class="btn-p" onclick="window.location.href='login.html'">Unlock Free Content — Sign Up Now</button>
   </div>
 </section>
 
 <!-- WELLNESS -->
 <section id="wellness">
-  <div class="s-hdr reveal"><div class="s-lbl">Student Wellbeing</div><h2 class="s-title">Mental Wellness Matters</h2><p class="s-sub">Academic success starts with a healthy mind. MINDSKYRA integrates wellness into every student's journey.</p></div>
+  <div class="s-hdr reveal">
+    <div class="s-lbl">Student Wellbeing</div>
+    <h2 class="s-title">Mental Wellness Matters</h2>
+    <p class="s-sub">Academic success starts with a healthy mind. MINDSKYRA integrates wellness into every student's journey.</p>
+  </div>
   <div class="w-grid">
     <div class="w-big reveal">
       <div>
-        <span style="font-size:48px;">🧘</span>
+        <span style="font-size:52px;">🧘</span>
         <h3>Your Mind Is Your Most Powerful Tool</h3>
         <p>We believe top performance comes from mental clarity. Our wellness curriculum includes mindfulness sessions, stress management workshops, and peer support circles — embedded right in the learning schedule.</p>
       </div>
       <div>
         <div class="w-tags"><span class="w-tag">✅ Stress Management</span><span class="w-tag">✅ Focus Techniques</span><span class="w-tag">✅ Peer Counselling</span><span class="w-tag">✅ Goal Setting</span></div>
-        <button class="btn-p" style="width:100%;">Learn More About Wellness →</button>
+        <button class="btn-p" style="width:100%;" onclick="window.location.href='login.html'">Start Your Wellness Journey →</button>
       </div>
     </div>
     <div class="w-sm reveal"><span class="w-em">🧠</span><h4>Daily Mind Check-In</h4><p>A 2-minute mood check before every session helps teachers adapt lesson energy to how students are feeling.</p></div>
     <div class="w-sm reveal"><span class="w-em">💬</span><h4>Peer Support Groups</h4><p>Moderated circles where learners share exam anxiety and celebrate each other's wins safely.</p></div>
-    <div class="w-sm reveal"><span class="w-em">🌙</span><h4>Sleep &amp; Study Balance</h4><p>Expert-designed timetables ensure efficient study without burnout — quality always over quantity.</p></div>
+    <div class="w-sm reveal"><span class="w-em">🌙</span><h4>Sleep & Study Balance</h4><p>Expert-designed timetables ensure efficient study without burnout — quality always over quantity.</p></div>
     <div class="w-sm reveal"><span class="w-em">🎯</span><h4>Goal Setting Workshops</h4><p>Monthly sessions with mentors to set short and long-term academic goals with a realistic roadmap.</p></div>
   </div>
 </section>
 
 <!-- TESTIMONIALS -->
 <section id="testimonials">
-  <div class="s-hdr reveal"><div class="s-lbl">Success Stories</div><h2 class="s-title">What Our Students Say</h2><p class="s-sub">Real results from real students across India who transformed their academic journey with MINDSKYRA.</p></div>
+  <div class="s-hdr reveal">
+    <div class="s-lbl">Success Stories</div>
+    <h2 class="s-title">What Our Students Say</h2>
+    <p class="s-sub">Real results from real students across India who transformed their academic journey with MINDSKYRA.</p>
+  </div>
   <div class="t-grid">
     <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">MINDSKYRA helped me crack JEE Mains with 97 percentile! The recorded lectures and doubt sessions were a game changer — I could revise any topic at 2am before exams.</p><div class="t-auth"><div class="t-av">A</div><div><div class="t-name">Arjun Sharma</div><div class="t-cls">Class 12 · PCM · Pune</div></div></div></div>
     <div class="t-card reveal"><div class="stars">★★★★★</div><div class="tq">"</div><p class="t-txt">As a parent, the real-time updates gave me complete visibility. My daughter improved from 65% to 89% in boards in just one year. Absolutely incredible platform.</p><div class="t-auth"><div class="t-av">P</div><div><div class="t-name">Priya Nair</div><div class="t-cls">Parent · Class 10 · Kochi</div></div></div></div>
@@ -976,8 +1131,8 @@ footer{
     <p>We combine the discipline of offline coaching with the flexibility of online learning, backed by a team of 50+ expert educators and a technology platform built for scale.</p>
     <p>From Class 3 foundations to JEE/NEET cracking, and from board mastery to AI-era skills, MINDSKYRA is your partner at every step of the academic journey.</p>
     <div class="ab-btns">
-      <button class="btn-p" onclick="goTo('courses')">Join 15,000+ Students →</button>
-      <button class="btn-s">📞 Talk to Us</button>
+      <button class="btn-p" onclick="window.location.href='login.html'">Join 15,000+ Students →</button>
+      <button class="btn-o" onclick="goTo('courses')">Explore Courses</button>
     </div>
   </div>
   <div class="ab-vis reveal">
@@ -987,16 +1142,25 @@ footer{
   </div>
 </section>
 
+<!-- CTA SECTION -->
+<section id="cta">
+  <div class="cta-content reveal">
+    <h2>Ready to Transform Your Future?</h2>
+    <p>Join thousands of students who have already started their journey with MINDSKYRA. Get access to world-class education, expert mentorship, and a supportive community.</p>
+    <button class="cta-btn" onclick="window.location.href='login.html'">Get Started Free Today →</button>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="ft-grid">
     <div class="ft-brand">
-      <div class="s-logo-row" style="margin-bottom:4px;"><div class="logo-box">M</div><span class="logo-txt" style="font-size:17px;">MINDSKYRA</span></div>
+      <div class="s-logo-row" style="margin-bottom:6px;"><div class="logo-box">M</div><span class="logo-txt" style="font-size:18px;">MINDSKYRA</span></div>
       <p>Transforming education through technology, mentorship and innovation — empowering India's next generation of achievers.</p>
     </div>
     <div class="ft-col"><h5>Platform</h5><a href="#courses">Courses</a><a href="#library">Free Library</a><a href="#fees">Fee Structure</a><a href="#features">Features</a></div>
     <div class="ft-col"><h5>Company</h5><a href="#about">About Us</a><a href="#">Careers</a><a href="#">Blog</a><a href="#">Press Kit</a></div>
-    <div class="ft-col"><h5>Contact</h5><ul><li>📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="21525451514e5355614c484f45524a5853400f424e4c">[email&#160;protected]</a></li><li>📞 +91 7058623898</li><li>📍 India</li></ul><a href="#" style="margin-top:6px;">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    <div class="ft-col"><h5>Contact</h5><ul><li>📧 support@mindskyra.com</li><li>📞 +91 7058623898</li><li>📍 India</li></ul><a href="#" style="margin-top:8px;">Privacy Policy</a><a href="#">Terms of Service</a></div>
   </div>
   <div class="ft-bot">
     <p>© 2024 MINDSKYRA Institute. All rights reserved.</p>
@@ -1016,7 +1180,7 @@ footer{
   <div class="ct-head">
     <div class="ct-av">S</div>
     <div class="ct-inf"><h4>Skyra · MINDSKYRA AI</h4><p>✅ Online — responds instantly</p></div>
-    <button class="ct-cls" onclick="toggleChat()"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    <button class="ct-cls" onclick="toggleChat()"><svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
   </div>
   <div class="ct-msgs" id="ctMsgs"></div>
   <div class="ct-quick">
@@ -1028,12 +1192,12 @@ footer{
   </div>
   <div class="ct-row">
     <input class="ct-inp" id="ctInp" placeholder="Ask Skyra anything..." onkeydown="if(event.key==='Enter')sendMsg()">
-    <button class="ct-snd" onclick="sendMsg()"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+    <button class="ct-snd" onclick="sendMsg()"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-/* ── FEE TABS ── */
+<script>
+/* ── TAB SWITCH ── */
 function switchTab(id, btn) {
   document.querySelectorAll('.fee-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.fee-tab').forEach(b => b.classList.remove('active'));
@@ -1054,40 +1218,38 @@ function toggleTheme(){
 (function(){applyTheme(localStorage.getItem('msk-t')||'dark');})();
 
 /* ── SIDEBAR ── */
-function toggleSB(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('open');}
-function closeSB(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('open');}
+function toggleSB(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSB(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
 
 /* ── SCROLL ── */
 function goTo(id){document.getElementById(id)?.scrollIntoView({behavior:'smooth'});}
 
 /* ── ACTIVE NAV ── */
-const sids=['hero','courses','features','fees','library','wellness','testimonials','about'];
+const sids=['hero','courses','features','fees','library','wellness','testimonials','about','cta'];
 window.addEventListener('scroll',()=>{
   let cur='hero';
-  sids.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-120)cur=id;});
+  sids.forEach(id=>{const el=document.getElementById(id);if(el&&window.scrollY>=el.offsetTop-150)cur=id;});
   document.querySelectorAll('.nav-a').forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
 });
 
 /* ── SCROLL REVEAL ── */
-const obs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});},{threshold:0.08,rootMargin:'0px 0px -30px 0px'});
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-
-/* ── ACTIVE LEARNERS ── */
-function refreshL(){
-  const h=new Date().getHours();
-  let b=1800;
-  if(h>=6&&h<12)b=3400;else if(h>=12&&h<18)b=4100;else if(h>=18&&h<22)b=3700;
-  const el=document.getElementById('activeLearners');
-  if(el)el.textContent=(b+Math.floor(Math.random()*600)).toLocaleString();
-}
-setInterval(refreshL,15000);refreshL();
 
 /* ── CHATBOT ── */
 const R={
   def:["Hi! I'm Skyra 👋 — your MINDSKYRA guide. I can help with courses, fees, enrollment, free library, or wellness. What would you like to know? 😊","Great question! Let me help. Are you looking for course info, fees, or how to get started?","Hello! I'm here 24/7. Ask me anything about MINDSKYRA! 🎓"],
   courses:["MINDSKYRA offers courses for Classes 3–12:\n\n📘 Classes 3–5 — Foundation Stage\n📗 Classes 6–8 — Middle School\n📙 Classes 9–10 — Board Prep (CBSE/State)\n📕 Class 11–12 Science — JEE/NEET Prep\n📒 Class 11–12 Commerce — CA Foundation\n🤖 LERNVO AI Skills — English, AI, Coding\n\nWhich class are you interested in? 🎓"],
-  fees:["Here's a quick fee overview:\n\n🟣 Class 3–5: ₹499/mo (Online) | ₹799/mo (Offline)\n🟢 Class 6–8: ₹699/mo (Online) | ₹999/mo (Offline)\n🟡 Class 9–10: ₹1,299/mo (Both modes)\n🔴 Class 11–12 Science: ₹1,799–₹2,199/mo\n🟠 Class 11–12 Commerce: ₹1,499/mo\n🤖 LERNVO AI Skills: ₹299/mo\n\n💰 Annual plans save up to 25%! EMI available."],
-  enroll:["Enrolling is easy!\n\n1️⃣ Click 'Login / Sign Up'\n2️⃣ Create your free account\n3️⃣ Choose your class & stream\n4️⃣ Select Online or Offline mode\n5️⃣ Complete payment & start learning!\n\n🚀 Ready to begin your journey?"],
+  fees:["Here's a quick fee overview:\n\n🟢 Class 3–5: ₹5,000–₹8,000/year\n🔵 Class 6–8: ₹12,000–₹15,000/year\n🟣 Class 9–10: ₹18,000–₹22,500/year\n🔴 Class 11–12 Science: ₹45,000–₹48,000/year\n🟠 Class 11–12 Commerce: ₹25,000–₹35,000/year\n\n💰 Online is just 10% of annual fee! EMI available."],
+  enroll:["Enrolling is easy!\n\n1️⃣ Click 'Get Started Free'\n2️⃣ Create your free account\n3️⃣ Choose your class & stream\n4️⃣ Select Online or Offline mode\n5️⃣ Complete payment & start learning!\n\n🚀 Ready to begin your journey?"],
   library:["Our Free Library gives you — completely FREE:\n\n📄 NCERT Notes (All subjects, Classes 6–12)\n🎬 50+ Sample Lecture Videos\n❓ Expert-solved Chapter Q&As\n📝 1000+ MCQ Practice Tests\n📐 Formula Sheets\n🏆 Previous Year Question Papers\n\nJust sign up — no credit card needed! 🆓"],
   wellness:["MINDSKYRA cares deeply about mental health:\n\n🧘 Mindfulness & stress management sessions\n💬 Moderated peer support circles\n🌙 Expert sleep & study balance plans\n🎯 Monthly goal-setting workshops\n🧠 Daily mood check-ins before classes\n\nA healthy mind creates a bright future! ❤️"],
   contact:["Reach us anytime:\n\n📧 support@mindskyra.com\n📞 +91 7058623898\n📍 India\n\nSupport: Mon–Sat, 9AM–7PM. I'm here 24/7! 😊"],
@@ -1113,7 +1275,7 @@ function addMsg(txt,role){
 }
 function typeMsg(txt,el){
   el.textContent='';let i=0;
-  const iv=setInterval(()=>{el.textContent+=txt[i++];document.getElementById('ctMsgs').scrollTop=9999;if(i>=txt.length)clearInterval(iv);},16);
+  const iv=setInterval(()=>{el.textContent+=txt[i++];document.getElementById('ctMsgs').scrollTop=9999;if(i>=txt.length)clearInterval(iv);},15);
 }
 function showTyp(){
   const w=document.getElementById('ctMsgs'),d=document.createElement('div');
@@ -1129,7 +1291,7 @@ function sendMsg(){
     hideTyp();
     const arr=getR(txt),reply=arr[Math.floor(Math.random()*arr.length)];
     typeMsg(reply,addMsg('','bot'));
-  },700+Math.random()*700);
+  },600+Math.random()*600);
 }
 function sendQ(msg){document.getElementById('ctInp').value=msg;sendMsg();}
 function toggleChat(){
@@ -1138,7 +1300,7 @@ function toggleChat(){
   if(chatOpen){
     w.classList.add('open');
     if(!document.getElementById('ctMsgs').hasChildNodes()){
-      setTimeout(()=>{showTyp();setTimeout(()=>{hideTyp();typeMsg("👋 Hi! I'm Skyra, your MINDSKYRA AI guide! I can help you explore courses, check fees, access the free library, or anything else. What would you like to know? 😊",addMsg('','bot'));},900);},300);
+      setTimeout(()=>{showTyp();setTimeout(()=>{hideTyp();typeMsg("👋 Hi! I'm Skyra, your MINDSKYRA AI guide! I can help you explore courses, check fees, access the free library, or anything else. What would you like to know? 😊",addMsg('','bot'));},800);},400);
     }
   }else{w.classList.remove('open');}
 }
