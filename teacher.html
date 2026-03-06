@@ -1,1494 +1,1343 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MINDSKYRA Institute - Teacher Portal</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#4F46E5',
-                        secondary: '#7C3AED',
-                        accent: '#F59E0B',
-                        success: '#10B981',
-                        warning: '#F59E0B',
-                        danger: '#EF4444',
-                        nebula: {
-                            dark: '#0f172a',
-                            light: '#1e293b',
-                            glow: '#0EA5E9',
-                            purple: '#A855F7'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
-        * { 
-            font-family: 'Inter', sans-serif; 
-            -webkit-tap-highlight-color: transparent; 
-        }
-        
-        .sidebar { 
-            transition: transform 0.3s ease; 
-            will-change: transform; 
-        }
-        .sidebar-hidden { 
-            transform: translateX(-100%); 
-        }
-        
-        .card { 
-            background: white; 
-            border-radius: 1rem; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-            transition: transform 0.2s, box-shadow 0.2s; 
-        }
-        .card:hover { 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-        }
-        
-        .nav-item { 
-            transition: all 0.2s; 
-        }
-        .nav-item:hover { 
-            background: rgba(79, 70, 229, 0.1); 
-            color: #4F46E5; 
-        }
-        .nav-item.active { 
-            background: #4F46E5; 
-            color: white; 
-        }
-        
-        .page { 
-            display: none; 
-        }
-        .page.active { 
-            display: block; 
-            animation: fadeIn 0.3s; 
-        }
-        
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-        
-        .loader { 
-            border: 3px solid #f3f3f3; 
-            border-radius: 50%; 
-            border-top: 3px solid #4F46E5; 
-            width: 24px; 
-            height: 24px; 
-            animation: spin 1s linear infinite; 
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        
-        .toast { 
-            position: fixed; 
-            top: 20px; 
-            right: 20px; 
-            padding: 1rem 1.5rem; 
-            border-radius: 1rem; 
-            color: white; 
-            font-weight: 500; 
-            transform: translateX(400px); 
-            transition: transform 0.3s; 
-            z-index: 9999; 
-            max-width: 90vw;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        .toast.show { 
-            transform: translateX(0); 
-        }
-        
-        .nebula-container {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .nebula-glow {
-            position: absolute;
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(14,165,233,0.4) 0%, transparent 70%);
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0); }
-            50% { transform: translate(30px, -30px); }
-        }
-        
-        .modal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.5); 
-            z-index: 50; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 1rem;
-            backdrop-filter: blur(4px);
-        }
-        .modal.show { 
-            display: flex; 
-        }
-        
-        .scroll-hidden { 
-            -webkit-overflow-scrolling: touch; 
-            scrollbar-width: none; 
-        }
-        .scroll-hidden::-webkit-scrollbar { 
-            display: none; 
-        }
-        
-        .attendance-checkbox {
-            width: 24px;
-            height: 24px;
-            cursor: pointer;
-            accent-color: #4F46E5;
-        }
-        
-        .notif-badge {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        .star-rating {
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .star-rating:hover {
-            transform: scale(1.2);
-        }
-        
-        .upload-zone {
-            border: 2px dashed #cbd5e1;
-            transition: all 0.3s;
-        }
-        .upload-zone:hover {
-            border-color: #4F46E5;
-            background: rgba(79, 70, 229, 0.05);
-        }
-        .upload-zone.dragover {
-            border-color: #4F46E5;
-            background: rgba(79, 70, 229, 0.1);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Teacher Portal — MINDSKYRA</title>
+<meta name="theme-color" content="#060B14">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<style>
+:root {
+    --bg:#060B14; --bg2:#0C1220; --card:#0F1828; --card2:#141F2E;
+    --border:rgba(20,184,166,0.14); --border2:rgba(20,184,166,0.3);
+    --teal:#14B8A6; --teal2:#2DD4BF; --teal3:#5EEAD4;
+    --emerald:#10B981; --cyan:#06B6D4; --blue:#3B82F6;
+    --amber:#F59E0B; --red:#EF4444; --green:#22C55E;
+    --text:#EEF9F8; --text2:#7FB8B0; --text3:#2D5550;
+    --grad:linear-gradient(135deg,#0F766E,#14B8A6,#2DD4BF);
+    --grad2:linear-gradient(135deg,#065F46,#059669,#34D399);
+    --grad-card:linear-gradient(135deg,#0F1828,#0D2029);
+    --shadow:0 8px 32px rgba(0,0,0,0.6);
+    --glow:0 0 30px rgba(20,184,166,0.12);
+    --nav-h:62px;
+}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;}
+html,body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(20,184,166,0.07) 0%,transparent 65%),
+               radial-gradient(ellipse 50% 60% at 90% 80%,rgba(6,182,212,0.04) 0%,transparent 60%);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* ── AUTH ── */
+#authScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
+.auth-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:var(--shadow),var(--glow);}
+.auth-logo{text-align:center;margin-bottom:28px;}
+.auth-icon{width:56px;height:56px;border-radius:16px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 12px;box-shadow:0 0 30px rgba(20,184,166,0.35);}
+.auth-title{font-size:1.4rem;font-weight:800;color:var(--text);}
+.auth-sub{font-size:0.8rem;color:var(--text2);margin-top:4px;}
+.auth-label{display:block;font-size:0.72rem;font-weight:700;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.auth-input{width:100%;background:rgba(20,184,166,0.05)!important;color:var(--text)!important;border:1.5px solid var(--border)!important;border-radius:11px;padding:11px 14px;font-size:0.875rem;font-family:inherit;outline:none;transition:border-color 0.2s;margin-bottom:16px;}
+.auth-input:focus{border-color:var(--teal)!important;}
+.auth-btn{width:100%;padding:13px;border-radius:11px;background:var(--grad);border:none;color:white;font-size:0.9rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(20,184,166,0.3);transition:all 0.2s;}
+.auth-btn:hover{filter:brightness(1.1);box-shadow:0 6px 28px rgba(20,184,166,0.45);}
+.auth-err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px 14px;font-size:0.8rem;color:#FCA5A5;margin-bottom:14px;display:none;}
+
+/* ── NAV ── */
+#mainNav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,11,20,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);height:var(--nav-h);display:flex;align-items:center;justify-content:space-around;padding:0 8px;}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;transition:all 0.2s;border-radius:12px;position:relative;}
+.nav-item .nav-icon{font-size:1.3rem;transition:transform 0.2s;}
+.nav-item .nav-label{font-size:0.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;transition:color 0.2s;}
+.nav-item.active .nav-label{color:var(--teal);}
+.nav-item.active .nav-icon{transform:scale(1.15);}
+.nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:0 0 4px 4px;background:var(--teal);}
+
+/* ── HEADER ── */
+#appHeader{position:fixed;top:0;left:0;right:0;z-index:99;background:rgba(6,11,20,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 16px;gap:12px;}
+.header-brand{display:flex;align-items:center;gap:9px;flex:1;}
+.h-icon{width:34px;height:34px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 16px rgba(20,184,166,0.3);}
+.h-name{font-weight:800;font-size:0.9rem;color:var(--text);}
+.h-role{font-size:0.65rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;}
+.h-actions{display:flex;gap:8px;align-items:center;}
+.h-btn{background:rgba(20,184,166,0.08);border:1px solid var(--border);padding:6px 10px;border-radius:9px;color:var(--text2);font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
+.h-btn:hover{background:rgba(20,184,166,0.15);color:var(--teal);}
+.streak-badge{background:linear-gradient(135deg,#78350F,#D97706);padding:5px 10px;border-radius:20px;font-size:0.72rem;font-weight:800;color:white;display:flex;align-items:center;gap:4px;box-shadow:0 2px 12px rgba(245,158,11,0.3);}
+
+/* ── MAIN ── */
+#mainApp{display:none;padding-top:68px;padding-bottom:calc(var(--nav-h)+16px);}
+.page{display:none;padding:14px 14px 0;position:relative;z-index:1;}
+.page.active{display:block;}
+.page-hd{margin-bottom:18px;}
+.page-title{font-size:1.5rem;font-weight:800;color:var(--text);}
+.page-sub{font-size:0.8rem;color:var(--text2);margin-top:3px;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;}
+.card-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.card-title{font-size:0.9rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
+.card-body{padding:16px;}
+
+/* ── BUTTONS ── */
+.btn-primary{background:var(--grad);border:none;color:white;padding:10px 18px;border-radius:11px;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(20,184,166,0.25);}
+.btn-primary:hover{filter:brightness(1.08);box-shadow:0 6px 24px rgba(20,184,166,0.4);}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-ghost{background:rgba(20,184,166,0.07);border:1px solid var(--border);color:var(--text2);padding:9px 16px;border-radius:11px;font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s;}
+.btn-ghost:hover{background:rgba(20,184,166,0.14);color:var(--teal);}
+.btn-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;padding:6px 12px;border-radius:9px;font-weight:700;font-size:0.75rem;cursor:pointer;transition:all 0.2s;}
+.btn-danger:hover{background:rgba(239,68,68,0.2);}
+.btn-sm{padding:6px 12px!important;font-size:0.75rem!important;border-radius:9px!important;}
+
+/* ── FORM INPUTS ── */
+.f-group{margin-bottom:14px;}
+.f-label{display:block;font-size:0.72rem;font-weight:700;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.f-input{width:100%;background:rgba(20,184,166,0.05)!important;color:var(--text)!important;border:1.5px solid var(--border)!important;border-radius:11px;padding:10px 14px;font-size:0.85rem;font-family:inherit;outline:none;transition:border-color 0.2s;}
+.f-input:focus{border-color:var(--teal)!important;}
+.f-input::placeholder{color:var(--text3)!important;}
+select.f-input option{background:#0C1220;}
+textarea.f-input{resize:vertical;min-height:80px;}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;}
+.stat-val{font-size:1.7rem;font-weight:800;line-height:1;}
+.stat-lbl{font-size:0.68rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-top:5px;}
+
+/* ── STREAK CALENDAR ── */
+.streak-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:12px 0;}
+.streak-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;cursor:default;}
+.streak-day.attended{background:rgba(20,184,166,0.3);color:var(--teal);border:1px solid rgba(20,184,166,0.4);}
+.streak-day.missed{background:rgba(239,68,68,0.12);color:rgba(239,68,68,0.5);border:1px solid rgba(239,68,68,0.15);}
+.streak-day.future{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);color:var(--text3);}
+.streak-day.today{border:2px solid var(--teal)!important;color:var(--teal2);}
+
+/* ── ATTENDANCE MARK ── */
+.att-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0;}
+@media(max-width:480px){.att-form-grid{grid-template-columns:1fr;}}
+.bulk-bar{display:flex;gap:8px;align-items:center;padding:10px 14px;background:rgba(20,184,166,0.04);border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.bulk-lbl{font-size:0.75rem;font-weight:700;color:var(--text2);}
+.bulk-btn{padding:5px 12px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;border:none;transition:all 0.18s;}
+.bb-p{background:rgba(34,197,94,0.12);color:#4ADE80;}
+.bb-p:hover{background:rgba(34,197,94,0.22);}
+.bb-a{background:rgba(239,68,68,0.1);color:#F87171;}
+.bb-a:hover{background:rgba(239,68,68,0.2);}
+
+.s-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(20,184,166,0.03);margin:6px 14px;transition:all 0.18s;}
+.s-row.mp{border-color:rgba(34,197,94,0.35);background:rgba(34,197,94,0.06);}
+.s-row.ma{border-color:rgba(239,68,68,0.35);background:rgba(239,68,68,0.05);}
+.s-row.ml{border-color:rgba(245,158,11,0.35);background:rgba(245,158,11,0.05);}
+.s-ava{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;}
+.s-info{flex:1;min-width:0;}
+.s-name{font-weight:700;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.s-meta{font-size:0.65rem;color:var(--text2);margin-top:1px;}
+.sbns{display:flex;gap:5px;flex-shrink:0;}
+.sbn{padding:5px 9px;border-radius:7px;font-size:0.68rem;font-weight:800;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;}
+.sbn-p{background:rgba(34,197,94,0.08);color:#4ADE80;border-color:rgba(34,197,94,0.15);}
+.sbn-p.on,.sbn-p:hover{background:rgba(34,197,94,0.2);border-color:#4ADE80;}
+.sbn-l{background:rgba(245,158,11,0.08);color:#FBBF24;border-color:rgba(245,158,11,0.15);}
+.sbn-l.on,.sbn-l:hover{background:rgba(245,158,11,0.2);border-color:#FBBF24;}
+.sbn-a{background:rgba(239,68,68,0.08);color:#F87171;border-color:rgba(239,68,68,0.15);}
+.sbn-a.on,.sbn-a:hover{background:rgba(239,68,68,0.2);border-color:#F87171;}
+
+/* ── COURSE CARDS ── */
+.course-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(20,184,166,0.1);color:var(--teal);border:1px solid rgba(20,184,166,0.2);}
+.content-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;transition:all 0.2s;}
+.content-card:hover{border-color:var(--border2);}
+.content-type-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.68rem;font-weight:700;}
+.ctb-note{background:rgba(59,130,246,0.12);color:#93C5FD;border:1px solid rgba(59,130,246,0.2);}
+.ctb-video{background:rgba(239,68,68,0.1);color:#FCA5A5;border:1px solid rgba(239,68,68,0.2);}
+.ctb-assign{background:rgba(245,158,11,0.1);color:#FCD34D;border:1px solid rgba(245,158,11,0.2);}
+.ctb-announce{background:rgba(168,85,247,0.1);color:#D8B4FE;border:1px solid rgba(168,85,247,0.2);}
+.ctb-link{background:rgba(20,184,166,0.1);color:var(--teal3);border:1px solid var(--border);}
+
+/* ── MODAL ── */
+.modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);padding:20px;align-items:center;justify-content:center;}
+.modal.open{display:flex;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow),var(--glow);}
+.modal-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-weight:800;font-size:1rem;color:var(--text);}
+.modal-close{background:rgba(255,255,255,0.07);border:none;width:30px;height:30px;border-radius:8px;color:var(--text2);font-size:1rem;cursor:pointer;}
+.modal-body{padding:18px;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.68rem;font-weight:700;}
+.badge-p{background:rgba(34,197,94,0.1);color:#4ADE80;border:1px solid rgba(34,197,94,0.2);}
+.badge-a{background:rgba(239,68,68,0.1);color:#F87171;border:1px solid rgba(239,68,68,0.2);}
+.badge-l{background:rgba(245,158,11,0.08);color:#FBBF24;border:1px solid rgba(245,158,11,0.2);}
+
+/* ── SKELETON ── */
+.skel{background:linear-gradient(90deg,#0F1828 25%,#1A2840 50%,#0F1828 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:70px;right:14px;z-index:999;padding:11px 18px;border-radius:12px;font-weight:700;font-size:0.82rem;color:white;transform:translateX(320px);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);max-width:300px;pointer-events:none;}
+#toast.show{transform:translateX(0);}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
+.empty-state .ei{font-size:2.6rem;margin-bottom:10px;}
+.empty-state .et{font-weight:700;font-size:0.95rem;color:var(--text2);margin-bottom:4px;}
+.empty-state .es{font-size:0.78rem;}
+
+/* ── TABS ── */
+.tab-row{display:flex;gap:6px;padding-bottom:14px;overflow-x:auto;scrollbar-width:none;}
+.tab-row::-webkit-scrollbar{display:none;}
+.tab-pill{padding:7px 16px;border-radius:20px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;white-space:nowrap;border:1px solid var(--border);background:rgba(20,184,166,0.04);color:var(--text3);}
+.tab-pill.on{background:rgba(20,184,166,0.14);color:var(--teal);border-color:var(--border2);}
+
+/* ── HISTORY TABLE ── */
+.hist-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+thead th{padding:10px 12px;text-align:left;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid rgba(20,184,166,0.06);transition:background 0.15s;}
+tbody tr:hover{background:rgba(20,184,166,0.04);}
+tbody td{padding:10px 12px;color:var(--text2);vertical-align:middle;}
+tbody td:first-child{color:var(--text);font-weight:600;}
+
+/* ── PROFILE ── */
+.profile-hero{background:var(--grad);border-radius:16px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;}
+.profile-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,0.1),transparent 60%);}
+.p-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;margin:0 auto 12px;position:relative;z-index:1;}
+.p-name{font-size:1.3rem;font-weight:800;color:white;position:relative;z-index:1;}
+.p-role{font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:4px;position:relative;z-index:1;}
+
+/* ── STUDENT LIST TAB ── */
+.student-tile{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:13px;background:var(--card2);border:1px solid var(--border);margin-bottom:8px;transition:all 0.18s;}
+.student-tile:hover{border-color:var(--border2);}
+
+/* ── Quick actions ── */
+.qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
+.qa-btn{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.qa-btn:hover{border-color:var(--border2);background:var(--card2);}
+.qa-icon{font-size:1.6rem;margin-bottom:6px;}
+.qa-lbl{font-size:0.75rem;font-weight:700;color:var(--text2);}
+</style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
 
-    <div id="toast" class="toast bg-gray-800"></div>
+<!-- ══ TOAST ══ -->
+<div id="toast"></div>
 
-    <div class="flex h-screen overflow-hidden">
-        
-        <aside id="sidebar" class="sidebar fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 lg:translate-x-0 sidebar-hidden">
-            <div class="flex items-center justify-between p-4 md:p-6 border-b border-gray-200">
-                <div class="flex items-center space-x-2">
-                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-sm md:text-lg">M</div>
-                    <span class="text-lg md:text-xl font-bold text-gray-800">MINDSKYRA</span>
-                </div>
-                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 p-2">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
+<!-- Loading screen while auth checks -->
+<div id="loadingScreen" style="position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+    <div style="width:52px;height:52px;border-radius:16px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 0 30px rgba(20,184,166,0.35)">🎓</div>
+    <div style="font-size:1rem;font-weight:800;color:var(--text)">MINDSKYRA</div>
+    <div style="font-size:0.75rem;color:var(--text2)">Loading Teacher Portal…</div>
+    <div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<!-- ══ MAIN APP ══ -->
+<div id="mainApp">
+
+    <!-- HEADER -->
+    <div id="appHeader">
+        <div class="header-brand">
+            <div class="h-icon">🎓</div>
+            <div>
+                <div class="h-name" id="hName">Loading…</div>
+                <div class="h-role">Teacher · MINDSKYRA</div>
             </div>
-
-            <nav class="p-4 space-y-1 overflow-y-auto h-[calc(100vh-80px)]" id="sidebarNav">
-                <!-- Navigation items injected by JavaScript -->
-            </nav>
-        </aside>
-
-        <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
-            
-            <header class="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 md:py-4">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3 md:space-x-4">
-                        <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                        </button>
-                        <h1 id="pageTitle" class="text-xl md:text-2xl font-bold text-gray-800">Dashboard</h1>
-                    </div>
-
-                    <div class="flex items-center space-x-2 md:space-x-4">
-                        <button onclick="showNotifications()" class="relative p-2 rounded-lg hover:bg-gray-100 transition">
-                            <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                            </svg>
-                            <span id="notifBadge" class="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full hidden notif-badge"></span>
-                        </button>
-
-                        <div class="relative" id="userMenu">
-                            <button onclick="toggleUserMenu()" class="flex items-center space-x-2 md:space-x-3 p-2 rounded-lg hover:bg-gray-100 transition">
-                                <div class="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-sm md:text-base" id="userAvatar">T</div>
-                                <div class="hidden md:block text-left">
-                                    <div class="font-semibold text-sm" id="userName">Teacher</div>
-                                    <div class="text-xs text-gray-500" id="userRole">Teacher</div>
-                                </div>
-                            </button>
-                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
-                                <a href="#" onclick="navigateTo('teacher-profile'); return false;" class="block px-4 py-2 hover:bg-gray-50 text-sm">Profile</a>
-                                <a href="#" onclick="logout(); return false;" class="block px-4 py-2 hover:bg-gray-50 text-sm text-red-600">Logout</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <main class="flex-1 overflow-y-auto p-3 md:p-6 lg:p-8 scroll-hidden pb-20 lg:pb-8" id="mainContent">
-                
-                <!-- TEACHER DASHBOARD PAGE -->
-                <div id="page-teacher-dashboard" class="page active">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold mb-2">Teacher Dashboard</h2>
-                        <p class="text-gray-600">Welcome back, <span id="teacherWelcomeName">Teacher</span></p>
-                    </div>
-
-                    <!-- Teacher Rating Chart - Nebula Design -->
-                    <div class="nebula-container p-4 md:p-6 mb-6">
-                        <div class="nebula-glow" style="top: 10%; left: 10%;"></div>
-                        <div class="nebula-glow" style="bottom: 10%; right: 10%; animation-delay: 3s;"></div>
-                        
-                        <div class="flex items-center justify-between mb-4 relative z-10">
-                            <div>
-                                <h3 class="text-white font-bold text-lg">Teaching Performance</h3>
-                                <p class="text-blue-200 text-sm">Based on student feedback ratings</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-3xl font-bold text-white" id="teacherAvgRating">0.0</div>
-                                <div class="text-yellow-400 text-sm">★ Average Rating</div>
-                            </div>
-                        </div>
-                        
-                        <div class="relative h-48 md:h-64 w-full z-10">
-                            <canvas id="teacherRatingChart"></canvas>
-                        </div>
-                        
-                        <div class="grid grid-cols-3 gap-4 mt-4 relative z-10">
-                            <div class="text-center">
-                                <div class="text-blue-300 text-xs mb-1">Teaching</div>
-                                <div class="text-white font-bold" id="avgTeachingRating">0.0</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-purple-300 text-xs mb-1">Content</div>
-                                <div class="text-white font-bold" id="avgContentRating">0.0</div>
-                            </div>
-                            <div class="text-center">
-                                <div class="text-indigo-300 text-xs mb-1">Doubt Solving</div>
-                                <div class="text-white font-bold" id="avgDoubtRating">0.0</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Stats -->
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="card p-4 bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-                            <div class="text-sm opacity-90 mb-1">My Courses</div>
-                            <div class="text-3xl font-bold" id="teacherCourseCount">0</div>
-                        </div>
-                        <div class="card p-4 bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-                            <div class="text-sm opacity-90 mb-1">Total Students</div>
-                            <div class="text-3xl font-bold" id="teacherStudentCount">0</div>
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="card p-4 md:p-6 mb-6">
-                        <h3 class="text-lg font-bold mb-4">Quick Actions</h3>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <button onclick="navigateTo('teacher-create-course')" class="p-4 bg-blue-50 text-blue-600 rounded-xl text-center hover:bg-blue-100 transition">
-                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                                <span class="font-medium text-sm">Create Course</span>
-                            </button>
-                            <button onclick="navigateTo('teacher-upload')" class="p-4 bg-green-50 text-green-600 rounded-xl text-center hover:bg-green-100 transition">
-                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                <span class="font-medium text-sm">Upload Content</span>
-                            </button>
-                            <button onclick="navigateTo('teacher-attendance')" class="p-4 bg-orange-50 text-orange-600 rounded-xl text-center hover:bg-orange-100 transition">
-                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                                <span class="font-medium text-sm">Attendance</span>
-                            </button>
-                            <button onclick="navigateTo('teacher-notifications')" class="p-4 bg-purple-50 text-purple-600 rounded-xl text-center hover:bg-purple-100 transition">
-                                <svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                                <span class="font-medium text-sm">Notify Students</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- My Courses List -->
-                    <div class="card p-4 md:p-6 mb-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold">My Courses</h3>
-                            <button onclick="navigateTo('teacher-create-course')" class="text-primary text-sm hover:underline">+ Create New</button>
-                        </div>
-                        <div id="teacherCoursesList" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <p class="text-gray-500 col-span-2 text-center py-4">Loading courses...</p>
-                        </div>
-                    </div>
-
-                    <!-- Recent Feedback -->
-                    <div class="card p-4 md:p-6">
-                        <h3 class="text-lg font-bold mb-4">Recent Student Feedback</h3>
-                        <div id="teacherRecentFeedback" class="space-y-3">
-                            <p class="text-gray-500 text-center py-4">No feedback yet</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEACHER ATTENDANCE PAGE -->
-                <div id="page-teacher-attendance" class="page">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold mb-2">Take Attendance</h2>
-                        <p class="text-gray-600">Mark attendance for your classes</p>
-                    </div>
-
-                    <div class="card p-4 md:p-6 mb-6">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
-                                <select id="attendanceCourse" onchange="loadAttendanceStudents()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                                    <option value="">Select Course</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Date</label>
-                                <input type="date" id="attendanceDate" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                            </div>
-                            <div class="flex items-end">
-                                <button onclick="loadAttendanceStudents()" class="w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90">
-                                    Load Students
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card p-4 md:p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-lg font-bold">Student List</h3>
-                            <div class="flex space-x-2">
-                                <button onclick="markAllPresent()" class="px-3 py-1 bg-green-100 text-green-700 rounded text-sm hover:bg-green-200">Mark All Present</button>
-                                <button onclick="markAllAbsent()" class="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200">Mark All Absent</button>
-                            </div>
-                        </div>
-                        
-                        <div id="attendanceStudentList" class="space-y-2">
-                            <p class="text-gray-500 text-center py-8">Select a course to view students</p>
-                        </div>
-
-                        <button onclick="saveAttendance()" class="w-full mt-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 hidden" id="saveAttendanceBtn">
-                            Save Attendance
-                        </button>
-                    </div>
-
-                    <div class="card p-4 md:p-6 mt-6">
-                        <h3 class="text-lg font-bold mb-4">Recent Attendance Records</h3>
-                        <div id="attendanceHistory" class="space-y-2">
-                            <p class="text-gray-500 text-center py-4">No records found</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEACHER CREATE COURSE PAGE -->
-                <div id="page-teacher-create-course" class="page">
-                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Create New Course</h2>
-                    <div class="card p-4 md:p-6 max-w-2xl">
-                        <form id="createCourseForm" onsubmit="createCourse(event)">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Board *</label>
-                                    <select id="courseBoard" required onchange="updateCourseSubjects()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                                        <option value="">Select Board</option>
-                                        <option value="CBSE">CBSE</option>
-                                        <option value="SSC">SSC (State Board)</option>
-                                        <option value="ICSE">ICSE</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Class *</label>
-                                    <select id="courseClass" required onchange="updateStreamVisibility()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                                        <option value="">Select Class</option>
-                                    </select>
-                                </div>
-                                
-                                <div id="courseStreamContainer" class="hidden">
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Stream *</label>
-                                    <select id="courseStream" onchange="updateCourseSubjects()" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                                        <option value="">Select Stream</option>
-                                        <option value="Science">Science</option>
-                                        <option value="Commerce">Commerce</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
-                                    <select id="courseSubject" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                                        <option value="">Select Subject</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Course Description</label>
-                                    <textarea id="courseDescription" rows="3" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="Brief description of the course..."></textarea>
-                                </div>
-                                
-                                <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90">
-                                    Create Course
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- TEACHER UPLOAD CONTENT PAGE -->
-                <div id="page-teacher-upload" class="page">
-                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Upload Content</h2>
-                    <div class="card p-4 md:p-6 max-w-2xl mb-6">
-                        <form id="uploadContentForm" onsubmit="uploadContent(event)">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Your Course *</label>
-                                    <select id="uploadCourse" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                                        <option value="">Select Course</option>
-                                    </select>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Chapter Name *</label>
-                                    <input type="text" id="uploadChapter" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="e.g., Quadratic Equations">
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes (PDF/DOC) *</label>
-                                    <div class="upload-zone rounded-lg p-4 text-center cursor-pointer" onclick="document.getElementById('notesFile').click()">
-                                        <input type="file" id="notesFile" accept=".pdf,.doc,.docx" required class="hidden" onchange="handleFileSelect(this, 'notesPreview')">
-                                        <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                        <p class="text-sm text-gray-600" id="notesPreview">Click to upload notes or drag & drop</p>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">DPP (Daily Practice Problems) *</label>
-                                    <div class="upload-zone rounded-lg p-4 text-center cursor-pointer" onclick="document.getElementById('dppFile').click()">
-                                        <input type="file" id="dppFile" accept=".pdf,.doc,.docx" required class="hidden" onchange="handleFileSelect(this, 'dppPreview')">
-                                        <svg class="w-8 h-8 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                        <p class="text-sm text-gray-600" id="dppPreview">Click to upload DPP or drag & drop</p>
-                                    </div>
-                                </div>
-                                
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">YouTube Video Link *</label>
-                                    <input type="url" id="videoLink" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="https://youtube.com/watch?v= ...">
-                                </div>
-                                
-                                <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90">
-                                    Upload Content
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <div class="card p-4 md:p-6">
-                        <h3 class="text-lg font-bold mb-4">Recent Uploads</h3>
-                        <div id="teacherRecentUploads" class="space-y-3">
-                            <p class="text-gray-500 text-center py-4">No uploads yet</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- TEACHER NOTIFICATIONS PAGE -->
-                <div id="page-teacher-notifications" class="page">
-                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">Send Notification to Students</h2>
-                    
-                    <div class="card p-4 md:p-6 max-w-2xl">
-                        <form id="teacherNotifForm" onsubmit="sendTeacherNotification(event)">
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Course</label>
-                                    <select id="teacherNotifCourse" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary">
-                                        <option value="">Select Course</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
-                                    <input type="text" id="teacherNotifTitle" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="e.g., Test Tomorrow">
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                                    <textarea id="teacherNotifMessage" rows="4" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary" placeholder="Enter your message to students..."></textarea>
-                                </div>
-
-                                <button type="submit" class="w-full py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90">
-                                    Send to Students
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- TEACHER PROFILE PAGE -->
-                <div id="page-teacher-profile" class="page">
-                    <h2 class="text-xl md:text-2xl font-bold mb-4 md:mb-6">My Profile</h2>
-                    <div class="card p-4 md:p-6 max-w-2xl">
-                        <div class="text-center mb-6">
-                            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4" id="profileAvatar">T</div>
-                            <h3 class="text-xl font-bold" id="profileName">Teacher Name</h3>
-                            <p class="text-gray-600" id="profileEmail">teacher@mindskyra.com</p>
-                        </div>
-                        
-                        <div class="space-y-4">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-4 bg-gray-50 rounded-lg">
-                                    <div class="text-sm text-gray-600 mb-1">Total Courses</div>
-                                    <div class="text-2xl font-bold text-primary" id="profileCourseCount">0</div>
-                                </div>
-                                <div class="p-4 bg-gray-50 rounded-lg">
-                                    <div class="text-sm text-gray-600 mb-1">Total Students</div>
-                                    <div class="text-2xl font-bold text-secondary" id="profileStudentCount">0</div>
-                                </div>
-                            </div>
-                            
-                            <div class="p-4 bg-gray-50 rounded-lg">
-                                <div class="text-sm text-gray-600 mb-1">Average Rating</div>
-                                <div class="flex items-center">
-                                    <span class="text-2xl font-bold text-yellow-500 mr-2" id="profileRating">0.0</span>
-                                    <span class="text-yellow-500">★</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </main>
+        </div>
+        <div class="h-actions">
+            <div class="streak-badge" id="hStreak">🔥 0</div>
+            <button class="h-btn" onclick="doLogout()">Logout</button>
         </div>
     </div>
 
-    <nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-2 md:px-4 py-2 z-40">
-        <div class="flex justify-around items-center" id="mobileNav">
-            <!-- Mobile nav items injected by JavaScript -->
+    <!-- ══ PAGE: DASHBOARD ══ -->
+    <div id="page-dash" class="page active">
+        <div class="page-hd">
+            <div class="page-title" id="dashGreet">Good Morning! 👋</div>
+            <div class="page-sub" id="dashDate"></div>
         </div>
-    </nav>
 
-    <script>
-    try {
-        // ==========================================
-        // FIREBASE CONFIGURATION
-        // ==========================================
-        const firebaseConfig = {
-            apiKey: "AIzaSyB5TTCXCD74IUeLmM7bynlgCUvcmcM6rTw",
-            authDomain: "mind-skyra-institute.firebaseapp.com",
-            projectId: "mind-skyra-institute",
-            storageBucket: "mind-skyra-institute.firebasestorage.app",
-            messagingSenderId: "333988573281",
-            appId: "1:333988573281:web:7d775f902b55d2e15aba20"
-        };
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-box"><div class="stat-val" style="color:var(--teal)" id="dsTotalClasses">—</div><div class="stat-lbl">Classes Taken</div></div>
+            <div class="stat-box"><div class="stat-val" style="color:var(--green)" id="dsStreak">—</div><div class="stat-lbl">🔥 Day Streak</div></div>
+            <div class="stat-box"><div class="stat-val" style="color:var(--amber)" id="dsStudents">—</div><div class="stat-lbl">My Students</div></div>
+            <div class="stat-box"><div class="stat-val" style="color:var(--blue)" id="dsContent">—</div><div class="stat-lbl">Content Posted</div></div>
+        </div>
 
-       if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-            }
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
+        <!-- Streak calendar -->
+        <div class="card" style="margin-bottom:14px">
+            <div class="card-head">
+                <div class="card-title">🔥 Teaching Streak — Last 28 Days</div>
+                <div id="streakLabel" style="font-size:0.75rem;color:var(--amber);font-weight:700"></div>
+            </div>
+            <div class="card-body">
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                    <span style="font-size:0.7rem;color:var(--text3)">4 weeks ago</span>
+                    <span style="font-size:0.7rem;color:var(--text3)">Today</span>
+                </div>
+                <div class="streak-wrap" id="streakCal"></div>
+                <div style="display:flex;gap:16px;margin-top:10px;font-size:0.7rem;color:var(--text2)">
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(20,184,166,0.3);display:inline-block;border:1px solid rgba(20,184,166,0.4)"></span>Attended</span>
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(239,68,68,0.12);display:inline-block;border:1px solid rgba(239,68,68,0.15)"></span>Missed</span>
+                    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,0.03);display:inline-block;border:1px solid rgba(255,255,255,0.06)"></span>Future</span>
+                </div>
+            </div>
+        </div>
 
-        // ==========================================
-        // GLOBAL STATE
-        // ==========================================
-        let currentUser = null;
-        let userData = null;
-        let teacherRatingChart = null;
-        let teacherCourses = [];
+        <!-- Today's attendance summary -->
+        <div class="card" style="margin-bottom:14px">
+            <div class="card-head">
+                <div class="card-title">📋 Today's Attendance</div>
+                <button class="btn-primary btn-sm" onclick="navigateTo('att')">+ Mark Now</button>
+            </div>
+            <div class="card-body" id="dashAttSummary">
+                <div class="skel" style="height:40px;margin-bottom:8px"></div>
+                <div class="skel" style="height:40px"></div>
+            </div>
+        </div>
 
-        const subjectMappings = {
-            '3-5': ['Mathematics', 'English', 'Hindi', 'EVS'],
-            '6-8': ['Mathematics', 'English', 'Hindi', 'Science', 'Social Science', 'Marathi'],
-            '9-10': ['Mathematics', 'English', 'Hindi', 'Science', 'Social Science', 'Marathi'],
-            '11-Science': ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English'],
-            '11-Commerce': ['Accountancy', 'Business Studies', 'Economics', 'Mathematics', 'English'],
-            '12-Science': ['Physics', 'Chemistry', 'Mathematics', 'Biology', 'English'],
-            '12-Commerce': ['Accountancy', 'Business Studies', 'Economics', 'Mathematics', 'English']
-        };
+        <!-- Quick Actions -->
+        <div class="card" style="margin-bottom:14px">
+            <div class="card-head"><div class="card-title">⚡ Quick Actions</div></div>
+            <div class="card-body">
+                <div class="qa-grid">
+                    <div class="qa-btn" onclick="navigateTo('att')"><div class="qa-icon">📋</div><div class="qa-lbl">Mark Attendance</div></div>
+                    <div class="qa-btn" onclick="openPostModal('note')"><div class="qa-icon">📝</div><div class="qa-lbl">Post Notes</div></div>
+                    <div class="qa-btn" onclick="openPostModal('assign')"><div class="qa-icon">📚</div><div class="qa-lbl">Give Assignment</div></div>
+                    <div class="qa-btn" onclick="openPostModal('announce')"><div class="qa-icon">📣</div><div class="qa-lbl">Announcement</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        const navStructure = [
-            { id: 'teacher-dashboard', label: 'Dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-            { id: 'teacher-attendance', label: 'Attendance', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01' },
-            { id: 'teacher-create-course', label: 'Create Course', icon: 'M12 6v6m0 0v6m0-6h6m-6 0H6' },
-            { id: 'teacher-upload', label: 'Upload Content', icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12' },
-            { id: 'teacher-notifications', label: 'Notify Students', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9' }
-        ];
+    <!-- ══ PAGE: ATTENDANCE ══ -->
+    <div id="page-att" class="page">
+        <div class="page-hd">
+            <div class="page-title">📋 Attendance</div>
+            <div class="page-sub">Mark & view student attendance</div>
+        </div>
 
-        // ==========================================
-        // AUTHENTICATION
-        // ==========================================
-        auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                currentUser = user;
-                await loadUserData();
-                setupNavigation();
-                setupMobileNav();
-                populateClassDropdowns();
-                setupNotificationsListener();
-                
-                // Check if user is teacher
-                if (userData.role !== 'teacher') {
-                    showToast('Access denied. Teachers only.', 'error');
-                    setTimeout(() => logout(), 2000);
-                    return;
-                }
-                
-                navigateTo('teacher-dashboard');
-                loadTeacherDashboard();
-            } else {
-                window.location.href = 'login.html';
-            }
-        });
+        <div class="tab-row">
+            <div class="tab-pill on" id="atab-mark" onclick="switchAttTab('mark')">✏️ Mark</div>
+            <div class="tab-pill"    id="atab-hist" onclick="switchAttTab('hist')">📊 History</div>
+            <div class="tab-pill"    id="atab-report" onclick="switchAttTab('report')">📈 Report</div>
+        </div>
 
-        async function loadUserData() {
-            try {
-                const doc = await db.collection('users').doc(currentUser.uid).get();
-                if (doc.exists) {
-                    userData = doc.data();
-                    const fullName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || 'Teacher';
-                    document.getElementById('userName').textContent = fullName;
-                    document.getElementById('userAvatar').textContent = (userData.firstName || 'T').charAt(0).toUpperCase();
-                    document.getElementById('teacherWelcomeName').textContent = userData.firstName || 'Teacher';
-                    
-                    // Update profile page
-                    document.getElementById('profileName').textContent = fullName;
-                    document.getElementById('profileEmail').textContent = currentUser.email;
-                    document.getElementById('profileAvatar').textContent = (userData.firstName || 'T').charAt(0).toUpperCase();
-                }
-            } catch (error) {
-                console.error('Error loading user data:', error);
-                showToast('Error loading user data', 'error');
-            }
-        }
-
-        // ==========================================
-        // NAVIGATION
-        // ==========================================
-        function setupNavigation() {
-            const nav = document.getElementById('sidebarNav');
-            nav.innerHTML = navStructure.map(item => `
-                <button onclick="navigateTo('${item.id}')" class="nav-item w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-left" data-page="${item.id}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}"></path>
-                    </svg>
-                    <span class="font-medium">${item.label}</span>
-                </button>
-            `).join('');
-        }
-
-        function setupMobileNav() {
-            const mobileItems = navStructure.slice(0, 4);
-            document.getElementById('mobileNav').innerHTML = mobileItems.map(item => `
-                <button onclick="navigateTo('${item.id}')" class="flex flex-col items-center p-2 text-gray-600 hover:text-primary">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.icon}"></path>
-                    </svg>
-                    <span class="text-[10px] mt-1">${item.label.split(' ')[0]}</span>
-                </button>
-            `).join('');
-        }
-
-        function populateClassDropdowns() {
-            const classOptions = '<option value="">Select Class</option>' + 
-                Array.from({length: 10}, (_, i) => `<option value="${i + 3}">Class ${i + 3}</option>`).join('');
-            
-            const courseClass = document.getElementById('courseClass');
-            if (courseClass) courseClass.innerHTML = classOptions;
-        }
-
-        function navigateTo(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            
-            const targetPage = document.getElementById(`page-${page}`);
-            if (targetPage) {
-                targetPage.classList.add('active');
-                const pageTitle = page.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                document.getElementById('pageTitle').textContent = pageTitle;
-            }
-            
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-                if (item.dataset.page === page) item.classList.add('active');
-            });
-            
-            if (window.innerWidth < 1024) {
-                document.getElementById('sidebar').classList.add('sidebar-hidden');
-            }
-            
-            loadPageData(page);
-        }
-
-        function loadPageData(page) {
-            switch(page) {
-                case 'teacher-dashboard':
-                    loadTeacherDashboard();
-                    break;
-                case 'teacher-attendance':
-                    loadTeacherCoursesForAttendance();
-                    break;
-                case 'teacher-upload':
-                    loadTeacherCoursesForUpload();
-                    loadTeacherRecentUploads();
-                    break;
-                case 'teacher-notifications':
-                    loadTeacherCoursesForNotif();
-                    break;
-                case 'teacher-profile':
-                    loadProfileData();
-                    break;
-            }
-        }
-
-        // ==========================================
-        // TEACHER DASHBOARD
-        // ==========================================
-        function initTeacherRatingChart(ratingsData) {
-            const ctx = document.getElementById('teacherRatingChart');
-            if (!ctx) return;
-            
-            if (teacherRatingChart) teacherRatingChart.destroy();
-            
-            const data = ratingsData || [4.2, 4.5, 4.3, 4.7, 4.6, 4.8, 4.5];
-            
-            teacherRatingChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                    datasets: [{
-                        label: 'Rating',
-                        data: data,
-                        borderColor: '#0EA5E9',
-                        backgroundColor: (context) => {
-                            const ctx = context.chart.ctx;
-                            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-                            gradient.addColorStop(0, 'rgba(14, 165, 233, 0.4)');
-                            gradient.addColorStop(1, 'rgba(168, 85, 247, 0.1)');
-                            return gradient;
-                        },
-                        borderWidth: 3,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: '#A855F7',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                            callbacks: {
-                                label: function(context) {
-                                    return '⭐ ' + context.parsed.y + ' / 5.0';
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            min: 0,
-                            max: 5,
-                            ticks: {
-                                color: 'rgba(255,255,255,0.7)',
-                                stepSize: 1
-                            },
-                            grid: { color: 'rgba(255,255,255,0.1)' }
-                        },
-                        x: {
-                            ticks: { color: 'rgba(255,255,255,0.7)' },
-                            grid: { display: false }
-                        }
-                    }
-                }
-            });
-        }
-
-        async function loadTeacherDashboard() {
-            try {
-                const coursesSnap = await db.collection('courses')
-                    .where('teacherId', '==', currentUser.uid)
-                    .get();
-                
-                teacherCourses = coursesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                document.getElementById('teacherCourseCount').textContent = coursesSnap.size;
-                
-                let totalStudents = 0;
-                coursesSnap.docs.forEach(doc => {
-                    const data = doc.data();
-                    totalStudents += (data.enrolledStudents || []).length;
-                });
-                document.getElementById('teacherStudentCount').textContent = totalStudents;
-                
-                await loadTeacherRatings();
-                
-                const coursesList = document.getElementById('teacherCoursesList');
-                if (coursesSnap.empty) {
-                    coursesList.innerHTML = '<p class="text-gray-500 col-span-2 text-center py-4">No courses created yet</p>';
-                } else {
-                    coursesList.innerHTML = coursesSnap.docs.map(doc => {
-                        const c = doc.data();
-                        const studentCount = (c.enrolledStudents || []).length;
-                        return `
-                            <div class="card p-4 border-l-4 border-primary">
-                                <h4 class="font-bold mb-1">${c.name}</h4>
-                                <p class="text-sm text-gray-600 mb-2">${c.board} • Class ${c.class}${c.stream ? ' • ' + c.stream : ''}</p>
-                                <div class="flex justify-between items-center">
-                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${studentCount} Students</span>
-                                    <span class="text-xs text-gray-500">${c.subject}</span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-                
-            } catch (error) {
-                console.error('Error loading teacher dashboard:', error);
-            }
-        }
-
-        async function loadTeacherRatings() {
-            try {
-                const feedbackSnap = await db.collection('teacherFeedback')
-                .where('teacherId', '==', currentUser.uid)
-                    .get();
-    
-            // Sort manually
-        const sortedDocs = feedbackSnap.docs.sort((a, b) => {
-            const dateA = a.data().createdAt?.toMillis() || 0;
-            const dateB = b.data().createdAt?.toMillis() || 0;
-            return dateB - dateA;
-            });
-                
-                if (feedbackSnap.empty) {
-                    document.getElementById('teacherAvgRating').textContent = '0.0';
-                    document.getElementById('avgTeachingRating').textContent = '0.0';
-                    document.getElementById('avgContentRating').textContent = '0.0';
-                    document.getElementById('avgDoubtRating').textContent = '0.0';
-                    initTeacherRatingChart([0, 0, 0, 0, 0, 0, 0]);
-                    document.getElementById('teacherRecentFeedback').innerHTML = '<p class="text-gray-500 text-center py-4">No feedback yet</p>';
-                    return;
-                }
-                
-                let totalRating = 0, totalTeaching = 0, totalContent = 0, totalDoubt = 0;
-                const ratings = [];
-                
-                feedbackSnap.docs.forEach((doc, index) => {
-                    const data = doc.data();
-                    totalRating += data.overallRating || 0;
-                    totalTeaching += data.teachingQuality || 0;
-                    totalContent += data.contentQuality || 0;
-                    totalDoubt += data.doubtSolving || 0;
-                    
-                    if (index < 7) ratings.push(data.overallRating || 0);
-                });
-                
-                const count = feedbackSnap.size;
-                document.getElementById('teacherAvgRating').textContent = (totalRating / count).toFixed(1);
-                document.getElementById('avgTeachingRating').textContent = (totalTeaching / count).toFixed(1);
-                document.getElementById('avgContentRating').textContent = (totalContent / count).toFixed(1);
-                document.getElementById('avgDoubtRating').textContent = (totalDoubt / count).toFixed(1);
-                
-                while (ratings.length < 7) ratings.push(0);
-                initTeacherRatingChart(ratings.reverse());
-                
-                const recentFeedback = feedbackSnap.docs.slice(0, 5);
-                document.getElementById('teacherRecentFeedback').innerHTML = recentFeedback.map(doc => {
-                    const data = doc.data();
-                    const stars = '⭐'.repeat(Math.round(data.overallRating || 0));
-                    return `
-                        <div class="border-b pb-3 last:border-0">
-                            <div class="flex items-center justify-between mb-1">
-                                <div class="text-yellow-500 text-sm">${stars}</div>
-                                <span class="text-xs text-gray-500">${data.createdAt ? data.createdAt.toDate().toLocaleDateString() : 'Unknown'}</span>
-                            </div>
-                            <p class="text-sm text-gray-700">${data.comment || 'No comment'}</p>
-                            <div class="mt-1 flex space-x-2 text-xs">
-                                <span class="text-green-600">Teaching: ${data.teachingQuality}/5</span>
-                                <span class="text-blue-600">Content: ${data.contentQuality}/5</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-            } catch (error) {
-                console.error('Error loading ratings:', error);
-            }
-        }
-
-        // ==========================================
-        // ATTENDANCE FUNCTIONS
-        // ==========================================
-        async function loadTeacherCoursesForAttendance() {
-            const select = document.getElementById('attendanceCourse');
-            
-            if (teacherCourses.length === 0) {
-                const snap = await db.collection('courses')
-                    .where('teacherId', '==', currentUser.uid)
-                    .get();
-                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            }
-            
-            if (teacherCourses.length === 0) {
-                select.innerHTML = '<option value="">No courses found</option>';
-                return;
-            }
-            
-            select.innerHTML = '<option value="">Select Course</option>' +
-                teacherCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-            
-            document.getElementById('attendanceDate').valueAsDate = new Date();
-            loadAttendanceHistory();
-        }
-
-        async function loadAttendanceStudents() {
-            const courseId = document.getElementById('attendanceCourse').value;
-            const date = document.getElementById('attendanceDate').value;
-            
-            if (!courseId || !date) {
-                showToast('Please select course and date', 'error');
-                return;
-            }
-            
-            try {
-                const courseDoc = await db.collection('courses').doc(courseId).get();
-                const courseData = courseDoc.data();
-                const enrolledStudents = courseData.enrolledStudents || [];
-                
-                if (enrolledStudents.length === 0) {
-                    document.getElementById('attendanceStudentList').innerHTML = 
-                        '<p class="text-gray-500 text-center py-8">No students enrolled in this course</p>';
-                    document.getElementById('saveAttendanceBtn').classList.add('hidden');
-                    return;
-                }
-                
-                const existingAttendance = await db.collection('attendance')
-                    .where('courseId', '==', courseId)
-                    .where('date', '==', date)
-                    .get();
-                
-                const existingData = {};
-                existingAttendance.forEach(doc => {
-                    const data = doc.data();
-                    existingData[data.studentId] = data.status;
-                });
-                
-                const studentList = document.getElementById('attendanceStudentList');
-                studentList.innerHTML = '';
-                
-                for (const studentId of enrolledStudents) {
-                    const studentDoc = await db.collection('users').doc(studentId).get();
-                    const studentData = studentDoc.data();
-                    
-                    const isPresent = existingData[studentId] === 'present';
-                    const isAbsent = existingData[studentId] === 'absent';
-                    
-                    const div = document.createElement('div');
-                    div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
-                    div.innerHTML = `
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">
-                                ${(studentData.firstName || 'S').charAt(0)}
-                            </div>
-                            <div>
-                                <p class="font-medium">${studentData.firstName || ''} ${studentData.lastName || ''}</p>
-                                <p class="text-xs text-gray-500">Class ${studentData.class || ''}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <label class="flex items-center space-x-1 cursor-pointer">
-                                <input type="radio" name="attendance_${studentId}" value="present" 
-                                    ${isPresent ? 'checked' : ''} class="attendance-checkbox">
-                                <span class="text-sm text-green-600 font-medium">Present</span>
-                            </label>
-                            <label class="flex items-center space-x-1 cursor-pointer">
-                                <input type="radio" name="attendance_${studentId}" value="absent" 
-                                    ${isAbsent ? 'checked' : ''} class="attendance-checkbox">
-                                <span class="text-sm text-red-600 font-medium">Absent</span>
-                            </label>
-                        </div>
-                    `;
-                    studentList.appendChild(div);
-                }
-                
-                document.getElementById('saveAttendanceBtn').classList.remove('hidden');
-                
-            } catch (error) {
-                console.error('Error loading students:', error);
-                showToast('Error loading students', 'error');
-            }
-        }
-
-        function markAllPresent() {
-            document.querySelectorAll('input[type="radio"][value="present"]').forEach(radio => radio.checked = true);
-        }
-
-        function markAllAbsent() {
-            document.querySelectorAll('input[type="radio"][value="absent"]').forEach(radio => radio.checked = true);
-        }
-
-        async function saveAttendance() {
-            const courseId = document.getElementById('attendanceCourse').value;
-            const date = document.getElementById('attendanceDate').value;
-            
-            try {
-                const courseDoc = await db.collection('courses').doc(courseId).get();
-                const enrolledStudents = courseDoc.data().enrolledStudents || [];
-                
-                const batch = db.batch();
-                
-                for (const studentId of enrolledStudents) {
-                    const radio = document.querySelector(`input[name="attendance_${studentId}"]:checked`);
-                    if (!radio) continue;
-                    
-                    const attendanceRef = db.collection('attendance').doc(`${courseId}_${date}_${studentId}`);
-                    batch.set(attendanceRef, {
-                        courseId,
-                        studentId,
-                        date,
-                        status: radio.value,
-                        markedBy: currentUser.uid,
-                        markedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-                
-                await batch.commit();
-                showToast('Attendance saved successfully');
-                loadAttendanceHistory();
-                
-            } catch (error) {
-                console.error('Error saving attendance:', error);
-                showToast('Error saving attendance', 'error');
-            }
-        }
-
-        async function loadAttendanceHistory() {
-            try {
-                const snap = await db.collection('attendance')
-                    .where('markedBy', '==', currentUser.uid)
-                    .orderBy('markedAt', 'desc')
-                    .limit(10)
-                    .get();
-                
-                const container = document.getElementById('attendanceHistory');
-                
-                if (snap.empty) {
-                    container.innerHTML = '<p class="text-gray-500 text-center py-4">No records found</p>';
-                    return;
-                }
-                
-                const grouped = {};
-                snap.docs.forEach(doc => {
-                    const data = doc.data();
-                    if (!grouped[data.date]) grouped[data.date] = { present: 0, absent: 0 };
-                    if (data.status === 'present') grouped[data.date].present++;
-                    else grouped[data.date].absent++;
-                });
-                
-                container.innerHTML = Object.entries(grouped).slice(0, 5).map(([date, counts]) => `
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <span class="font-medium">${date}</span>
-                        <div class="flex space-x-3 text-sm">
-                            <span class="text-green-600">${counts.present} Present</span>
-                            <span class="text-red-600">${counts.absent} Absent</span>
-                        </div>
+        <!-- MARK TAB -->
+        <div id="attc-mark">
+            <div class="card" style="margin-bottom:12px">
+                <div class="card-head">
+                    <div class="card-title">📝 Session Details</div>
+                    <div id="attDateLabel" style="font-size:0.75rem;color:var(--text2)"></div>
+                </div>
+                <div class="att-form-grid">
+                    <div class="f-group"><label class="f-label">Date</label><input type="date" id="attDate" class="f-input"></div>
+                    <div class="f-group"><label class="f-label">Class</label>
+                        <select id="attClass" class="f-input" onchange="loadAttStudents()">
+                            <option value="">— Select —</option>
+                        </select>
                     </div>
-                `).join('');
-                
-            } catch (error) {
-                console.error('Error loading history:', error);
-            }
-        }
-
-        // ==========================================
-        // COURSE CREATION
-        // ==========================================
-        function updateStreamVisibility() {
-            const classVal = document.getElementById('courseClass').value;
-            const container = document.getElementById('courseStreamContainer');
-            
-            if (classVal === '11' || classVal === '12') {
-                container.classList.remove('hidden');
-                document.getElementById('courseStream').required = true;
-            } else {
-                container.classList.add('hidden');
-                document.getElementById('courseStream').required = false;
-                document.getElementById('courseStream').value = '';
-            }
-            
-            updateCourseSubjects();
-        }
-
-        function updateCourseSubjects() {
-            const classVal = document.getElementById('courseClass').value;
-            const stream = document.getElementById('courseStream').value;
-            const subjectSelect = document.getElementById('courseSubject');
-            
-            let subjects = [];
-            const classNum = parseInt(classVal);
-            
-            if (classNum >= 3 && classNum <= 5) {
-                subjects = subjectMappings['3-5'];
-            } else if (classNum >= 6 && classNum <= 8) {
-                subjects = subjectMappings['6-8'];
-            } else if (classNum >= 9 && classNum <= 10) {
-                subjects = subjectMappings['9-10'];
-            } else if ((classVal === '11' || classVal === '12') && stream) {
-                subjects = subjectMappings[`${classVal}-${stream}`] || [];
-            }
-            
-            subjectSelect.innerHTML = '<option value="">Select Subject</option>' + 
-                subjects.map(s => `<option value="${s}">${s}</option>`).join('');
-        }
-
-        async function createCourse(e) {
-            e.preventDefault();
-            
-            const board = document.getElementById('courseBoard').value;
-            const classVal = document.getElementById('courseClass').value;
-            const stream = document.getElementById('courseStream').value;
-            const subject = document.getElementById('courseSubject').value;
-            const description = document.getElementById('courseDescription').value;
-            
-            const courseName = stream ? 
-                `${board} Class ${classVal} ${stream} ${subject}` : 
-                `${board} Class ${classVal} ${subject}`;
-            
-            try {
-                await db.collection('courses').add({
-                    name: courseName,
-                    board,
-                    class: classVal,
-                    stream: stream || null,
-                    subject,
-                    description,
-                    teacherId: currentUser.uid,
-                    teacherName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
-                    enrolledStudents: [],
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    isActive: true
-                });
-                
-                showToast('Course created successfully');
-                document.getElementById('createCourseForm').reset();
-                document.getElementById('courseStreamContainer').classList.add('hidden');
-                
-                const snap = await db.collection('courses')
-                    .where('teacherId', '==', currentUser.uid)
-                    .get();
-                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                
-                navigateTo('teacher-dashboard');
-            } catch (error) {
-                console.error('Error creating course:', error);
-                showToast('Error creating course', 'error');
-            }
-        }
-
-        // ==========================================
-        // CONTENT UPLOAD
-        // ==========================================
-        async function loadTeacherCoursesForUpload() {
-            const select = document.getElementById('uploadCourse');
-            
-            if (teacherCourses.length === 0) {
-                const snap = await db.collection('courses')
-                    .where('teacherId', '==', currentUser.uid)
-                    .get();
-                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            }
-            
-            if (teacherCourses.length === 0) {
-                select.innerHTML = '<option value="">No courses found. Create a course first.</option>';
-                return;
-            }
-            
-            select.innerHTML = '<option value="">Select Course</option>' +
-                teacherCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-        }
-
-        function handleFileSelect(input, previewId) {
-            const file = input.files[0];
-            if (file) {
-                const preview = document.getElementById(previewId);
-                preview.textContent = `Selected: ${file.name}`;
-                preview.classList.add('text-green-600', 'font-medium');
-            }
-        }
-
-        async function uploadContent(e) {
-            e.preventDefault();
-            
-            const courseId = document.getElementById('uploadCourse').value;
-            const chapter = document.getElementById('uploadChapter').value;
-            const videoLink = document.getElementById('videoLink').value;
-            const notesFile = document.getElementById('notesFile').files[0];
-            const dppFile = document.getElementById('dppFile').files[0];
-            
-            try {
-                showToast('Uploading content...');
-                
-                let notesUrl = '', dppUrl = '';
-                
-                if (notesFile) {
-                    const notesRef = storage.ref(`courses/${courseId}/notes/${Date.now()}_${notesFile.name}`);
-                    await notesRef.put(notesFile);
-                    notesUrl = await notesRef.getDownloadURL();
-                }
-                
-                if (dppFile) {
-                    const dppRef = storage.ref(`courses/${courseId}/dpp/${Date.now()}_${dppFile.name}`);
-                    await dppRef.put(dppFile);
-                    dppUrl = await dppRef.getDownloadURL();
-                }
-                
-                await db.collection('courses').doc(courseId).collection('content').add({
-                    chapter,
-                    notesUrl: notesUrl || videoLink,
-                    dppUrl: dppUrl || videoLink,
-                    videoUrl: videoLink,
-                    uploadedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    uploadedBy: currentUser.uid
-                });
-                
-                showToast('Content uploaded successfully');
-                document.getElementById('uploadContentForm').reset();
-                document.getElementById('notesPreview').textContent = 'Click to upload notes or drag & drop';
-                document.getElementById('dppPreview').textContent = 'Click to upload DPP or drag & drop';
-                document.getElementById('notesPreview').classList.remove('text-green-600', 'font-medium');
-                document.getElementById('dppPreview').classList.remove('text-green-600', 'font-medium');
-                
-                loadTeacherRecentUploads();
-            } catch (error) {
-                console.error('Error uploading content:', error);
-                showToast('Error uploading content', 'error');
-            }
-        }
-
-        async function loadTeacherRecentUploads() {
-            const container = document.getElementById('teacherRecentUploads');
-            
-            if (teacherCourses.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-4">No uploads yet</p>';
-                return;
-            }
-            
-            try {
-                const uploads = [];
-                for (const course of teacherCourses) {
-                    const snap = await db.collection('courses').doc(course.id).collection('content')
-                        .orderBy('uploadedAt', 'desc').limit(2).get();
-                    snap.docs.forEach(doc => {
-                        uploads.push({ ...doc.data(), courseName: course.name, id: doc.id });
-                    });
-                }
-                
-                uploads.sort((a, b) => (b.uploadedAt?.toMillis() || 0) - (a.uploadedAt?.toMillis() || 0));
-                
-                if (uploads.length === 0) {
-                    container.innerHTML = '<p class="text-gray-500 text-center py-4">No uploads yet</p>';
-                    return;
-                }
-                
-                container.innerHTML = uploads.slice(0, 5).map(u => `
-                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                        <div>
-                            <p class="font-medium text-sm">${u.courseName}</p>
-                            <p class="text-xs text-gray-600">${u.chapter}</p>
-                        </div>
-                        <span class="text-xs text-gray-400">${u.uploadedAt ? u.uploadedAt.toDate().toLocaleDateString() : 'Unknown'}</span>
+                    <div class="f-group"><label class="f-label">Subject</label><input type="text" id="attSubject" class="f-input" placeholder="e.g. Physics"></div>
+                    <div class="f-group"><label class="f-label">Room No.</label><input type="text" id="attRoom" class="f-input" placeholder="e.g. 101"></div>
+                    <div class="f-group"><label class="f-label">Period</label>
+                        <select id="attPeriod" class="f-input">
+                            <option value="1">Period 1</option><option value="2">Period 2</option>
+                            <option value="3">Period 3</option><option value="4">Period 4</option>
+                            <option value="5">Period 5</option><option value="6">Period 6</option>
+                            <option value="7">Period 7</option><option value="8">Period 8</option>
+                        </select>
                     </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading uploads:', error);
-            }
-        }
+                    <div class="f-group"><label class="f-label">Session Note</label><input type="text" id="attNote" class="f-input" placeholder="Optional note"></div>
+                </div>
+                <div style="padding:0 14px 14px;display:flex;justify-content:flex-end">
+                    <button class="btn-primary btn-sm" onclick="loadAttStudents()">🔄 Load Students</button>
+                </div>
+            </div>
 
-        // ==========================================
-        // NOTIFICATIONS
-        // ==========================================
-        async function loadTeacherCoursesForNotif() {
-            const select = document.getElementById('teacherNotifCourse');
-            
-            if (teacherCourses.length === 0) {
-                const snap = await db.collection('courses')
-                    .where('teacherId', '==', currentUser.uid)
-                    .get();
-                teacherCourses = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            }
-            
-            select.innerHTML = '<option value="">Select Course</option>' +
-                teacherCourses.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-        }
+            <div class="card">
+                <div class="bulk-bar">
+                    <span class="bulk-lbl">Mark All:</span>
+                    <button class="bulk-btn bb-p" onclick="markAllAtt('present')">✅ Present</button>
+                    <button class="bulk-btn bb-a" onclick="markAllAtt('absent')">❌ Absent</button>
+                    <div style="flex:1"></div>
+                    <span id="attMarkedCnt" style="font-size:0.72rem;color:var(--text3)">0 marked</span>
+                </div>
+                <div id="attStudentList" style="padding-bottom:8px">
+                    <div class="empty-state"><div class="ei">🏫</div><div class="et">Select class & date to load students</div></div>
+                </div>
+                <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+                    <button class="btn-ghost" onclick="resetAtt()">↺ Reset</button>
+                    <button class="btn-primary" id="attSaveBtn" onclick="saveAtt()">💾 Save Attendance</button>
+                </div>
+            </div>
+        </div>
 
-        async function sendTeacherNotification(e) {
-            e.preventDefault();
-            
-            const courseId = document.getElementById('teacherNotifCourse').value;
-            const title = document.getElementById('teacherNotifTitle').value;
-            const message = document.getElementById('teacherNotifMessage').value;
-            
-            try {
-                const courseDoc = await db.collection('courses').doc(courseId).get();
-                const enrolledStudents = courseDoc.data().enrolledStudents || [];
-                
-                if (enrolledStudents.length === 0) {
-                    showToast('No students enrolled in this course', 'error');
-                    return;
-                }
-                
-                const batch = db.batch();
-                const timestamp = firebase.firestore.FieldValue.serverTimestamp();
-                
-                enrolledStudents.forEach(studentId => {
-                    const notifRef = db.collection('notifications').doc();
-                    batch.set(notifRef, {
-                        userId: studentId,
-                        title,
-                        message,
-                        priority: 'normal',
-                        sender: userData.firstName + ' ' + userData.lastName,
-                        senderRole: 'teacher',
-                        courseId,
-                        read: false,
-                        createdAt: timestamp
-                    });
-                });
-                
-                await batch.commit();
-                showToast(`Notification sent to ${enrolledStudents.length} students`);
-                document.getElementById('teacherNotifForm').reset();
-                
-            } catch (error) {
-                console.error('Error sending notification:', error);
-                showToast('Error sending notification', 'error');
-            }
-        }
+        <!-- HISTORY TAB -->
+        <div id="attc-hist" style="display:none">
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Recent Records</div>
+                    <div style="display:flex;gap:7px;flex-wrap:wrap">
+                        <select id="hfClass" class="f-input" style="padding:7px 10px;font-size:0.78rem" onchange="loadAttHistory()"><option value="">All Classes</option></select>
+                        <input type="date" id="hfDate" class="f-input" style="padding:7px 10px;font-size:0.78rem" onchange="loadAttHistory()">
+                        <button class="btn-ghost btn-sm" onclick="clearHistFilters()">✕</button>
+                    </div>
+                </div>
+                <div class="hist-scroll">
+                    <table>
+                        <thead><tr><th>Student</th><th>Date</th><th>Subject</th><th>Period</th><th>Status</th><th>Note</th></tr></thead>
+                        <tbody id="histTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-        // ==========================================
-        // PROFILE
-        // ==========================================
-        function loadProfileData() {
-            document.getElementById('profileCourseCount').textContent = document.getElementById('teacherCourseCount').textContent;
-            document.getElementById('profileStudentCount').textContent = document.getElementById('teacherStudentCount').textContent;
-            document.getElementById('profileRating').textContent = document.getElementById('teacherAvgRating').textContent;
-        }
+        <!-- REPORT TAB -->
+        <div id="attc-report" style="display:none">
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Per-Student Attendance %</div>
+                    <select id="rpClass" class="f-input" style="padding:7px 10px;font-size:0.78rem;width:140px" onchange="loadAttReport()"><option value="">All Classes</option></select>
+                </div>
+                <div class="card-body" id="rpBody">
+                    <div class="skel" style="height:50px;margin-bottom:8px"></div>
+                    <div class="skel" style="height:50px;margin-bottom:8px"></div>
+                    <div class="skel" style="height:50px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        // ==========================================
-        // NOTIFICATIONS LISTENER
-        // ==========================================
-        function setupNotificationsListener() {
-            if (!currentUser) return;
-            
-            db.collection('notifications')
-                .where('userId', '==', currentUser.uid)
-                .where('read', '==', false)
-                .onSnapshot(snapshot => {
-                    const badge = document.getElementById('notifBadge');
-                    if (snapshot.size > 0) {
-                        badge.classList.remove('hidden');
-                    } else {
-                        badge.classList.add('hidden');
-                    }
-                });
-        }
+    <!-- ══ PAGE: COURSES / CONTENT ══ -->
+    <div id="page-courses" class="page">
+        <div class="page-hd">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+                <div>
+                    <div class="page-title">📚 Courses & Content</div>
+                    <div class="page-sub">Post notes, videos, assignments & announcements</div>
+                </div>
+                <button class="btn-primary btn-sm" onclick="openPostModal('note')">+ Post</button>
+            </div>
+        </div>
 
-        function showNotifications() {
-            showToast('Notifications feature coming soon');
-        }
+        <div class="tab-row" id="contentTypeTabs">
+            <div class="tab-pill on" onclick="filterContent('all',this)">All</div>
+            <div class="tab-pill" onclick="filterContent('note',this)">📝 Notes</div>
+            <div class="tab-pill" onclick="filterContent('video',this)">🎥 Videos</div>
+            <div class="tab-pill" onclick="filterContent('assign',this)">📚 Assignments</div>
+            <div class="tab-pill" onclick="filterContent('announce',this)">📣 Announcements</div>
+            <div class="tab-pill" onclick="filterContent('link',this)">🔗 Links</div>
+        </div>
 
-        // ==========================================
-        // UTILITY FUNCTIONS
-        // ==========================================
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('sidebar-hidden');
-        }
+        <div id="contentList">
+            <div class="skel" style="height:80px;margin-bottom:10px;border-radius:14px"></div>
+            <div class="skel" style="height:80px;margin-bottom:10px;border-radius:14px"></div>
+            <div class="skel" style="height:80px;border-radius:14px"></div>
+        </div>
+    </div>
 
-        function toggleUserMenu() {
-            document.getElementById('userDropdown').classList.toggle('hidden');
-        }
+    <!-- ══ PAGE: STUDENTS ══ -->
+    <div id="page-students" class="page">
+        <div class="page-hd">
+            <div class="page-title">👥 My Students</div>
+            <div class="page-sub">View class roster & attendance stats</div>
+        </div>
+        <div class="f-group" style="margin-bottom:12px">
+            <select id="stuFilterClass" class="f-input" onchange="loadMyStudents()"><option value="">All My Classes</option></select>
+        </div>
+        <div id="studentTileList">
+            <div class="skel" style="height:58px;margin-bottom:8px;border-radius:13px"></div>
+            <div class="skel" style="height:58px;margin-bottom:8px;border-radius:13px"></div>
+            <div class="skel" style="height:58px;border-radius:13px"></div>
+        </div>
+    </div>
 
-        async function logout() {
-            try {
-                await auth.signOut();
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.error('Error logging out:', error);
-            }
-        }
+    <!-- ══ PAGE: PROFILE ══ -->
+    <div id="page-profile" class="page">
+        <div class="page-hd"><div class="page-title">👤 Profile</div></div>
+        <div class="profile-hero">
+            <div class="p-avatar" id="pAvatar">T</div>
+            <div class="p-name" id="pName">—</div>
+            <div class="p-role" id="pRole">Teacher</div>
+        </div>
 
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast ${type === 'success' ? 'bg-green-500' : 'bg-red-500'} show`;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
+        <div class="card" style="margin-bottom:12px">
+            <div class="card-head"><div class="card-title">📊 My Stats</div></div>
+            <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+                <div><div style="font-size:1.4rem;font-weight:800;color:var(--teal)" id="profClasses">—</div><div style="font-size:0.68rem;color:var(--text2);margin-top:3px">Classes</div></div>
+                <div><div style="font-size:1.4rem;font-weight:800;color:var(--amber)" id="profStreak">—</div><div style="font-size:0.68rem;color:var(--text2);margin-top:3px">🔥 Streak</div></div>
+                <div><div style="font-size:1.4rem;font-weight:800;color:var(--blue)" id="profPosts">—</div><div style="font-size:0.68rem;color:var(--text2);margin-top:3px">Posts</div></div>
+            </div>
+        </div>
 
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('#userMenu')) {
-                document.getElementById('userDropdown').classList.add('hidden');
-            }
-        });
+        <div class="card" style="margin-bottom:12px">
+            <div class="card-head"><div class="card-title">⚙️ Edit Profile</div></div>
+            <div class="card-body">
+                <div class="f-group"><label class="f-label">Full Name</label><input type="text" id="profNameInput" class="f-input" placeholder="Your full name"></div>
+                <div class="f-group"><label class="f-label">Subjects (comma separated)</label><input type="text" id="profSubjects" class="f-input" placeholder="Physics, Chemistry, Maths"></div>
+                <div class="f-group"><label class="f-label">Assigned Classes</label><input type="text" id="profClsInput" class="f-input" placeholder="9, 10, 11"></div>
+                <div class="f-group"><label class="f-label">Phone</label><input type="tel" id="profPhone" class="f-input" placeholder="+91 XXXXX XXXXX"></div>
+                <button class="btn-primary" onclick="saveProfile()">💾 Save Profile</button>
+            </div>
+        </div>
 
-        document.querySelectorAll('.upload-zone').forEach(zone => {
-            zone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                zone.classList.add('dragover');
-            });
-            
-            zone.addEventListener('dragleave', () => {
-                zone.classList.remove('dragover');
-            });
-            
-            zone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                zone.classList.remove('dragover');
-                
-            });
-            
-        });
-        } catch (error) {
-    console.error("PAGE ERROR:", error);
-    alert("Error loading page: " + error.message);
+        <div class="card">
+            <div class="card-head"><div class="card-title">🔐 Account</div></div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:0.8rem;color:var(--text2)">Email: <span id="profEmail" style="color:var(--teal);font-weight:700"></span></div>
+                <button class="btn-danger" onclick="doLogout()" style="width:fit-content">🚪 Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div id="mainNav">
+        <div class="nav-item active" onclick="navigateTo('dash')" id="nav-dash"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+        <div class="nav-item" onclick="navigateTo('att')"     id="nav-att"><div class="nav-icon">📋</div><div class="nav-label">Attendance</div></div>
+        <div class="nav-item" onclick="navigateTo('courses')" id="nav-courses"><div class="nav-icon">📚</div><div class="nav-label">Courses</div></div>
+        <div class="nav-item" onclick="navigateTo('students')" id="nav-students"><div class="nav-icon">👥</div><div class="nav-label">Students</div></div>
+        <div class="nav-item" onclick="navigateTo('profile')" id="nav-profile"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
+    </div>
+</div>
+
+<!-- ══ POST CONTENT MODAL ══ -->
+<div class="modal" id="postModal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <div class="modal-title" id="postModalTitle">📝 Post Content</div>
+            <button class="modal-close" onclick="closeModal('postModal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="f-group"><label class="f-label">Content Type</label>
+                <select id="postType" class="f-input" onchange="updatePostForm()">
+                    <option value="note">📝 Notes / Study Material</option>
+                    <option value="video">🎥 Video Link</option>
+                    <option value="assign">📚 Assignment / Homework</option>
+                    <option value="announce">📣 Announcement</option>
+                    <option value="link">🔗 Reference Link</option>
+                </select>
+            </div>
+            <div class="f-group"><label class="f-label">Title</label><input type="text" id="postTitle" class="f-input" placeholder="e.g. Chapter 3 Notes — Newton's Laws"></div>
+            <div class="f-group"><label class="f-label">Description / Content</label><textarea id="postDesc" class="f-input" rows="4" placeholder="Write content, instructions, or description here…"></textarea></div>
+            <div id="postLinkWrap" class="f-group" style="display:none"><label class="f-label">URL / Link</label><input type="url" id="postLink" class="f-input" placeholder="https://…"></div>
+            <div id="postDueWrap" class="f-group" style="display:none"><label class="f-label">Due Date</label><input type="date" id="postDue" class="f-input"></div>
+            <div class="f-group"><label class="f-label">Target Class</label>
+                <select id="postClass" class="f-input">
+                    <option value="all">📢 All Classes</option>
+                </select>
+            </div>
+            <div class="f-group"><label class="f-label">Subject</label><input type="text" id="postSubject" class="f-input" placeholder="e.g. Physics"></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+                <button class="btn-ghost" onclick="closeModal('postModal')">Cancel</button>
+                <button class="btn-primary" onclick="savePost()">🚀 Publish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ VIEW CONTENT MODAL ══ -->
+<div class="modal" id="viewModal">
+    <div class="modal-box">
+        <div class="modal-head">
+            <div class="modal-title" id="vmTitle">—</div>
+            <button class="modal-close" onclick="closeModal('viewModal')">✕</button>
+        </div>
+        <div class="modal-body" id="vmBody"></div>
+    </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// FIREBASE INIT
+// ═══════════════════════════════════════════
+const firebaseConfig = {
+    apiKey:"AIzaSyB5TTCXCD74IUeLmM7bynlgCUvcmcM6rTw",
+    authDomain:"mind-skyra-institute.firebaseapp.com",
+    projectId:"mind-skyra-institute",
+    storageBucket:"mind-skyra-institute.firebasestorage.app",
+    messagingSenderId:"333988573281",
+    appId:"1:333988573281:web:7d775f902b55d2e15aba20"
+};
+firebase.initializeApp(firebaseConfig);
+const db   = firebase.firestore();
+const auth = firebase.auth();
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let teacherData    = null;
+let currentUser    = null;
+let allClasses     = [];
+let attMarked      = {};   // { studentId: {status, note} }
+let attStudents    = [];
+let allContent     = [];
+let contentFilter  = 'all';
+let streakDays     = 0;
+let currentPage    = 'dash';
+
+// ═══════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════
+auth.onAuthStateChanged(async user => {
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
+    currentUser = user;
+    await loadTeacherData();
+    showApp();
+});
+
+async function doLogout() {
+    await auth.signOut();
+    window.location.href = 'login.html';
 }
-     
+function showApp() {
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    initApp();
+}
+
+// ═══════════════════════════════════════════
+// LOAD TEACHER DATA
+// ═══════════════════════════════════════════
+async function loadTeacherData() {
+    try {
+        const doc = await db.collection('teachers').doc(currentUser.uid).get();
+        if (doc.exists) {
+            teacherData = { id: doc.id, ...doc.data() };
+        } else {
+            // Auto-create teacher profile
+            teacherData = {
+                id: currentUser.uid, email: currentUser.email,
+                fullName: currentUser.displayName || currentUser.email.split('@')[0],
+                subjects: [], classes: [], phone: '', streak: 0, lastActive: null
+            };
+            await db.collection('teachers').doc(currentUser.uid).set(teacherData);
+        }
+    } catch(e) { console.error(e); }
+}
+
+// ═══════════════════════════════════════════
+// INIT APP
+// ═══════════════════════════════════════════
+async function initApp() {
+    // Header
+    const name = teacherData?.fullName || 'Teacher';
+    document.getElementById('hName').textContent = name;
+    document.getElementById('pName').textContent = name;
+    document.getElementById('pRole').textContent = (teacherData?.subjects||[]).join(', ') || 'Teacher';
+    document.getElementById('pAvatar').textContent = name.charAt(0).toUpperCase();
+    document.getElementById('profEmail').textContent = currentUser.email;
+    document.getElementById('profNameInput').value = name;
+    document.getElementById('profSubjects').value  = (teacherData?.subjects||[]).join(', ');
+    document.getElementById('profClsInput').value  = (teacherData?.classes||[]).join(', ');
+    document.getElementById('profPhone').value     = teacherData?.phone || '';
+
+    // Dashboard date/greeting
+    const now = new Date();
+    const hr  = now.getHours();
+    const greet = hr < 12 ? 'Good Morning' : hr < 17 ? 'Good Afternoon' : 'Good Evening';
+    document.getElementById('dashGreet').textContent = `${greet}, ${name.split(' ')[0]}! 👋`;
+    document.getElementById('dashDate').textContent  = now.toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+    document.getElementById('attDateLabel').textContent = now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'});
+
+    // Set today's date in attendance form
+    document.getElementById('attDate').value = todayStr();
+
+    await loadClasses();
+    await updateStreak();
+    loadDashStats();
+    loadDashAttSummary();
+    loadContent();
+    loadAttHistory();
+    loadMyStudents();
+}
+
+// ═══════════════════════════════════════════
+// CLASSES
+// ═══════════════════════════════════════════
+async function loadClasses() {
+    try {
+        const snap = await db.collection('students').get();
+        const set  = new Set();
+        snap.forEach(d => {
+            const c = d.data().class || d.data().roleData?.class;
+            if (c) set.add(String(c));
+        });
+        allClasses = [...set].sort((a,b) => Number(a)-Number(b)||a.localeCompare(b));
+
+        ['attClass','hfClass','rpClass','stuFilterClass'].forEach(id => {
+            const s = document.getElementById(id);
+            if (!s) return;
+            const first = s.options[0].cloneNode(true);
+            s.innerHTML = '';
+            s.appendChild(first);
+            allClasses.forEach(c => {
+                const o = document.createElement('option');
+                o.value = c; o.textContent = 'Class ' + c;
+                s.appendChild(o);
+            });
+        });
+        const pc = document.getElementById('postClass');
+        if (pc) {
+            pc.innerHTML = '<option value="all">📢 All Classes</option>';
+            allClasses.forEach(c => {
+                const o = document.createElement('option'); o.value=c; o.textContent='Class '+c; pc.appendChild(o);
+            });
+        }
+    } catch(e) { console.error(e); }
+}
+
+// ═══════════════════════════════════════════
+// STREAK SYSTEM
+// ═══════════════════════════════════════════
+async function updateStreak() {
+    try {
+        // Simple query — no orderBy to avoid composite index
+        const snap = await db.collection('attendance')
+            .where('markedBy', '==', currentUser.uid)
+            .get();
+
+        const daysWithClass = new Set();
+        snap.forEach(d => { if (d.data().date) daysWithClass.add(d.data().date); });
+
+        // Build last 28 days
+        const days = [];
+        let streak = 0, countingStreak = true;
+        for (let i = 27; i >= 0; i--) {
+            const d    = new Date(); d.setDate(d.getDate() - i);
+            const dStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+            const isWeekend = d.getDay()===0 || d.getDay()===6;
+            const isFuture  = i < 0;
+            const attended  = daysWithClass.has(dStr);
+            days.push({ dStr, day: d.getDate(), attended, isFuture: i<0, isToday: i===0, isWeekend });
+            // Count streak (backwards from today, skip weekends)
+            if (countingStreak && i <= 0) {
+                if (attended) streak++;
+                else if (!isWeekend && i < 0) countingStreak = false;
+            }
+        }
+        streakDays = streak;
+
+        // Update streak in Firestore
+        await db.collection('teachers').doc(currentUser.uid).update({
+            streak: streak, lastActive: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Render calendar
+        const cal = document.getElementById('streakCal');
+        cal.innerHTML = days.map(d => {
+            let cls = 'streak-day ';
+            if (d.dStr > todayStr()) cls += 'future';
+            else if (d.attended) cls += 'attended';
+            else cls += 'missed';
+            if (d.isToday) cls += ' today';
+            return `<div class="${cls}" title="${d.dStr}">${d.day}</div>`;
+        }).join('');
+
+        // Update labels
+        const lbl = streak >= 7 ? `🏆 ${streak} Day Streak!` : streak >= 3 ? `🔥 ${streak} Day Streak` : streak > 0 ? `✅ ${streak} Day Streak` : '⚡ Start your streak!';
+        document.getElementById('streakLabel').textContent = lbl;
+        document.getElementById('hStreak').textContent     = '🔥 ' + streak;
+        document.getElementById('dsStreak').textContent    = streak;
+        document.getElementById('profStreak').textContent  = streak;
+    } catch(e) {
+        // If no records yet, show empty streak
+        buildEmptyStreak();
+    }
+}
+
+function buildEmptyStreak() {
+    const cal = document.getElementById('streakCal');
+    let html = '';
+    for (let i = 27; i >= 0; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        html += `<div class="streak-day ${i===0?'today future':'future'}">${d.getDate()}</div>`;
+    }
+    cal.innerHTML = html;
+    document.getElementById('streakLabel').textContent = '⚡ Start teaching to build streak!';
+    document.getElementById('hStreak').textContent = '🔥 0';
+}
+
+// ═══════════════════════════════════════════
+// DASHBOARD STATS
+// ═══════════════════════════════════════════
+async function loadDashStats() {
+    try {
+        const [attSnap, stuSnap, cntSnap] = await Promise.all([
+            db.collection('attendance').where('markedBy','==',currentUser.uid).get(),
+            db.collection('students').get(),
+            db.collection('courseContent').where('teacherId','==',currentUser.uid).get()
+        ]);
+        const classDates = new Set();
+        attSnap.forEach(d => { if (d.data().date) classDates.add(d.data().date + '_' + (d.data().class||'')); });
+        document.getElementById('dsTotalClasses').textContent = classDates.size;
+        document.getElementById('dsStudents').textContent     = stuSnap.size;
+        document.getElementById('dsContent').textContent      = cntSnap.size;
+        document.getElementById('profClasses').textContent    = classDates.size;
+        document.getElementById('profPosts').textContent      = cntSnap.size;
+    } catch(e) {}
+}
+
+async function loadDashAttSummary() {
+    const el  = document.getElementById('dashAttSummary');
+    try {
+        // Simple query — no orderBy
+        const snap = await db.collection('attendance')
+            .where('markedBy','==',currentUser.uid)
+            .where('date','==',todayStr())
+            .get();
+
+        if (snap.empty) {
+            el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="ei">📋</div><div class="et">No attendance marked today</div><button class="btn-primary btn-sm" onclick="navigateTo('att')" style="margin-top:10px">Mark Now →</button></div>`;
+            return;
+        }
+
+        // Group by subject
+        const subjects = {};
+        snap.forEach(d => {
+            const s = d.data().subject || 'General';
+            if (!subjects[s]) subjects[s] = {p:0,a:0,l:0,total:0};
+            subjects[s].total++;
+            if (d.data().status==='present') subjects[s].p++;
+            else if (d.data().status==='absent') subjects[s].a++;
+            else subjects[s].l++;
+        });
+
+        el.innerHTML = Object.entries(subjects).map(([subj, c]) => {
+            const pct = Math.round(((c.p+c.l)/c.total)*100);
+            const col = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+                <div style="flex:1"><div style="font-weight:700;font-size:0.85rem">${subj}</div>
+                <div style="font-size:0.7rem;color:var(--text2);margin-top:2px">✅${c.p} ⏰${c.l} ❌${c.a} · ${c.total} students</div></div>
+                <div style="font-weight:800;font-size:1.1rem;color:${col}">${pct}%</div>
+            </div>`;
+        }).join('') + `<div style="text-align:right;margin-top:8px"><button class="btn-ghost btn-sm" onclick="navigateTo('att');switchAttTab('hist')">View All →</button></div>`;
+    } catch(e) {
+        el.innerHTML = '<div style="color:#F87171;font-size:0.8rem;padding:10px">Could not load today\'s data</div>';
+    }
+}
+
+// ═══════════════════════════════════════════
+// ATTENDANCE — MARK
+// ═══════════════════════════════════════════
+async function loadAttStudents() {
+    const cls  = document.getElementById('attClass').value;
+    const date = document.getElementById('attDate').value;
+    const el   = document.getElementById('attStudentList');
+    if (!cls) { el.innerHTML = '<div class="empty-state"><div class="ei">🏫</div><div class="et">Select a class first</div></div>'; return; }
+
+    el.innerHTML = '<div style="padding:14px"><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px"></div></div>';
+    attMarked = {};
+
+    try {
+        // Load students
+        const snap = await db.collection('students').where('class','==',cls).get();
+        const snap2 = await db.collection('students').get();
+        const students = [];
+        snap.forEach(d => students.push({id:d.id,...d.data()}));
+        snap2.forEach(d => {
+            const dd = d.data();
+            if (dd.roleData?.class===cls && !students.find(s=>s.id===d.id)) students.push({id:d.id,...dd});
+        });
+        attStudents = students;
+
+        // Check existing attendance
+        if (date) {
+            const subject = document.getElementById('attSubject').value.trim();
+            let q = db.collection('attendance').where('date','==',date).where('class','==',cls);
+            if (subject) q = q.where('subject','==',subject);
+            const eSnap = await q.where('markedBy','==',currentUser.uid).get();
+            eSnap.forEach(d => { const dd=d.data(); attMarked[dd.studentId]={status:dd.status,note:dd.note||'',docId:d.id}; });
+        }
+
+        renderAttStudents();
+        updateAttCount();
+    } catch(e) {
+        el.innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><div class="et" style="color:#F87171">Error loading: ${e.message}</div></div>`;
+    }
+}
+
+function renderAttStudents() {
+    const el = document.getElementById('attStudentList');
+    if (!attStudents.length) {
+        el.innerHTML = '<div class="empty-state"><div class="ei">👥</div><div class="et">No students in this class</div></div>';
+        return;
+    }
+    el.innerHTML = attStudents.map(s => {
+        const name = s.fullName || ((s.firstName||'')+' '+(s.lastName||'')).trim() || 'Student';
+        const m    = attMarked[s.id];
+        const rc   = m ? (m.status==='present'?'mp':m.status==='absent'?'ma':'ml') : '';
+        return `<div class="s-row ${rc}" id="srow-${s.id}">
+            <div class="s-ava">${name.charAt(0).toUpperCase()}</div>
+            <div class="s-info">
+                <div class="s-name">${name}</div>
+                <div class="s-meta">Roll ${s.rollNumber||s.id.slice(-4).toUpperCase()} · Class ${s.class||s.roleData?.class||'—'}</div>
+            </div>
+            <div class="sbns">
+                <button class="sbn sbn-p ${m?.status==='present'?'on':''}" onclick="markAtt('${s.id}','present')">✅</button>
+                <button class="sbn sbn-l ${m?.status==='late'?'on':''}"    onclick="markAtt('${s.id}','late')">⏰</button>
+                <button class="sbn sbn-a ${m?.status==='absent'?'on':''}"  onclick="markAtt('${s.id}','absent')">❌</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function markAtt(id, status) {
+    if (!attMarked[id]) attMarked[id] = {status:'',note:''};
+    attMarked[id].status = status;
+    const row = document.getElementById('srow-'+id);
+    if (row) {
+        row.className = `s-row m${status[0]}`;
+        row.querySelectorAll('.sbn').forEach(b => b.classList.remove('on'));
+        const map = {present:'sbn-p',late:'sbn-l',absent:'sbn-a'};
+        row.querySelector('.'+map[status])?.classList.add('on');
+    }
+    updateAttCount();
+}
+
+function markAllAtt(status) { attStudents.forEach(s => markAtt(s.id, status)); }
+
+function updateAttCount() {
+    const cnt = Object.values(attMarked).filter(v=>v.status).length;
+    document.getElementById('attMarkedCnt').textContent = `${cnt} / ${attStudents.length} marked`;
+}
+
+async function saveAtt() {
+    const date    = document.getElementById('attDate').value;
+    const cls     = document.getElementById('attClass').value;
+    const subject = document.getElementById('attSubject').value.trim();
+    const room    = document.getElementById('attRoom').value.trim();
+    const period  = document.getElementById('attPeriod').value;
+    const sNote   = document.getElementById('attNote').value.trim();
+
+    if (!date)    { showToast('Select a date','error'); return; }
+    if (!cls)     { showToast('Select a class','error'); return; }
+    if (!subject) { showToast('Enter subject name','error'); return; }
+
+    const unmarked = attStudents.filter(s => !attMarked[s.id]?.status);
+    if (unmarked.length > 0 && !confirm(`${unmarked.length} student(s) not marked. Continue?`)) return;
+
+    const btn = document.getElementById('attSaveBtn');
+    btn.disabled = true; btn.textContent = '⏳ Saving…';
+
+    try {
+        const batch = db.batch();
+        let count = 0;
+        const teacherName = teacherData?.fullName || currentUser.email;
+
+        for (const s of attStudents) {
+            const m = attMarked[s.id];
+            if (!m?.status) continue;
+            const data = {
+                studentId: s.id,
+                studentName: s.fullName || ((s.firstName||'')+' '+(s.lastName||'')).trim(),
+                class: cls, date, subject, teacherName,
+                teacherId: currentUser.uid,
+                room: room||'', period, status: m.status,
+                note: m.note||sNote||'', mode:'offline',
+                markedBy: currentUser.uid,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if (m.docId) batch.update(db.collection('attendance').doc(m.docId), data);
+            else batch.set(db.collection('attendance').doc(), data);
+            count++;
+        }
+        await batch.commit();
+
+        // Update teacher streak
+        await updateStreak();
+        loadDashAttSummary();
+        loadDashStats();
+
+        showToast(`✅ Attendance saved for ${count} students!`, 'success');
+        switchAttTab('hist'); loadAttHistory();
+    } catch(e) {
+        showToast('Error: '+e.message,'error');
+    } finally {
+        btn.disabled=false; btn.textContent='💾 Save Attendance';
+    }
+}
+
+function resetAtt() {
+    attMarked = {};
+    document.getElementById('attSubject').value = '';
+    document.getElementById('attRoom').value    = '';
+    renderAttStudents(); updateAttCount();
+}
+
+// ═══════════════════════════════════════════
+// ATTENDANCE — HISTORY
+// ═══════════════════════════════════════════
+async function loadAttHistory() {
+    const cls  = document.getElementById('hfClass')?.value  || '';
+    const date = document.getElementById('hfDate')?.value   || '';
+    const tbody = document.getElementById('histTbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6"><div class="skel" style="height:38px;margin:6px 0"></div></td></tr>'.repeat(3);
+
+    try {
+        // Simple single-field queries to avoid composite index requirement
+        let snap;
+        if (cls && date) {
+            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).where('class','==',cls).get();
+        } else if (cls) {
+            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).where('class','==',cls).get();
+        } else if (date) {
+            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).where('date','==',date).get();
+        } else {
+            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).get();
+        }
+
+        let records = snap.docs.map(d => ({id:d.id,...d.data()}));
+        // Client-side filter
+        if (cls && date) records = records.filter(r => r.class===cls && r.date===date);
+        else if (date)   records = records.filter(r => r.date===date);
+        // Client-side sort by date desc
+        records.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+        records = records.slice(0, 150);
+
+        if (!records.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state" style="padding:20px"><div class="ei">📭</div><div class="et">No records found</div></div></td></tr>'; return; }
+
+        tbody.innerHTML = records.map(r => {
+            return `<tr>
+                <td><div style="font-weight:700">${r.studentName||'—'}</div><div style="font-size:0.65rem;color:var(--text3)">Class ${r.class||'—'}</div></td>
+                <td>${formatDate(r.date)}</td>
+                <td>${r.subject||'—'}</td>
+                <td>P${r.period||'—'}</td>
+                <td><span class="badge badge-${r.status?.[0]||'p'}">${r.status==='present'?'✅':r.status==='absent'?'❌':'⏰'} ${cap(r.status)}</span></td>
+                <td style="font-size:0.75rem">${r.note||'—'}</td>
+            </tr>`;
+        }).join('');
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:#F87171;text-align:center;padding:16px">Error: ${e.message}</td></tr>`;
+    }
+}
+
+function clearHistFilters() {
+    document.getElementById('hfClass').value = '';
+    document.getElementById('hfDate').value  = '';
+    loadAttHistory();
+}
+
+async function loadAttReport() {
+    const cls = document.getElementById('rpClass').value;
+    const el  = document.getElementById('rpBody');
+    el.innerHTML = '<div class="skel" style="height:50px;margin-bottom:8px"></div>'.repeat(4);
+
+    try {
+        // Simple query, filter client-side
+        const snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).get();
+        const map  = {};
+        snap.forEach(d => {
+            const dd = d.data();
+            if (cls && dd.class !== cls) return;
+            if (!map[dd.studentId]) map[dd.studentId] = {name:dd.studentName||'?',class:dd.class||'—',p:0,a:0,l:0,total:0};
+            map[dd.studentId].total++;
+            if (dd.status==='present') map[dd.studentId].p++;
+            else if (dd.status==='absent') map[dd.studentId].a++;
+            else map[dd.studentId].l++;
+        });
+        const entries = Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
+        if (!entries.length) { el.innerHTML='<div class="empty-state"><div class="ei">📭</div><div class="et">No data yet</div></div>'; return; }
+        el.innerHTML = entries.map(s => {
+            const pct = s.total>0 ? Math.round(((s.p+s.l)/s.total)*100) : 0;
+            const col = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+            return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
+                <div style="width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;flex-shrink:0">${s.name.charAt(0).toUpperCase()}</div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
+                    <div style="font-size:0.68rem;color:var(--text3)">Class ${s.class} · ${s.total} classes · ✅${s.p} ❌${s.a} ⏰${s.l}</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                    <div style="font-weight:800;color:${col}">${pct}%</div>
+                    <div style="height:4px;width:60px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:3px"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div></div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch(e) { el.innerHTML=`<div style="color:#F87171;padding:12px">Error: ${e.message}</div>`; }
+}
+
+function switchAttTab(tab) {
+    ['mark','hist','report'].forEach(t => {
+        document.getElementById('atab-'+t).className = 'tab-pill' + (t===tab?' on':'');
+        document.getElementById('attc-'+t).style.display = t===tab?'block':'none';
+    });
+    if (tab==='hist')   loadAttHistory();
+    if (tab==='report') loadAttReport();
+}
+
+// ═══════════════════════════════════════════
+// COURSE CONTENT
+// ═══════════════════════════════════════════
+async function loadContent() {
+    const el = document.getElementById('contentList');
+    try {
+        // No orderBy to avoid composite index — sort client-side
+        const snap = await db.collection('courseContent')
+            .where('teacherId','==',currentUser.uid)
+            .get();
+        allContent = snap.docs.map(d => ({id:d.id,...d.data()}));
+        // Client-side sort by date desc
+        allContent.sort((a,b) => (b.createdAt?.toMillis?.()||0) - (a.createdAt?.toMillis?.()||0));
+        renderContent();
+    } catch(e) {
+        el.innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><div class="et" style="color:#F87171">Error: ${e.message}</div></div>`;
+    }
+}
+
+function renderContent() {
+    const el  = document.getElementById('contentList');
+    const arr = contentFilter==='all' ? allContent : allContent.filter(c=>c.type===contentFilter);
+    if (!arr.length) {
+        el.innerHTML='<div class="empty-state"><div class="ei">📭</div><div class="et">No content yet</div><div class="es">Tap + Post to add notes, videos or assignments</div></div>';
+        return;
+    }
+    const typeMap = {note:['📝','ctb-note'],video:['🎥','ctb-video'],assign:['📚','ctb-assign'],announce:['📣','ctb-announce'],link:['🔗','ctb-link']};
+    el.innerHTML = arr.map(c => {
+        const [icon, cls] = typeMap[c.type]||['📄','ctb-note'];
+        const target = c.targetClass==='all' ? 'All Classes' : 'Class '+c.targetClass;
+        return `<div class="content-card">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+                <div style="font-size:1.5rem;flex-shrink:0">${icon}</div>
+                <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px">
+                        <span class="content-type-badge ${cls}">${cap(c.type)}</span>
+                        <span class="course-chip">${c.subject||'General'}</span>
+                        <span style="font-size:0.68rem;color:var(--text3)">${target}</span>
+                    </div>
+                    <div style="font-weight:700;font-size:0.875rem;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title||'Untitled'}</div>
+                    <div style="font-size:0.75rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${c.description||''}</div>
+                    ${c.dueDate?`<div style="font-size:0.7rem;color:var(--amber);margin-top:4px">📅 Due: ${formatDate(c.dueDate)}</div>`:''}
+                    ${c.link?`<a href="${c.link}" target="_blank" style="font-size:0.72rem;color:var(--teal);margin-top:4px;display:inline-block">🔗 Open Link</a>`:''}
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+                    <button class="btn-ghost btn-sm" onclick="viewContent('${c.id}')">👁</button>
+                    <button class="btn-danger btn-sm" onclick="deleteContent('${c.id}')">🗑</button>
+                </div>
+            </div>
+            <div style="font-size:0.65rem;color:var(--text3);margin-top:8px;text-align:right">${c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString('en-IN'):''}</div>
+        </div>`;
+    }).join('');
+}
+
+function filterContent(type, btn) {
+    contentFilter = type;
+    document.querySelectorAll('#contentTypeTabs .tab-pill').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    renderContent();
+}
+
+function openPostModal(type) {
+    document.getElementById('postType').value = type;
+    document.getElementById('postTitle').value   = '';
+    document.getElementById('postDesc').value    = '';
+    document.getElementById('postLink').value    = '';
+    document.getElementById('postSubject').value = '';
+    document.getElementById('postClass').value   = 'all';
+    updatePostForm();
+    openModal('postModal');
+    navigateTo('courses');
+}
+
+function updatePostForm() {
+    const t = document.getElementById('postType').value;
+    document.getElementById('postLinkWrap').style.display = (t==='video'||t==='link') ? 'block':'none';
+    document.getElementById('postDueWrap').style.display  = t==='assign' ? 'block':'none';
+    const titles = {note:'📝 Post Study Notes',video:'🎥 Post Video',assign:'📚 Post Assignment',announce:'📣 Post Announcement',link:'🔗 Share Link'};
+    document.getElementById('postModalTitle').textContent = titles[t]||'Post Content';
+}
+
+async function savePost() {
+    const title   = document.getElementById('postTitle').value.trim();
+    const desc    = document.getElementById('postDesc').value.trim();
+    const type    = document.getElementById('postType').value;
+    const subj    = document.getElementById('postSubject').value.trim();
+    const cls     = document.getElementById('postClass').value;
+    const link    = document.getElementById('postLink').value.trim();
+    const due     = document.getElementById('postDue').value;
+
+    if (!title) { showToast('Enter a title','error'); return; }
+
+    try {
+        await db.collection('courseContent').add({
+            title, description:desc, type, subject:subj||'General',
+            targetClass:cls, link:link||'', dueDate:due||'',
+            teacherId: currentUser.uid,
+            teacherName: teacherData?.fullName || currentUser.email,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        closeModal('postModal');
+        showToast('✅ Content published!','success');
+        loadContent(); loadDashStats();
+    } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+function viewContent(id) {
+    const c = allContent.find(x=>x.id===id);
+    if (!c) return;
+    document.getElementById('vmTitle').textContent = c.title||'Content';
+    document.getElementById('vmBody').innerHTML = `
+        <div style="margin-bottom:12px;display:flex;gap:7px;flex-wrap:wrap">
+            <span class="course-chip">${cap(c.type)}</span>
+            <span class="course-chip">${c.subject||'General'}</span>
+            <span class="course-chip">${c.targetClass==='all'?'All Classes':'Class '+c.targetClass}</span>
+        </div>
+        <div style="font-size:0.875rem;line-height:1.7;color:var(--text2);margin-bottom:12px;white-space:pre-wrap">${c.description||'No description'}</div>
+        ${c.link?`<a href="${c.link}" target="_blank" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:0.82rem;padding:8px 14px">🔗 Open Link</a>`:''}
+        ${c.dueDate?`<div style="font-size:0.8rem;color:var(--amber);margin-top:8px">📅 Due Date: ${formatDate(c.dueDate)}</div>`:''}
+        <div style="font-size:0.7rem;color:var(--text3);margin-top:12px">Posted by ${c.teacherName||'You'}</div>`;
+    openModal('viewModal');
+}
+
+async function deleteContent(id) {
+    if (!confirm('Delete this content?')) return;
+    try {
+        await db.collection('courseContent').doc(id).delete();
+        showToast('Deleted','info');
+        loadContent(); loadDashStats();
+    } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ═══════════════════════════════════════════
+// STUDENTS
+// ═══════════════════════════════════════════
+async function loadMyStudents() {
+    const cls = document.getElementById('stuFilterClass')?.value || '';
+    const el  = document.getElementById('studentTileList');
+    el.innerHTML = '<div class="skel" style="height:58px;margin-bottom:8px;border-radius:13px"></div>'.repeat(4);
+
+    try {
+        let snap;
+        if (cls) snap = await db.collection('students').where('class','==',cls).get();
+        else snap = await db.collection('students').get();
+
+        if (snap.empty) { el.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">No students found</div></div>'; return; }
+
+        // Get attendance % for each student
+        const students = snap.docs.map(d=>({id:d.id,...d.data()}));
+        el.innerHTML = students.map(s => {
+            const name = s.fullName||((s.firstName||'')+' '+(s.lastName||'')).trim()||'Student';
+            const cls  = s.class||s.roleData?.class||'—';
+            return `<div class="student-tile">
+                <div style="width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;flex-shrink:0">${name.charAt(0).toUpperCase()}</div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+                    <div style="font-size:0.7rem;color:var(--text2);margin-top:1px">Class ${cls} · Roll ${s.rollNumber||s.id.slice(-4).toUpperCase()}</div>
+                </div>
+                <button class="btn-ghost btn-sm" onclick="viewStudentAtt('${s.id}','${name}')">📊</button>
+            </div>`;
+        }).join('');
+    } catch(e) {
+        el.innerHTML=`<div class="empty-state"><div class="ei">⚠️</div><div class="et" style="color:#F87171">Error: ${e.message}</div></div>`;
+    }
+}
+
+async function viewStudentAtt(id, name) {
+    document.getElementById('vmTitle').textContent = '📊 ' + name;
+    document.getElementById('vmBody').innerHTML = '<div class="skel" style="height:200px"></div>';
+    openModal('viewModal');
+
+    try {
+        // Simple query, sort client-side
+        const snap = await db.collection('attendance')
+            .where('studentId','==',id)
+            .where('markedBy','==',currentUser.uid)
+            .get();
+        const docs = snap.docs.sort((a,b) => (b.data().date||'').localeCompare(a.data().date||'')).slice(0,50);
+        if (snap.empty) { document.getElementById('vmBody').innerHTML='<div class="empty-state"><div class="ei">📭</div><div class="et">No attendance records for this student</div></div>'; return; }
+        let p=0,a=0,l=0,total=0;
+        const rows = docs.map(d => {
+            const r=d.data(); total++;
+            if (r.status==='present') p++;
+            else if (r.status==='absent') a++;
+            else l++;
+            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+                <div style="flex:1"><div style="font-weight:600;font-size:0.82rem">${r.subject||'—'}</div><div style="font-size:0.7rem;color:var(--text3)">${formatDate(r.date)} · P${r.period||'—'}</div></div>
+                <span class="badge badge-${r.status?.[0]||'p'}">${r.status==='present'?'✅':r.status==='absent'?'❌':'⏰'} ${cap(r.status)}</span>
+            </div>`;
+        }).join('');
+        const pct = total>0?Math.round(((p+l)/total)*100):0;
+        const col = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+        document.getElementById('vmBody').innerHTML = `
+            <div style="display:flex;gap:14px;margin-bottom:16px;background:var(--card2);border-radius:12px;padding:14px;text-align:center">
+                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:var(--green)">✅ ${p}</div><div style="font-size:0.68rem;color:var(--text2)">Present</div></div>
+                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:var(--amber)">⏰ ${l}</div><div style="font-size:0.68rem;color:var(--text2)">Late</div></div>
+                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:var(--red)">❌ ${a}</div><div style="font-size:0.68rem;color:var(--text2)">Absent</div></div>
+                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:${col}">${pct}%</div><div style="font-size:0.68rem;color:var(--text2)">Overall</div></div>
+            </div>
+            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;margin-bottom:16px">
+                <div style="height:100%;width:${pct}%;background:${col};border-radius:3px;transition:width 0.5s"></div>
+            </div>
+            <div style="max-height:300px;overflow-y:auto">${rows}</div>`;
+    } catch(e) { document.getElementById('vmBody').innerHTML=`<div style="color:#F87171">Error: ${e.message}</div>`; }
+}
+
+// ═══════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════
+async function saveProfile() {
+    const name     = document.getElementById('profNameInput').value.trim();
+    const subjects = document.getElementById('profSubjects').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const classes  = document.getElementById('profClsInput').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const phone    = document.getElementById('profPhone').value.trim();
+
+    try {
+        await db.collection('teachers').doc(currentUser.uid).update({ fullName:name, subjects, classes, phone });
+        teacherData = { ...teacherData, fullName:name, subjects, classes, phone };
+        document.getElementById('hName').textContent  = name;
+        document.getElementById('pName').textContent  = name;
+        document.getElementById('pRole').textContent  = subjects.join(', ')||'Teacher';
+        document.getElementById('pAvatar').textContent = name.charAt(0).toUpperCase();
+        showToast('✅ Profile saved!','success');
+    } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function navigateTo(page) {
+    currentPage = page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-'+page)?.classList.add('active');
+    document.getElementById('nav-'+page)?.classList.add('active');
+    if (page==='att') { loadAttHistory(); }
+    if (page==='courses') { loadContent(); }
+    if (page==='students') { loadMyStudents(); }
+}
+
+// ═══════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function showToast(msg, type='success') {
+    const t = document.getElementById('toast');
+    const c = {success:'linear-gradient(135deg,#065F46,#059669)',error:'linear-gradient(135deg,#7F1D1D,#DC2626)',warning:'linear-gradient(135deg,#78350F,#D97706)',info:'linear-gradient(135deg,#1E3A5F,#2563EB)'};
+    t.style.background = c[type]||c.success;
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function todayStr() {
+    const d = new Date();
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function formatDate(str) {
+    if (!str) return '—';
+    try { return new Date(str+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+    catch(e) { return str; }
+}
+function cap(s) { return s?s.charAt(0).toUpperCase()+s.slice(1):'—'; }
 </script>
-</body>
-</html>
 </body>
 </html>
