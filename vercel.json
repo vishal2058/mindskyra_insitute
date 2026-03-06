@@ -2,10 +2,6 @@
   "version": 2,
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/login", "dest": "/login.html" },
-    { "src": "/teacher", "dest": "/teacher.html" },
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/app", "dest": "/app.html" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
