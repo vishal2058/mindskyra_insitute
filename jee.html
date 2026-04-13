@@ -1,1 +1,436 @@
+import { useState } from "react";
 
+const data = {
+  physics: {
+    label: "Physics",
+    color: "#f97316",
+    accent: "#fed7aa",
+    bg: "#431407",
+    subjectShare: 22.5,
+    classDistribution: { "Class XI": 48, "Class XII": 52 },
+    chapters: [
+      { name: "Modern Physics", weightage: 16.7, questions: 5, priority: "CRITICAL", class: "XII" },
+      { name: "Current Electricity", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
+      { name: "Electrostatics", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
+      { name: "Ray Optics", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
+      { name: "Thermodynamics", weightage: 10, questions: 3, priority: "HIGH", class: "XI" },
+      { name: "Rotational Motion", weightage: 8, questions: 2, priority: "HIGH", class: "XI" },
+      { name: "Magnetic Effects", weightage: 7, questions: 2, priority: "HIGH", class: "XII" },
+      { name: "Alternating Current", weightage: 6, questions: 2, priority: "HIGH", class: "XII" },
+      { name: "Kinematics", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "Laws of Motion", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "Wave Optics", weightage: 4, questions: 1, priority: "MODERATE", class: "XII" },
+      { name: "Kinetic Theory", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "EM Waves", weightage: 2, questions: 1, priority: "LOW", class: "XII" },
+      { name: "Others", weightage: 2.3, questions: 1, priority: "LOW", class: "—" },
+    ],
+    tips: [
+      "Mechanics (Kinematics+Rotational+Laws) = ~18% combined — never skip",
+      "Electrostatics + Current Electricity = your guaranteed 6–8 marks",
+      "Modern Physics has highest single-chapter weightage (16.7%) — master Bohr, radioactivity, photoelectric",
+      "Optics (Ray + Wave) collectively contribute ~14% — very reliable scoring zone",
+    ],
+  },
+  chemistry: {
+    label: "Chemistry",
+    color: "#22c55e",
+    accent: "#bbf7d0",
+    bg: "#052e16",
+    subjectShare: 22.5,
+    classDistribution: { "Class XI": 44, "Class XII": 56 },
+    chapters: [
+      { name: "Coordination Compounds", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
+      { name: "d & f-Block + Periodic", weightage: 9, questions: 3, priority: "CRITICAL", class: "XII" },
+      { name: "Chemical Bonding", weightage: 8, questions: 2, priority: "CRITICAL", class: "XI" },
+      { name: "Aldehyde/Ketone/Acids", weightage: 8, questions: 2, priority: "CRITICAL", class: "XII" },
+      { name: "Thermodynamics (Chem)", weightage: 7, questions: 2, priority: "HIGH", class: "XI" },
+      { name: "Electrochemistry", weightage: 7, questions: 2, priority: "HIGH", class: "XII" },
+      { name: "Chemical Equilibrium", weightage: 6, questions: 2, priority: "HIGH", class: "XI" },
+      { name: "Chemical Kinetics", weightage: 6, questions: 2, priority: "HIGH", class: "XII" },
+      { name: "Solutions", weightage: 5, questions: 1, priority: "HIGH", class: "XII" },
+      { name: "Organic Reactions (basics)", weightage: 5, questions: 1, priority: "MODERATE", class: "XI/XII" },
+      { name: "Atomic Structure", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "p-Block Elements", weightage: 5, questions: 1, priority: "MODERATE", class: "XI/XII" },
+      { name: "Biomolecules + Polymers", weightage: 4, questions: 1, priority: "LOW", class: "XII" },
+      { name: "Others", weightage: 5, questions: 1, priority: "LOW", class: "—" },
+    ],
+    tips: [
+      "Chemistry is the fastest scoring subject — NCERT is king here",
+      "Coordination Compounds + d/f-block = highest inorganic yield",
+      "Physical Chemistry (Electrochemistry + Kinetics + Solutions) = reliable numerical zone",
+      "Organic reactions (Aldehydes/Amines/Halogens) follow predictable patterns — memorize reaction charts",
+    ],
+  },
+  maths: {
+    label: "Mathematics",
+    color: "#818cf8",
+    accent: "#c7d2fe",
+    bg: "#1e1b4b",
+    subjectShare: 35,
+    classDistribution: { "Class XI": 46, "Class XII": 54 },
+    chapters: [
+      { name: "Calculus (Integral)", weightage: 15, questions: 4, priority: "CRITICAL", class: "XII" },
+      { name: "Calculus (Differential)", weightage: 12, questions: 3, priority: "CRITICAL", class: "XI/XII" },
+      { name: "3D Geometry + Vectors", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
+      { name: "Matrices & Determinants", weightage: 8, questions: 2, priority: "CRITICAL", class: "XII" },
+      { name: "Coordinate Geometry", weightage: 8, questions: 2, priority: "CRITICAL", class: "XI" },
+      { name: "Probability", weightage: 7, questions: 2, priority: "HIGH", class: "XI/XII" },
+      { name: "Complex Numbers", weightage: 6, questions: 2, priority: "HIGH", class: "XI" },
+      { name: "Differential Equations", weightage: 6, questions: 2, priority: "HIGH", class: "XII" },
+      { name: "Binomial Theorem", weightage: 5, questions: 1, priority: "HIGH", class: "XI" },
+      { name: "Sequences & Series", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "Permutations & Comb.", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "Conic Sections", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "Trigonometry", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
+      { name: "Mathematical Reasoning", weightage: 3, questions: 1, priority: "LOW", class: "XI/XII" },
+      { name: "Statistics", weightage: 3, questions: 1, priority: "LOW", class: "XI/XII" },
+    ],
+    tips: [
+      "Calculus alone = 27% of Maths section — your #1 investment",
+      "3D Geometry + Vectors = very formulaic, high ROI for time invested",
+      "Matrices & Determinants: easy marks if practiced — never leave this",
+      "Maths carries 35% of the total paper — a strong Maths game changes your percentile",
+    ],
+  },
+};
+
+const priorityColors = {
+  CRITICAL: { bg: "#450a0a", text: "#fca5a5", dot: "#ef4444" },
+  HIGH: { bg: "#422006", text: "#fcd34d", dot: "#f59e0b" },
+  MODERATE: { bg: "#0c2340", text: "#93c5fd", dot: "#60a5fa" },
+  LOW: { bg: "#1f2937", text: "#9ca3af", dot: "#6b7280" },
+};
+
+const WeightageBar = ({ value, max, color }) => (
+  <div style={{ background: "#1f2937", borderRadius: 4, height: 6, width: "100%", overflow: "hidden" }}>
+    <div
+      style={{
+        height: "100%",
+        width: ${(value / max) * 100}%,
+        background: color,
+        borderRadius: 4,
+        transition: "width 0.6s ease",
+      }}
+    />
+  </div>
+);
+
+const SubjectDot = ({ pct, label, color }) => (
+  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+    <div
+      style={{
+        width: 56,
+        height: 56,
+        borderRadius: "50%",
+        border: 3px solid ${color},
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 13,
+        fontWeight: 700,
+        color,
+        background: ${color}15,
+      }}
+    >
+      {pct}%
+    </div>
+    <span style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", maxWidth: 60 }}>{label}</span>
+  </div>
+);
+
+export default function JEEDashboard() {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [activeSubject, setActiveSubject] = useState("physics");
+
+  const subject = data[activeSubject];
+
+  return (
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "#0a0a0f",
+        fontFamily: "'Georgia', serif",
+        color: "#e2e8f0",
+        padding: "24px 16px",
+      }}
+    >
+      {/* Header */}
+      <div style={{ maxWidth: 900, margin: "0 auto" }}>
+        <div style={{ marginBottom: 32, borderBottom: "1px solid #1f2937", paddingBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+            <div>
+              <div style={{ fontSize: 11, letterSpacing: 4, color: "#6b7280", textTransform: "uppercase", marginBottom: 6 }}>
+                National Testing Agency · Official NTA Analysis
+              </div>
+              <h1
+                style={{
+                  fontSize: 28,
+                  fontWeight: 700,
+                  background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  margin: 0,
+                  lineHeight: 1.2,
+                }}
+              >
+                JEE Main 2026
+              </h1>
+              <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>
+                Deep Syllabus Analysis · Chapter-wise Weightage · Strategy Guide
+              </div>
+            </div>
+            <div
+              style={{
+                background: "#0f172a",
+                border: "1px solid #1e3a5f",
+                borderRadius: 8,
+                padding: "10px 16px",
+                fontSize: 12,
+                color: "#60a5fa",
+                textAlign: "right",
+              }}
+            >
+              <div style={{ fontWeight: 700, fontSize: 14 }}>✓ Session 2 Completed</div>
+              <div style={{ color: "#475569", marginTop: 2 }}>April 2–8, 2026</div>
+              <div style={{ color: "#475569" }}>Based on 5-Year PYQ Analysis</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nav Tabs */}
+        <div style={{ display: "flex", gap: 4, marginBottom: 28, flexWrap: "wrap" }}>
+          {["overview", "subjects", "strategy", "deleted"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                padding: "8px 20px",
+                borderRadius: 6,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 13,
+                fontFamily: "inherit",
+                fontWeight: 600,
+                letterSpacing: 0.5,
+                transition: "all 0.2s",
+                background: activeTab === tab ? "#1e3a5f" : "#111827",
+                color: activeTab === tab ? "#93c5fd" : "#6b7280",
+                borderBottom: activeTab === tab ? "2px solid #3b82f6" : "2px solid transparent",
+              }}
+            >
+              {tab === "overview" ? "📊 Overview" : tab === "subjects" ? "📚 Subjects" : tab === "strategy" ? "🎯 Strategy" : "🗑 Deleted Topics"}
+            </button>
+          ))}
+        </div>
+
+        {/* ── OVERVIEW TAB ── */}
+        {activeTab === "overview" && (
+          <div>
+            {/* Stat Cards */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 28 }}>
+              {[
+                { label: "Total Questions", value: "90", sub: "30 per subject", icon: "📝" },
+                { label: "Total Marks", value: "300", sub: "+4 / −1 scheme", icon: "🏆" },
+                { label: "Duration", value: "3 hrs", sub: "180 minutes", icon: "⏱" },
+                { label: "Sessions", value: "2", sub: "Jan & Apr 2026", icon: "📅" },
+                { label: "Mode", value: "CBT", sub: "Computer-based", icon: "💻" },
+                { label: "Subjects", value: "3", sub: "Phy · Chem · Math", icon: "🔬" },
+              ].map((card) => (
+                <div
+                  key={card.label}
+                  style={{
+                    background: "#0f172a",
+                    border: "1px solid #1e293b",
+                    borderRadius: 10,
+                    padding: "14px 16px",
+                  }}
+                >
+                  <div style={{ fontSize: 20, marginBottom: 6 }}>{card.icon}</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9" }}>{card.value}</div>
+                  <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>{card.label}</div>
+                  <div style={{ fontSize: 11, color: "#475569" }}>{card.sub}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Subject Share */}
+            <div
+              style={{
+                background: "#0f172a",
+                border: "1px solid #1e293b",
+                borderRadius: 12,
+                padding: 24,
+                marginBottom: 24,
+              }}
+            >
+              <h2 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#cbd5e1" }}>
+                Subject-wise Marks Distribution (Paper 1)
+              </h2>
+              <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
+                <SubjectDot pct={35} label="Mathematics" color="#818cf8" />
+                <SubjectDot pct={22.5} label="Physics" color="#f97316" />
+                <SubjectDot pct={22.5} label="Chemistry" color="#22c55e" />
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  {[
+                    { label: "Mathematics", pct: 35, color: "#818cf8" },
+                    { label: "Physics", pct: 22.5, color: "#f97316" },
+                    { label: "Chemistry", pct: 22.5, color: "#22c55e" },
+                  ].map((s) => (
+                    <div key={s.label} style={{ marginBottom: 12 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
+                        <span style={{ color: s.color, fontWeight: 600 }}>{s.label}</span>
+                        <span style={{ color: "#64748b" }}>{s.pct}%</span>
+                      </div>
+                      <WeightageBar value={s.pct} max={35} color={s.color} />
+                    </div>
+                  ))}
+                  <div style={{ marginTop: 14, padding: "10px 12px", background: "#1e293b", borderRadius: 8, fontSize: 12, color: "#94a3b8", borderLeft: "3px solid #818cf8" }}>
+                    💡 Mathematics carries the highest share. A strong Maths performance significantly boosts your percentile.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Exam Pattern */}
+            <div
+              style={{
+                background: "#0f172a",
+                border: "1px solid #1e293b",
+                borderRadius: 12,
+                padding: 24,
+              }}
+            >
+              <h2 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#cbd5e1" }}>
+                Section-wise Paper Structure
+              </h2>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
+                {[
+                  {
+                    sec: "Section A",
+                    desc: "20 MCQs (Single Correct)",
+                    marks: "80 marks/subject",
+                    note: "−1 for wrong answer",
+                    col: "#3b82f6",
+                  },
+                  {
+                    sec: "Section B",
+                    desc: "10 Numerical Value Qs",
+                    marks: "Attempt any 5",
+                    note: "No negative marking",
+                    col: "#a855f7",
+                  },
+                ].map((s) => (
+                  <div
+                    key={s.sec}
+                    style={{
+                      background: "#111827",
+                      border: 1px solid ${s.col}40,
+                      borderRadius: 10,
+                      padding: "16px",
+                      borderTop: 3px solid ${s.col},
+                    }}
+                  >
+                    <div style={{ fontSize: 14, fontWeight: 700, color: s.col, marginBottom: 8 }}>{s.sec}</div>
+                    <div style={{ fontSize: 13, color: "#e2e8f0", marginBottom: 4 }}>{s.desc}</div>
+                    <div style={{ fontSize: 12, color: "#a855f7" }}>{s.marks}</div>
+                    <div style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>{s.note}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 16, padding: "12px 14px", background: "#1a1a2e", borderRadius: 8, fontSize: 12, color: "#94a3b8" }}>
+                <strong style={{ color: "#fbbf24" }}>Marking Scheme:</strong> Correct = +4 | Wrong MCQ = −1 | Unattempted = 0 | Section B (numerical) has no negative marking — always attempt all 5!
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── SUBJECTS TAB ── */}
+        {activeTab === "subjects" && (
+          <div>
+            {/* Subject Switcher */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+              {Object.keys(data).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveSubject(key)}
+                  style={{
+                    padding: "8px 22px",
+                    borderRadius: 8,
+                    border: 1px solid ${data[key].color}40,
+                    cursor: "pointer",
+                    fontSize: 13,
+                    fontFamily: "inherit",
+                    fontWeight: 700,
+                    background: activeSubject === key ? ${data[key].color}20 : "#111827",
+                    color: activeSubject === key ? data[key].color : "#6b7280",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {data[key].label}
+                </button>
+              ))}
+            </div>
+
+            {/* Subject Header */}
+            <div
+              style={{
+                background: ${subject.color}10,
+                border: 1px solid ${subject.color}30,
+                borderRadius: 12,
+                padding: "16px 20px",
+                marginBottom: 20,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 12,
+              }}
+            >
+              <div>
+                <h2 style={{ margin: 0, color: subject.color, fontSize: 20, fontWeight: 700 }}>{subject.label}</h2>
+                <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
+                  Paper share: <strong style={{ color: subject.color }}>{subject.subjectShare}%</strong> · 30 Questions · 120 Marks
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 16 }}>
+                {Object.entries(subject.classDistribution).map(([cls, pct]) => (
+                  <div key={cls} style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: subject.color }}>{pct}%</div>
+                    <div style={{ fontSize: 11, color: "#64748b" }}>{cls}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Chapter Table */}
+            <div
+              style={{
+                background: "#0f172a",
+                border: "1px solid #1e293b",
+                borderRadius: 12,
+                overflow: "hidden",
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "2fr 1fr 80px 90px",
+                  padding: "10px 16px",
+                  background: "#111827",
+                  fontSize: 11,
+                  color: "#64748b",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  fontWeight: 700,
+                }}
+              >
+                <span>Chapter</span>
+                <span>Weightage (5yr)</span>
+                <span>~Qs</span>
+                <span>Priority</span>
+              </div>
+              {subject.chapters.map((ch, i) => {
+                const pc = priorityColors[ch.priority];
+                const maxW = Math.max(...subject.chapters.map((c) => c.weightage));
+                return (
