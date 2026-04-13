@@ -1,28 +1,404 @@
-import { useState } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>JEE Main 2026 — Syllabus Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f;
+    --surface: #0f172a;
+    --surface2: #111827;
+    --border: #1e293b;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --muted2: #475569;
+    --muted3: #6b7280;
+    --physics: #f97316;
+    --chemistry: #22c55e;
+    --maths: #818cf8;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--text);
+    padding: 24px 16px;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
 
-const data = {
+  /* HEADER */
+  .header { max-width: 900px; margin: 0 auto 0; border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 32px; }
+  .header-row { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header-label { font-size: 11px; letter-spacing: 4px; color: var(--muted3); text-transform: uppercase; margin-bottom: 6px; font-family: 'JetBrains Mono', monospace; }
+  .header-title {
+    font-size: 28px; font-weight: 700;
+    background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+  }
+  .header-sub { font-size: 13px; color: var(--muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .header-badge {
+    background: #0f172a; border: 1px solid #1e3a5f; border-radius: 8px;
+    padding: 10px 16px; font-size: 12px; color: #60a5fa; text-align: right; font-family: 'JetBrains Mono', monospace;
+  }
+  .header-badge .badge-title { font-weight: 700; font-size: 14px; }
+  .header-badge .badge-sub { color: var(--muted2); margin-top: 2px; }
+
+  /* NAV TABS */
+  .tabs { max-width: 900px; margin: 0 auto; display: flex; gap: 4px; margin-bottom: 28px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 8px 20px; border-radius: 6px; border: none; cursor: pointer;
+    font-size: 13px; font-family: 'EB Garamond', serif; font-weight: 600;
+    letter-spacing: 0.5px; transition: all 0.2s;
+    background: var(--surface2); color: var(--muted3);
+    border-bottom: 2px solid transparent;
+  }
+  .tab-btn.active { background: #1e3a5f; color: #93c5fd; border-bottom-color: #3b82f6; }
+
+  /* MAIN CONTENT */
+  .content { max-width: 900px; margin: 0 auto; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* STAT CARDS */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-2px); border-color: #2d3f5f; }
+  .stat-icon { font-size: 20px; margin-bottom: 6px; }
+  .stat-value { font-size: 22px; font-weight: 700; color: #f1f5f9; font-family: 'JetBrains Mono', monospace; }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .stat-sub { font-size: 11px; color: var(--muted2); }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .card-title { font-size: 16px; font-weight: 700; color: #cbd5e1; margin-bottom: 20px; }
+
+  /* SUBJECT DOTS */
+  .dots-row { display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 24px; }
+  .subject-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .subject-dot {
+    width: 56px; height: 56px; border-radius: 50%;
+    border-width: 3px; border-style: solid;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  }
+  .subject-dot-label { font-size: 11px; color: var(--muted3); text-align: center; max-width: 60px; }
+
+  /* WEIGHTAGE BAR */
+  .bar-wrap { background: #1f2937; border-radius: 4px; height: 6px; width: 100%; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; }
+  .bar-label-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+
+  /* BARS SECTION */
+  .bars-section { flex: 1; min-width: 200px; }
+  .bar-item { margin-bottom: 12px; }
+  .info-box { margin-top: 14px; padding: 10px 12px; background: #1e293b; border-radius: 8px; font-size: 12px; color: #94a3b8; border-left: 3px solid var(--maths); }
+
+  /* SECTION STRUCTURE */
+  .section-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .section-card { background: var(--surface2); border-radius: 10px; padding: 16px; }
+  .section-name { font-size: 14px; font-weight: 700; margin-bottom: 8px; font-family: 'JetBrains Mono', monospace; }
+  .section-desc { font-size: 13px; color: var(--text); margin-bottom: 4px; }
+  .section-marks { font-size: 12px; color: #a855f7; }
+  .section-note { font-size: 11px; color: var(--muted3); margin-top: 4px; }
+  .marking-box { margin-top: 16px; padding: 12px 14px; background: #1a1a2e; border-radius: 8px; font-size: 12px; color: #94a3b8; }
+
+  /* SUBJECTS TAB */
+  .subject-switcher { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .subject-btn {
+    padding: 8px 22px; border-radius: 8px; cursor: pointer;
+    font-size: 13px; font-family: 'EB Garamond', serif; font-weight: 700;
+    transition: all 0.2s; background: var(--surface2);
+    color: var(--muted3);
+  }
+  .subject-header {
+    border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;
+  }
+  .subject-header h2 { font-size: 20px; font-weight: 700; }
+  .subject-header-sub { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .class-dist { display: flex; gap: 16px; }
+  .class-dist-item { text-align: center; }
+  .class-dist-pct { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .class-dist-label { font-size: 11px; color: var(--muted); }
+
+  /* CHAPTER TABLE */
+  .chapter-table { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 20px; }
+  .chapter-header {
+    display: grid; grid-template-columns: 2fr 1fr 80px 90px;
+    padding: 10px 16px; background: var(--surface2);
+    font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  }
+  .chapter-row {
+    display: grid; grid-template-columns: 2fr 1fr 80px 90px;
+    padding: 10px 16px; align-items: center; font-size: 13px;
+    border-top: 1px solid #1e293b; transition: background 0.15s;
+  }
+  .chapter-row:hover { background: #111827; }
+  .chapter-name { font-weight: 600; color: var(--text); }
+  .chapter-class { font-size: 10px; color: var(--muted3); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+  .chapter-weightage { font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .chapter-qs { font-family: 'JetBrains Mono', monospace; color: #94a3b8; }
+  .priority-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 4px; font-size: 10px;
+    font-weight: 700; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.5px;
+  }
+  .priority-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  /* TIPS */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+  .tip-card { background: var(--surface2); border-radius: 8px; padding: 12px 14px; font-size: 12px; color: #94a3b8; border-left-width: 3px; border-left-style: solid; line-height: 1.5; }
+
+  /* STRATEGY TAB */
+  .strategy-intro { background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; padding: 20px; margin-bottom: 24px; }
+  .strategy-intro p { font-size: 14px; color: #94a3b8; line-height: 1.7; }
+  .strategy-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .strategy-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .strategy-card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .strategy-item { font-size: 12px; color: #94a3b8; padding: 6px 0; border-bottom: 1px solid #1e293b; line-height: 1.5; display: flex; gap: 8px; align-items: flex-start; }
+  .strategy-item:last-child { border-bottom: none; }
+  .strategy-bullet { flex-shrink: 0; margin-top: 2px; }
+  .timeline { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .timeline-title { font-size: 15px; font-weight: 700; color: #cbd5e1; margin-bottom: 16px; }
+  .timeline-row { display: grid; grid-template-columns: 80px 1fr; gap: 16px; align-items: start; margin-bottom: 16px; }
+  .timeline-week { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted3); padding-top: 4px; }
+  .timeline-content { background: var(--surface2); border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #94a3b8; line-height: 1.5; }
+
+  /* DELETED TOPICS TAB */
+  .deleted-intro { background: #1a0a0a; border: 1px solid #450a0a; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; font-size: 13px; color: #fca5a5; }
+  .deleted-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .deleted-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .deleted-card-header { padding: 10px 14px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .deleted-item { padding: 7px 14px; font-size: 12px; color: #6b7280; border-top: 1px solid #1e293b; display: flex; align-items: center; gap: 8px; text-decoration: line-through; }
+  .deleted-item::before { content: '✕'; color: #450a0a; font-size: 10px; flex-shrink: 0; }
+
+  @media (max-width: 600px) {
+    .chapter-header, .chapter-row { grid-template-columns: 1.5fr 1fr 50px 70px; font-size: 11px; }
+    .header-title { font-size: 22px; }
+    .dots-row { flex-direction: row; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <div>
+      <div class="header-label">National Testing Agency · Official NTA Analysis</div>
+      <h1 class="header-title">JEE Main 2026</h1>
+      <div class="header-sub">Deep Syllabus Analysis · Chapter-wise Weightage · Strategy Guide</div>
+    </div>
+    <div class="header-badge">
+      <div class="badge-title">✓ Session 2 Completed</div>
+      <div class="badge-sub">April 2–8, 2026</div>
+      <div class="badge-sub">Based on 5-Year PYQ Analysis</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" data-tab="overview">📊 Overview</button>
+  <button class="tab-btn" data-tab="subjects">📚 Subjects</button>
+  <button class="tab-btn" data-tab="strategy">🎯 Strategy</button>
+  <button class="tab-btn" data-tab="deleted">🗑 Deleted Topics</button>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- ── OVERVIEW TAB ── -->
+  <div class="tab-panel active" id="tab-overview">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-icon">📝</div><div class="stat-value">90</div><div class="stat-label">Total Questions</div><div class="stat-sub">30 per subject</div></div>
+      <div class="stat-card"><div class="stat-icon">🏆</div><div class="stat-value">300</div><div class="stat-label">Total Marks</div><div class="stat-sub">+4 / −1 scheme</div></div>
+      <div class="stat-card"><div class="stat-icon">⏱</div><div class="stat-value">3 hrs</div><div class="stat-label">Duration</div><div class="stat-sub">180 minutes</div></div>
+      <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-value">2</div><div class="stat-label">Sessions</div><div class="stat-sub">Jan & Apr 2026</div></div>
+      <div class="stat-card"><div class="stat-icon">💻</div><div class="stat-value">CBT</div><div class="stat-label">Mode</div><div class="stat-sub">Computer-based</div></div>
+      <div class="stat-card"><div class="stat-icon">🔬</div><div class="stat-value">3</div><div class="stat-label">Subjects</div><div class="stat-sub">Phy · Chem · Math</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Subject-wise Marks Distribution (Paper 1)</div>
+      <div class="dots-row">
+        <div class="subject-dot-wrap">
+          <div class="subject-dot" style="border-color:#818cf8;color:#818cf8;background:#818cf815;">35%</div>
+          <div class="subject-dot-label">Mathematics</div>
+        </div>
+        <div class="subject-dot-wrap">
+          <div class="subject-dot" style="border-color:#f97316;color:#f97316;background:#f9731615;">22.5%</div>
+          <div class="subject-dot-label">Physics</div>
+        </div>
+        <div class="subject-dot-wrap">
+          <div class="subject-dot" style="border-color:#22c55e;color:#22c55e;background:#22c55e15;">22.5%</div>
+          <div class="subject-dot-label">Chemistry</div>
+        </div>
+        <div class="bars-section">
+          <div class="bar-item">
+            <div class="bar-label-row"><span style="color:#818cf8;font-weight:600;">Mathematics</span><span style="color:var(--muted);" class="mono">35%</span></div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:100%;background:#818cf8;"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label-row"><span style="color:#f97316;font-weight:600;">Physics</span><span style="color:var(--muted);" class="mono">22.5%</span></div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:64.3%;background:#f97316;"></div></div>
+          </div>
+          <div class="bar-item">
+            <div class="bar-label-row"><span style="color:#22c55e;font-weight:600;">Chemistry</span><span style="color:var(--muted);" class="mono">22.5%</span></div>
+            <div class="bar-wrap"><div class="bar-fill" style="width:64.3%;background:#22c55e;"></div></div>
+          </div>
+          <div class="info-box">💡 Mathematics carries the highest share. A strong Maths performance significantly boosts your percentile.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Section-wise Paper Structure</div>
+      <div class="section-grid">
+        <div class="section-card" style="border-top:3px solid #3b82f6;border:1px solid #3b82f640;border-top:3px solid #3b82f6;">
+          <div class="section-name" style="color:#3b82f6;">Section A</div>
+          <div class="section-desc">20 MCQs (Single Correct)</div>
+          <div class="section-marks">80 marks/subject</div>
+          <div class="section-note">−1 for wrong answer</div>
+        </div>
+        <div class="section-card" style="border:1px solid #a855f740;border-top:3px solid #a855f7;">
+          <div class="section-name" style="color:#a855f7;">Section B</div>
+          <div class="section-desc">10 Numerical Value Qs</div>
+          <div class="section-marks">Attempt any 5</div>
+          <div class="section-note">No negative marking</div>
+        </div>
+      </div>
+      <div class="marking-box">
+        <strong style="color:#fbbf24;">Marking Scheme:</strong> Correct = +4 | Wrong MCQ = −1 | Unattempted = 0 | Section B (numerical) has no negative marking — always attempt all 5!
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SUBJECTS TAB ── -->
+  <div class="tab-panel" id="tab-subjects">
+    <div class="subject-switcher">
+      <button class="subject-btn active" data-subject="physics" style="border:1px solid #f9731640;color:#f97316;background:#f9731620;">Physics</button>
+      <button class="subject-btn" data-subject="chemistry" style="border:1px solid #22c55e40;color:var(--muted3);background:var(--surface2);">Chemistry</button>
+      <button class="subject-btn" data-subject="maths" style="border:1px solid #818cf840;color:var(--muted3);background:var(--surface2);">Mathematics</button>
+    </div>
+    <div id="subject-content"></div>
+  </div>
+
+  <!-- ── STRATEGY TAB ── -->
+  <div class="tab-panel" id="tab-strategy">
+    <div class="strategy-intro">
+      <p>Based on 5-year PYQ analysis, here's an evidence-driven strategy to maximize your JEE Main 2026 score. Focus on high-weightage chapters first, then fill gaps.</p>
+    </div>
+    <div class="strategy-grid">
+      <div class="strategy-card">
+        <div class="strategy-card-title" style="color:#f97316;">⚡ Physics Strategy</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#f97316;">▸</span>Master Modern Physics first — highest single-chapter yield (16.7%)</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#f97316;">▸</span>Electrostatics + Current Electricity = guaranteed 6–8 marks</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#f97316;">▸</span>Optics (Ray + Wave) = ~14% — very reliable scoring zone</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#f97316;">▸</span>Never skip Mechanics — Kinematics + Rotational + Laws = ~18%</div>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-title" style="color:#22c55e;">🧪 Chemistry Strategy</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#22c55e;">▸</span>NCERT is king — Chemistry is the fastest scoring subject</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#22c55e;">▸</span>Coordination + d/f-block = highest inorganic yield</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#22c55e;">▸</span>Physical Chemistry numericals (Electrochemistry + Kinetics + Solutions)</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#22c55e;">▸</span>Memorize reaction charts for Organic — patterns are predictable</div>
+      </div>
+      <div class="strategy-card">
+        <div class="strategy-card-title" style="color:#818cf8;">📐 Mathematics Strategy</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#818cf8;">▸</span>Calculus alone = 27% of Maths — your #1 investment</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#818cf8;">▸</span>3D Geometry + Vectors = formulaic, very high ROI</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#818cf8;">▸</span>Matrices & Determinants: easy marks — never leave this unpracticed</div>
+        <div class="strategy-item"><span class="strategy-bullet" style="color:#818cf8;">▸</span>Maths = 35% of paper — a strong game changes your percentile</div>
+      </div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-title">📅 Revision Roadmap (Last 4 Weeks)</div>
+      <div class="timeline-row">
+        <div class="timeline-week">Week 1</div>
+        <div class="timeline-content"><strong style="color:#ef4444;">CRITICAL chapters only</strong> — Modern Physics, Calculus, Coordination Compounds, Current Electricity, 3D Geometry. Solve 10 PYQs per chapter.</div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-week">Week 2</div>
+        <div class="timeline-content"><strong style="color:#f59e0b;">HIGH priority chapters</strong> — Thermodynamics (both), Electrochemistry, Probability, Differential Equations. Full NCERT revision for Chemistry.</div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-week">Week 3</div>
+        <div class="timeline-content"><strong style="color:#60a5fa;">MODERATE + formula revision</strong> — Matrices, Coordinate Geometry, Magnetic Effects, Wave Optics. Make formula sheets. 2 full mock tests.</div>
+      </div>
+      <div class="timeline-row">
+        <div class="timeline-week">Week 4</div>
+        <div class="timeline-content"><strong style="color:#a855f7;">Mock tests + weak areas</strong> — Daily full-length mocks. Analyze mistakes. Revise notes only. Sleep 8 hours. No new topics.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DELETED TOPICS TAB ── -->
+  <div class="tab-panel" id="tab-deleted">
+    <div class="deleted-intro">
+      ⚠️ The following topics were removed from the JEE Main syllabus by NTA. Do NOT waste time on these in your preparation.
+    </div>
+    <div class="deleted-grid">
+      <div class="deleted-card">
+        <div class="deleted-card-header" style="background:#f9731615;color:#f97316;">⚡ Physics — Deleted</div>
+        <div class="deleted-item">Communication Systems</div>
+        <div class="deleted-item">Semiconductors (detailed)</div>
+        <div class="deleted-item">Logic Gates (full chapter)</div>
+        <div class="deleted-item">Experimental Skills (select)</div>
+        <div class="deleted-item">Scalars & Vectors (standalone)</div>
+      </div>
+      <div class="deleted-card">
+        <div class="deleted-card-header" style="background:#22c55e15;color:#22c55e;">🧪 Chemistry — Deleted</div>
+        <div class="deleted-item">Environmental Chemistry</div>
+        <div class="deleted-item">Chemistry in Everyday Life</div>
+        <div class="deleted-item">Surface Chemistry (partial)</div>
+        <div class="deleted-item">Nuclear Chemistry (partial)</div>
+        <div class="deleted-item">General Organic Chemistry (select)</div>
+      </div>
+      <div class="deleted-card">
+        <div class="deleted-card-header" style="background:#818cf815;color:#818cf8;">📐 Mathematics — Deleted</div>
+        <div class="deleted-item">Mathematical Induction</div>
+        <div class="deleted-item">Height & Distance (Trigonometry)</div>
+        <div class="deleted-item">Properties of Triangles</div>
+        <div class="deleted-item">Linear Programming (partial)</div>
+        <div class="deleted-item">Profit & Loss / Interest (select)</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+const subjects = {
   physics: {
     label: "Physics",
     color: "#f97316",
-    accent: "#fed7aa",
-    bg: "#431407",
     subjectShare: 22.5,
     classDistribution: { "Class XI": 48, "Class XII": 52 },
     chapters: [
-      { name: "Modern Physics", weightage: 16.7, questions: 5, priority: "CRITICAL", class: "XII" },
-      { name: "Current Electricity", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
-      { name: "Electrostatics", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
-      { name: "Ray Optics", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
-      { name: "Thermodynamics", weightage: 10, questions: 3, priority: "HIGH", class: "XI" },
-      { name: "Rotational Motion", weightage: 8, questions: 2, priority: "HIGH", class: "XI" },
-      { name: "Magnetic Effects", weightage: 7, questions: 2, priority: "HIGH", class: "XII" },
-      { name: "Alternating Current", weightage: 6, questions: 2, priority: "HIGH", class: "XII" },
-      { name: "Kinematics", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "Laws of Motion", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "Wave Optics", weightage: 4, questions: 1, priority: "MODERATE", class: "XII" },
-      { name: "Kinetic Theory", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "EM Waves", weightage: 2, questions: 1, priority: "LOW", class: "XII" },
-      { name: "Others", weightage: 2.3, questions: 1, priority: "LOW", class: "—" },
+      { name: "Modern Physics", weightage: 16.7, questions: 5, priority: "CRITICAL", cls: "XII" },
+      { name: "Current Electricity", weightage: 10, questions: 3, priority: "CRITICAL", cls: "XII" },
+      { name: "Electrostatics", weightage: 10, questions: 3, priority: "CRITICAL", cls: "XII" },
+      { name: "Ray Optics", weightage: 10, questions: 3, priority: "CRITICAL", cls: "XII" },
+      { name: "Thermodynamics", weightage: 10, questions: 3, priority: "HIGH", cls: "XI" },
+      { name: "Rotational Motion", weightage: 8, questions: 2, priority: "HIGH", cls: "XI" },
+      { name: "Magnetic Effects", weightage: 7, questions: 2, priority: "HIGH", cls: "XII" },
+      { name: "Alternating Current", weightage: 6, questions: 2, priority: "HIGH", cls: "XII" },
+      { name: "Kinematics", weightage: 5, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "Laws of Motion", weightage: 5, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "Wave Optics", weightage: 4, questions: 1, priority: "MODERATE", cls: "XII" },
+      { name: "Kinetic Theory", weightage: 4, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "EM Waves", weightage: 2, questions: 1, priority: "LOW", cls: "XII" },
+      { name: "Others", weightage: 2.3, questions: 1, priority: "LOW", cls: "—" },
     ],
     tips: [
       "Mechanics (Kinematics+Rotational+Laws) = ~18% combined — never skip",
@@ -34,25 +410,23 @@ const data = {
   chemistry: {
     label: "Chemistry",
     color: "#22c55e",
-    accent: "#bbf7d0",
-    bg: "#052e16",
     subjectShare: 22.5,
     classDistribution: { "Class XI": 44, "Class XII": 56 },
     chapters: [
-      { name: "Coordination Compounds", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
-      { name: "d & f-Block + Periodic", weightage: 9, questions: 3, priority: "CRITICAL", class: "XII" },
-      { name: "Chemical Bonding", weightage: 8, questions: 2, priority: "CRITICAL", class: "XI" },
-      { name: "Aldehyde/Ketone/Acids", weightage: 8, questions: 2, priority: "CRITICAL", class: "XII" },
-      { name: "Thermodynamics (Chem)", weightage: 7, questions: 2, priority: "HIGH", class: "XI" },
-      { name: "Electrochemistry", weightage: 7, questions: 2, priority: "HIGH", class: "XII" },
-      { name: "Chemical Equilibrium", weightage: 6, questions: 2, priority: "HIGH", class: "XI" },
-      { name: "Chemical Kinetics", weightage: 6, questions: 2, priority: "HIGH", class: "XII" },
-      { name: "Solutions", weightage: 5, questions: 1, priority: "HIGH", class: "XII" },
-      { name: "Organic Reactions (basics)", weightage: 5, questions: 1, priority: "MODERATE", class: "XI/XII" },
-      { name: "Atomic Structure", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "p-Block Elements", weightage: 5, questions: 1, priority: "MODERATE", class: "XI/XII" },
-      { name: "Biomolecules + Polymers", weightage: 4, questions: 1, priority: "LOW", class: "XII" },
-      { name: "Others", weightage: 5, questions: 1, priority: "LOW", class: "—" },
+      { name: "Coordination Compounds", weightage: 10, questions: 3, priority: "CRITICAL", cls: "XII" },
+      { name: "d & f-Block + Periodic", weightage: 9, questions: 3, priority: "CRITICAL", cls: "XII" },
+      { name: "Chemical Bonding", weightage: 8, questions: 2, priority: "CRITICAL", cls: "XI" },
+      { name: "Aldehyde/Ketone/Acids", weightage: 8, questions: 2, priority: "CRITICAL", cls: "XII" },
+      { name: "Thermodynamics (Chem)", weightage: 7, questions: 2, priority: "HIGH", cls: "XI" },
+      { name: "Electrochemistry", weightage: 7, questions: 2, priority: "HIGH", cls: "XII" },
+      { name: "Chemical Equilibrium", weightage: 6, questions: 2, priority: "HIGH", cls: "XI" },
+      { name: "Chemical Kinetics", weightage: 6, questions: 2, priority: "HIGH", cls: "XII" },
+      { name: "Solutions", weightage: 5, questions: 1, priority: "HIGH", cls: "XII" },
+      { name: "Organic Reactions (basics)", weightage: 5, questions: 1, priority: "MODERATE", cls: "XI/XII" },
+      { name: "Atomic Structure", weightage: 5, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "p-Block Elements", weightage: 5, questions: 1, priority: "MODERATE", cls: "XI/XII" },
+      { name: "Biomolecules + Polymers", weightage: 4, questions: 1, priority: "LOW", cls: "XII" },
+      { name: "Others", weightage: 5, questions: 1, priority: "LOW", cls: "—" },
     ],
     tips: [
       "Chemistry is the fastest scoring subject — NCERT is king here",
@@ -64,26 +438,24 @@ const data = {
   maths: {
     label: "Mathematics",
     color: "#818cf8",
-    accent: "#c7d2fe",
-    bg: "#1e1b4b",
     subjectShare: 35,
     classDistribution: { "Class XI": 46, "Class XII": 54 },
     chapters: [
-      { name: "Calculus (Integral)", weightage: 15, questions: 4, priority: "CRITICAL", class: "XII" },
-      { name: "Calculus (Differential)", weightage: 12, questions: 3, priority: "CRITICAL", class: "XI/XII" },
-      { name: "3D Geometry + Vectors", weightage: 10, questions: 3, priority: "CRITICAL", class: "XII" },
-      { name: "Matrices & Determinants", weightage: 8, questions: 2, priority: "CRITICAL", class: "XII" },
-      { name: "Coordinate Geometry", weightage: 8, questions: 2, priority: "CRITICAL", class: "XI" },
-      { name: "Probability", weightage: 7, questions: 2, priority: "HIGH", class: "XI/XII" },
-      { name: "Complex Numbers", weightage: 6, questions: 2, priority: "HIGH", class: "XI" },
-      { name: "Differential Equations", weightage: 6, questions: 2, priority: "HIGH", class: "XII" },
-      { name: "Binomial Theorem", weightage: 5, questions: 1, priority: "HIGH", class: "XI" },
-      { name: "Sequences & Series", weightage: 5, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "Permutations & Comb.", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "Conic Sections", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "Trigonometry", weightage: 4, questions: 1, priority: "MODERATE", class: "XI" },
-      { name: "Mathematical Reasoning", weightage: 3, questions: 1, priority: "LOW", class: "XI/XII" },
-      { name: "Statistics", weightage: 3, questions: 1, priority: "LOW", class: "XI/XII" },
+      { name: "Calculus (Integral)", weightage: 15, questions: 4, priority: "CRITICAL", cls: "XII" },
+      { name: "Calculus (Differential)", weightage: 12, questions: 3, priority: "CRITICAL", cls: "XI/XII" },
+      { name: "3D Geometry + Vectors", weightage: 10, questions: 3, priority: "CRITICAL", cls: "XII" },
+      { name: "Matrices & Determinants", weightage: 8, questions: 2, priority: "CRITICAL", cls: "XII" },
+      { name: "Coordinate Geometry", weightage: 8, questions: 2, priority: "CRITICAL", cls: "XI" },
+      { name: "Probability", weightage: 7, questions: 2, priority: "HIGH", cls: "XI/XII" },
+      { name: "Complex Numbers", weightage: 6, questions: 2, priority: "HIGH", cls: "XI" },
+      { name: "Differential Equations", weightage: 6, questions: 2, priority: "HIGH", cls: "XII" },
+      { name: "Binomial Theorem", weightage: 5, questions: 1, priority: "HIGH", cls: "XI" },
+      { name: "Sequences & Series", weightage: 5, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "Permutations & Comb.", weightage: 4, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "Conic Sections", weightage: 4, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "Trigonometry", weightage: 4, questions: 1, priority: "MODERATE", cls: "XI" },
+      { name: "Mathematical Reasoning", weightage: 3, questions: 1, priority: "LOW", cls: "XI/XII" },
+      { name: "Statistics", weightage: 3, questions: 1, priority: "LOW", cls: "XI/XII" },
     ],
     tips: [
       "Calculus alone = 27% of Maths section — your #1 investment",
@@ -96,341 +468,116 @@ const data = {
 
 const priorityColors = {
   CRITICAL: { bg: "#450a0a", text: "#fca5a5", dot: "#ef4444" },
-  HIGH: { bg: "#422006", text: "#fcd34d", dot: "#f59e0b" },
+  HIGH:     { bg: "#422006", text: "#fcd34d", dot: "#f59e0b" },
   MODERATE: { bg: "#0c2340", text: "#93c5fd", dot: "#60a5fa" },
-  LOW: { bg: "#1f2937", text: "#9ca3af", dot: "#6b7280" },
+  LOW:      { bg: "#1f2937", text: "#9ca3af", dot: "#6b7280" },
 };
 
-const WeightageBar = ({ value, max, color }) => (
-  <div style={{ background: "#1f2937", borderRadius: 4, height: 6, width: "100%", overflow: "hidden" }}>
-    <div
-      style={{
-        height: "100%",
-        width: ${(value / max) * 100}%,
-        background: color,
-        borderRadius: 4,
-        transition: "width 0.6s ease",
-      }}
-    />
-  </div>
-);
+let activeSubject = "physics";
 
-const SubjectDot = ({ pct, label, color }) => (
-  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-    <div
-      style={{
-        width: 56,
-        height: 56,
-        borderRadius: "50%",
-        border: 3px solid ${color},
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 13,
-        fontWeight: 700,
-        color,
-        background: ${color}15,
-      }}
-    >
-      {pct}%
+function renderSubject(key) {
+  const s = subjects[key];
+  const maxW = Math.max(...s.chapters.map(c => c.weightage));
+  const distEntries = Object.entries(s.classDistribution);
+
+  const rows = s.chapters.map(ch => {
+    const pc = priorityColors[ch.priority];
+    const barW = ((ch.weightage / maxW) * 100).toFixed(1);
+    return `
+      <div class="chapter-row">
+        <div>
+          <div class="chapter-name">${ch.name}</div>
+          <div class="chapter-class">Class ${ch.cls}</div>
+          <div class="bar-wrap" style="margin-top:4px;max-width:120px;">
+            <div class="bar-fill" style="width:${barW}%;background:${s.color};"></div>
+          </div>
+        </div>
+        <div class="chapter-weightage" style="color:${s.color};">${ch.weightage}%</div>
+        <div class="chapter-qs">~${ch.questions}</div>
+        <div>
+          <span class="priority-badge" style="background:${pc.bg};color:${pc.text};">
+            <span class="priority-dot" style="background:${pc.dot};"></span>
+            ${ch.priority}
+          </span>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const tipsHTML = s.tips.map(t => `
+    <div class="tip-card" style="border-left-color:${s.color};">💡 ${t}</div>
+  `).join('');
+
+  const distHTML = distEntries.map(([cls, pct]) => `
+    <div class="class-dist-item">
+      <div class="class-dist-pct" style="color:${s.color};">${pct}%</div>
+      <div class="class-dist-label">${cls}</div>
     </div>
-    <span style={{ fontSize: 11, color: "#9ca3af", textAlign: "center", maxWidth: 60 }}>{label}</span>
-  </div>
-);
+  `).join('');
 
-export default function JEEDashboard() {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [activeSubject, setActiveSubject] = useState("physics");
-
-  const subject = data[activeSubject];
-
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#0a0a0f",
-        fontFamily: "'Georgia', serif",
-        color: "#e2e8f0",
-        padding: "24px 16px",
-      }}
-    >
-      {/* Header */}
-      <div style={{ maxWidth: 900, margin: "0 auto" }}>
-        <div style={{ marginBottom: 32, borderBottom: "1px solid #1f2937", paddingBottom: 20 }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-            <div>
-              <div style={{ fontSize: 11, letterSpacing: 4, color: "#6b7280", textTransform: "uppercase", marginBottom: 6 }}>
-                National Testing Agency · Official NTA Analysis
-              </div>
-              <h1
-                style={{
-                  fontSize: 28,
-                  fontWeight: 700,
-                  background: "linear-gradient(135deg, #f1f5f9, #94a3b8)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  margin: 0,
-                  lineHeight: 1.2,
-                }}
-              >
-                JEE Main 2026
-              </h1>
-              <div style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>
-                Deep Syllabus Analysis · Chapter-wise Weightage · Strategy Guide
-              </div>
-            </div>
-            <div
-              style={{
-                background: "#0f172a",
-                border: "1px solid #1e3a5f",
-                borderRadius: 8,
-                padding: "10px 16px",
-                fontSize: 12,
-                color: "#60a5fa",
-                textAlign: "right",
-              }}
-            >
-              <div style={{ fontWeight: 700, fontSize: 14 }}>✓ Session 2 Completed</div>
-              <div style={{ color: "#475569", marginTop: 2 }}>April 2–8, 2026</div>
-              <div style={{ color: "#475569" }}>Based on 5-Year PYQ Analysis</div>
-            </div>
-          </div>
+  return `
+    <div class="subject-header" style="background:${s.color}10;border:1px solid ${s.color}30;">
+      <div>
+        <h2 style="color:${s.color};">${s.label}</h2>
+        <div class="subject-header-sub">
+          Paper share: <strong style="color:${s.color};">${s.subjectShare}%</strong> · 30 Questions · 120 Marks
         </div>
+      </div>
+      <div class="class-dist">${distHTML}</div>
+    </div>
+    <div class="chapter-table">
+      <div class="chapter-header">
+        <span>Chapter</span>
+        <span>Weightage (5yr)</span>
+        <span>~Qs</span>
+        <span>Priority</span>
+      </div>
+      ${rows}
+    </div>
+    <div class="card" style="margin-top:0;">
+      <div class="card-title">📌 Key Insights — ${s.label}</div>
+      <div class="tips-grid">${tipsHTML}</div>
+    </div>
+  `;
+}
 
-        {/* Nav Tabs */}
-        <div style={{ display: "flex", gap: 4, marginBottom: 28, flexWrap: "wrap" }}>
-          {["overview", "subjects", "strategy", "deleted"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: "8px 20px",
-                borderRadius: 6,
-                border: "none",
-                cursor: "pointer",
-                fontSize: 13,
-                fontFamily: "inherit",
-                fontWeight: 600,
-                letterSpacing: 0.5,
-                transition: "all 0.2s",
-                background: activeTab === tab ? "#1e3a5f" : "#111827",
-                color: activeTab === tab ? "#93c5fd" : "#6b7280",
-                borderBottom: activeTab === tab ? "2px solid #3b82f6" : "2px solid transparent",
-              }}
-            >
-              {tab === "overview" ? "📊 Overview" : tab === "subjects" ? "📚 Subjects" : tab === "strategy" ? "🎯 Strategy" : "🗑 Deleted Topics"}
-            </button>
-          ))}
-        </div>
+function updateSubjectButtons(key) {
+  document.querySelectorAll('.subject-btn').forEach(btn => {
+    const sk = btn.dataset.subject;
+    const color = subjects[sk].color;
+    if (sk === key) {
+      btn.style.color = color;
+      btn.style.background = color + '20';
+      btn.style.border = `1px solid ${color}40`;
+    } else {
+      btn.style.color = 'var(--muted3)';
+      btn.style.background = 'var(--surface2)';
+      btn.style.border = `1px solid ${subjects[sk].color}40`;
+    }
+  });
+}
 
-        {/* ── OVERVIEW TAB ── */}
-        {activeTab === "overview" && (
-          <div>
-            {/* Stat Cards */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 28 }}>
-              {[
-                { label: "Total Questions", value: "90", sub: "30 per subject", icon: "📝" },
-                { label: "Total Marks", value: "300", sub: "+4 / −1 scheme", icon: "🏆" },
-                { label: "Duration", value: "3 hrs", sub: "180 minutes", icon: "⏱" },
-                { label: "Sessions", value: "2", sub: "Jan & Apr 2026", icon: "📅" },
-                { label: "Mode", value: "CBT", sub: "Computer-based", icon: "💻" },
-                { label: "Subjects", value: "3", sub: "Phy · Chem · Math", icon: "🔬" },
-              ].map((card) => (
-                <div
-                  key={card.label}
-                  style={{
-                    background: "#0f172a",
-                    border: "1px solid #1e293b",
-                    borderRadius: 10,
-                    padding: "14px 16px",
-                  }}
-                >
-                  <div style={{ fontSize: 20, marginBottom: 6 }}>{card.icon}</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: "#f1f5f9" }}>{card.value}</div>
-                  <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>{card.label}</div>
-                  <div style={{ fontSize: 11, color: "#475569" }}>{card.sub}</div>
-                </div>
-              ))}
-            </div>
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
 
-            {/* Subject Share */}
-            <div
-              style={{
-                background: "#0f172a",
-                border: "1px solid #1e293b",
-                borderRadius: 12,
-                padding: 24,
-                marginBottom: 24,
-              }}
-            >
-              <h2 style={{ margin: "0 0 20px", fontSize: 16, fontWeight: 700, color: "#cbd5e1" }}>
-                Subject-wise Marks Distribution (Paper 1)
-              </h2>
-              <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
-                <SubjectDot pct={35} label="Mathematics" color="#818cf8" />
-                <SubjectDot pct={22.5} label="Physics" color="#f97316" />
-                <SubjectDot pct={22.5} label="Chemistry" color="#22c55e" />
-                <div style={{ flex: 1, minWidth: 200 }}>
-                  {[
-                    { label: "Mathematics", pct: 35, color: "#818cf8" },
-                    { label: "Physics", pct: 22.5, color: "#f97316" },
-                    { label: "Chemistry", pct: 22.5, color: "#22c55e" },
-                  ].map((s) => (
-                    <div key={s.label} style={{ marginBottom: 12 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
-                        <span style={{ color: s.color, fontWeight: 600 }}>{s.label}</span>
-                        <span style={{ color: "#64748b" }}>{s.pct}%</span>
-                      </div>
-                      <WeightageBar value={s.pct} max={35} color={s.color} />
-                    </div>
-                  ))}
-                  <div style={{ marginTop: 14, padding: "10px 12px", background: "#1e293b", borderRadius: 8, fontSize: 12, color: "#94a3b8", borderLeft: "3px solid #818cf8" }}>
-                    💡 Mathematics carries the highest share. A strong Maths performance significantly boosts your percentile.
-                  </div>
-                </div>
-              </div>
-            </div>
+// Subject switching
+document.querySelectorAll('.subject-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeSubject = btn.dataset.subject;
+    updateSubjectButtons(activeSubject);
+    document.getElementById('subject-content').innerHTML = renderSubject(activeSubject);
+  });
+});
 
-            {/* Exam Pattern */}
-            <div
-              style={{
-                background: "#0f172a",
-                border: "1px solid #1e293b",
-                borderRadius: 12,
-                padding: 24,
-              }}
-            >
-              <h2 style={{ margin: "0 0 16px", fontSize: 16, fontWeight: 700, color: "#cbd5e1" }}>
-                Section-wise Paper Structure
-              </h2>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
-                {[
-                  {
-                    sec: "Section A",
-                    desc: "20 MCQs (Single Correct)",
-                    marks: "80 marks/subject",
-                    note: "−1 for wrong answer",
-                    col: "#3b82f6",
-                  },
-                  {
-                    sec: "Section B",
-                    desc: "10 Numerical Value Qs",
-                    marks: "Attempt any 5",
-                    note: "No negative marking",
-                    col: "#a855f7",
-                  },
-                ].map((s) => (
-                  <div
-                    key={s.sec}
-                    style={{
-                      background: "#111827",
-                      border: 1px solid ${s.col}40,
-                      borderRadius: 10,
-                      padding: "16px",
-                      borderTop: 3px solid ${s.col},
-                    }}
-                  >
-                    <div style={{ fontSize: 14, fontWeight: 700, color: s.col, marginBottom: 8 }}>{s.sec}</div>
-                    <div style={{ fontSize: 13, color: "#e2e8f0", marginBottom: 4 }}>{s.desc}</div>
-                    <div style={{ fontSize: 12, color: "#a855f7" }}>{s.marks}</div>
-                    <div style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>{s.note}</div>
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop: 16, padding: "12px 14px", background: "#1a1a2e", borderRadius: 8, fontSize: 12, color: "#94a3b8" }}>
-                <strong style={{ color: "#fbbf24" }}>Marking Scheme:</strong> Correct = +4 | Wrong MCQ = −1 | Unattempted = 0 | Section B (numerical) has no negative marking — always attempt all 5!
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* ── SUBJECTS TAB ── */}
-        {activeTab === "subjects" && (
-          <div>
-            {/* Subject Switcher */}
-            <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-              {Object.keys(data).map((key) => (
-                <button
-                  key={key}
-                  onClick={() => setActiveSubject(key)}
-                  style={{
-                    padding: "8px 22px",
-                    borderRadius: 8,
-                    border: 1px solid ${data[key].color}40,
-                    cursor: "pointer",
-                    fontSize: 13,
-                    fontFamily: "inherit",
-                    fontWeight: 700,
-                    background: activeSubject === key ? ${data[key].color}20 : "#111827",
-                    color: activeSubject === key ? data[key].color : "#6b7280",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {data[key].label}
-                </button>
-              ))}
-            </div>
-
-            {/* Subject Header */}
-            <div
-              style={{
-                background: ${subject.color}10,
-                border: 1px solid ${subject.color}30,
-                borderRadius: 12,
-                padding: "16px 20px",
-                marginBottom: 20,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: 12,
-              }}
-            >
-              <div>
-                <h2 style={{ margin: 0, color: subject.color, fontSize: 20, fontWeight: 700 }}>{subject.label}</h2>
-                <div style={{ fontSize: 12, color: "#64748b", marginTop: 4 }}>
-                  Paper share: <strong style={{ color: subject.color }}>{subject.subjectShare}%</strong> · 30 Questions · 120 Marks
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: 16 }}>
-                {Object.entries(subject.classDistribution).map(([cls, pct]) => (
-                  <div key={cls} style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: subject.color }}>{pct}%</div>
-                    <div style={{ fontSize: 11, color: "#64748b" }}>{cls}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Chapter Table */}
-            <div
-              style={{
-                background: "#0f172a",
-                border: "1px solid #1e293b",
-                borderRadius: 12,
-                overflow: "hidden",
-                marginBottom: 20,
-              }}
-            >
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "2fr 1fr 80px 90px",
-                  padding: "10px 16px",
-                  background: "#111827",
-                  fontSize: 11,
-                  color: "#64748b",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                  fontWeight: 700,
-                }}
-              >
-                <span>Chapter</span>
-                <span>Weightage (5yr)</span>
-                <span>~Qs</span>
-                <span>Priority</span>
-              </div>
-              {subject.chapters.map((ch, i) => {
-                const pc = priorityColors[ch.priority];
-                const maxW = Math.max(...subject.chapters.map((c) => c.weightage));
-                return (
+// Initial render
+document.getElementById('subject-content').innerHTML = renderSubject(activeSubject);
+</script>
+</body>
+</html>
