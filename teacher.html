@@ -234,7 +234,6 @@ textarea.fi{resize:vertical;min-height:80px;}
 /* ══════════════════════════════════
    ATTENDANCE STYLES
 ══════════════════════════════════ */
-/* ── STUDENT ROW ── */
 .s-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);margin:5px 0;transition:all 0.18s;}
 .s-row.mp{border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);}
 .s-row.ma{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.04);}
@@ -252,19 +251,15 @@ textarea.fi{resize:vertical;min-height:80px;}
 .sbn-a{color:var(--red);}
 .sbn-a.on{background:var(--red-bg);border-color:rgba(239,68,68,0.3);}
 
-/* ── BULK BAR ── */
 .bulk-bar{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .bulk-lbl{font-size:0.72rem;font-weight:700;color:var(--text2);}
 
-/* ── ATT FORM GRID ── */
 .att-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0;}
 @media(max-width:400px){.att-form-grid{grid-template-columns:1fr;}}
 
-/* ── REPORT ITEM ── */
 .report-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
 .report-item:last-child{border-bottom:none;}
 
-/* ── TABLE ── */
 .hist-scroll{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:0.78rem;}
 thead th{padding:10px 12px;text-align:left;font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;}
@@ -273,12 +268,20 @@ tbody tr:hover{background:var(--bg3);}
 tbody td{padding:10px 12px;color:var(--text2);vertical-align:middle;}
 tbody td:first-child{color:var(--text);font-weight:600;}
 
-/* ── TODAY ROW ── */
 .today-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
 .today-row:last-child{border-bottom:none;}
 
-/* ── ATT SECTION HEADER ── */
 .att-section-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+
+/* ── LOGOUT CONFIRM MODAL ── */
+.logout-modal-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px;}
+.logout-modal-overlay.open{display:flex;}
+.logout-modal-box{background:var(--card);border-radius:20px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes popIn{from{transform:scale(0.85);opacity:0;}to{transform:scale(1);opacity:1;}}
+.logout-modal-icon{width:64px;height:64px;border-radius:50%;background:var(--red-bg);border:2px solid rgba(239,68,68,0.2);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:28px auto 16px;}
+.logout-modal-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem;text-align:center;color:var(--text);margin-bottom:8px;}
+.logout-modal-sub{font-size:0.78rem;color:var(--text2);text-align:center;padding:0 24px;margin-bottom:24px;line-height:1.5;}
+.logout-modal-actions{display:flex;gap:10px;padding:0 18px 22px;}
 
 @media(max-width:380px){.stats-grid{grid-template-columns:1fr 1fr;}.mini-grid{grid-template-columns:1fr 1fr;}}
 </style>
@@ -293,6 +296,19 @@ tbody td:first-child{color:var(--text);font-weight:600;}
   <div class="sp-name">MINDSKYRA</div>
   <div class="sp-sub">Course Manager</div>
   <div class="spinner"></div>
+</div>
+
+<!-- ══ LOGOUT CONFIRM MODAL ══ -->
+<div class="logout-modal-overlay" id="logoutModal">
+  <div class="logout-modal-box">
+    <div class="logout-modal-icon">🚪</div>
+    <div class="logout-modal-title">Logout?</div>
+    <div class="logout-modal-sub">You will be signed out of MINDSKYRA Course Manager and redirected to the login page.</div>
+    <div class="logout-modal-actions">
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;padding:13px" onclick="closeLogoutModal()">Cancel</button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center;padding:13px" id="logoutConfirmBtn" onclick="confirmLogout()">🚪 Yes, Logout</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ MAIN ══ -->
@@ -317,7 +333,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
       <div class="pg-sub" id="dashDate"></div>
     </div>
 
-    <!-- Dashboard section tabs -->
     <div class="tab-row" id="dashTabRow">
       <div class="tab-pill on" id="dtab-overview" onclick="switchDashTab('overview')">📊 Overview</div>
       <div class="tab-pill" id="dtab-mark"     onclick="switchDashTab('mark')">✏️ Mark Att.</div>
@@ -334,7 +349,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
         <div class="stat-box"><div class="stat-icon">📄</div><div class="stat-val" style="color:var(--green)" id="st-pdfs">—</div><div class="stat-lbl">PDFs</div></div>
       </div>
 
-      <!-- Today's Attendance Summary -->
       <div class="card">
         <div class="card-hd">
           <div class="card-title">📋 Today's Attendance</div>
@@ -366,7 +380,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
         </div>
       </div>
 
-      <!-- Recent content -->
       <div class="card">
         <div class="card-hd"><div class="card-title">🕐 Recently Added</div></div>
         <div id="recentList">
@@ -377,7 +390,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
 
     <!-- ─── MARK ATTENDANCE SECTION ─── -->
     <div id="dsec-mark" style="display:none">
-
       <div class="card">
         <div class="card-hd"><div class="card-title">📝 Session Details</div><div id="attDateLabel" style="font-size:0.75rem;color:var(--text2)"></div></div>
         <div class="att-form-grid">
@@ -437,11 +449,7 @@ tbody td:first-child{color:var(--text);font-weight:600;}
           <table>
             <thead>
               <tr>
-                <th>Student</th>
-                <th>Date</th>
-                <th>Subject</th>
-                <th>Period</th>
-                <th>Status</th>
+                <th>Student</th><th>Date</th><th>Subject</th><th>Period</th><th>Status</th>
               </tr>
             </thead>
             <tbody id="histTbody"><tr><td colspan="5"><div class="skel" style="height:38px;margin:6px 0"></div></td></tr></tbody>
@@ -478,12 +486,10 @@ tbody td:first-child{color:var(--text);font-weight:600;}
         </div>
       </div>
     </div>
-
     <div class="search-wrap">
       <div class="search-ico">🔍</div>
       <input class="fi" id="structSearch" placeholder="Search subjects / chapters…" oninput="filterStructure()">
     </div>
-
     <div id="structureTree">
       <div class="skel" style="height:52px;margin-bottom:8px;border-radius:12px"></div>
       <div class="skel" style="height:52px;margin-bottom:8px;border-radius:12px"></div>
@@ -498,57 +504,41 @@ tbody td:first-child{color:var(--text);font-weight:600;}
       <div class="pg-sub">Videos, Notes & DPPs</div>
     </div>
 
-    <!-- Chapter selector -->
     <div class="card">
       <div class="card-hd"><div class="card-title">📌 Select Target Chapter</div></div>
       <div class="card-body">
-        <div class="fg">
-          <label class="fl">Class</label>
-          <select class="fi" id="upClass" onchange="populateSubjectFilter()">
-            <option value="">— All Classes —</option>
-          </select>
+        <div class="fg"><label class="fl">Class</label>
+          <select class="fi" id="upClass" onchange="populateSubjectFilter()"><option value="">— All Classes —</option></select>
         </div>
-        <div class="fg">
-          <label class="fl">Subject</label>
-          <select class="fi" id="upSubject" onchange="populateChapterFilter()">
-            <option value="">— Select Subject —</option>
-          </select>
+        <div class="fg"><label class="fl">Subject</label>
+          <select class="fi" id="upSubject" onchange="populateChapterFilter()"><option value="">— Select Subject —</option></select>
         </div>
-        <div class="fg">
-          <label class="fl">Chapter</label>
-          <select class="fi" id="upChapter">
-            <option value="">— Select Chapter —</option>
-          </select>
+        <div class="fg"><label class="fl">Chapter</label>
+          <select class="fi" id="upChapter"><option value="">— Select Chapter —</option></select>
         </div>
       </div>
     </div>
 
-    <!-- Content Form -->
     <div class="card">
       <div class="card-hd"><div class="card-title">📋 Content Details</div></div>
       <div class="card-body">
-
         <div class="type-sw">
           <button class="type-btn on" id="ct-video"  onclick="setContentType('video')">🎬 Video</button>
           <button class="type-btn"    id="ct-notes"  onclick="setContentType('notes')">📝 Notes</button>
           <button class="type-btn"    id="ct-dpp"    onclick="setContentType('dpp')">✏️ DPP</button>
         </div>
-
-        <div class="fg">
-          <label class="fl">Title</label>
+        <div class="fg"><label class="fl">Title</label>
           <input class="fi" id="ctTitle" placeholder="e.g. Rotational Dynamics — Part 1">
         </div>
-        <div class="fg">
-          <label class="fl">Description (optional)</label>
+        <div class="fg"><label class="fl">Description (optional)</label>
           <textarea class="fi" id="ctDesc" rows="2" placeholder="Brief description…"></textarea>
         </div>
 
         <!-- YouTube zone -->
         <div id="yt-zone">
-          <div class="fg">
-            <label class="fl">YouTube URL</label>
+          <div class="fg"><label class="fl">YouTube URL</label>
             <div style="display:flex;gap:6px">
-              <input class="fi" id="ytUrl" placeholder="https://youtu.be/... or youtube.com/watch?v=…" oninput="previewYT()" style="flex:1">
+              <input class="fi" id="ytUrl" placeholder="https://youtu.be/… or youtube.com/watch?v=…" oninput="previewYT()" style="flex:1">
               <button onclick="clearYT()" style="width:40px;height:42px;border:none;border-radius:10px;background:var(--red-bg);color:var(--red);font-size:1rem;cursor:pointer;flex-shrink:0">✕</button>
             </div>
           </div>
@@ -568,7 +558,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
             <div style="font-size:0.72rem;color:var(--text2)">PDF only · max 100 MB</div>
           </div>
           <input type="file" id="pdfFile" accept="application/pdf,.pdf" style="display:none" onchange="onFileSelect(event)">
-
           <div id="filePrev" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:8px">
             <div style="display:flex;align-items:center;gap:10px">
               <div style="font-size:1.8rem">📄</div>
@@ -579,7 +568,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
               <button onclick="clearFile()" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--red-bg);color:var(--red);cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
             </div>
           </div>
-
           <div id="uploadProg" style="display:none;margin-top:10px">
             <div class="prog-wrap">
               <div class="prog-row"><span id="upStatus">Uploading…</span><span id="upPct">0%</span></div>
@@ -591,7 +579,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
         <button class="btn btn-primary" id="uploadBtn" style="width:100%;justify-content:center;padding:14px;margin-top:4px" onclick="doUpload()">
           ☁️ <span id="uploadBtnTxt">Save YouTube Link</span>
         </button>
-
       </div>
     </div>
   </div>
@@ -602,28 +589,90 @@ tbody td:first-child{color:var(--text);font-weight:600;}
       <div class="pg-title">📚 Content Library</div>
       <div class="pg-sub">Browse all uploaded content</div>
     </div>
-
     <div class="tab-row">
       <div class="tab-pill on" id="lt-all"   onclick="switchLibTab('all')">All</div>
       <div class="tab-pill"   id="lt-video"  onclick="switchLibTab('video')">🎬 Videos</div>
       <div class="tab-pill"   id="lt-notes"  onclick="switchLibTab('notes')">📝 Notes</div>
       <div class="tab-pill"   id="lt-dpp"    onclick="switchLibTab('dpp')">✏️ DPP</div>
     </div>
-
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <select class="fi" id="libClass" style="flex:1;min-width:100px;padding:8px 12px" onchange="loadLibrary()">
-        <option value="">All Classes</option>
-      </select>
-      <select class="fi" id="libSubject" style="flex:1;min-width:120px;padding:8px 12px" onchange="loadLibrary()">
-        <option value="">All Subjects</option>
-      </select>
+      <select class="fi" id="libClass" style="flex:1;min-width:100px;padding:8px 12px" onchange="loadLibrary()"><option value="">All Classes</option></select>
+      <select class="fi" id="libSubject" style="flex:1;min-width:120px;padding:8px 12px" onchange="loadLibrary()"><option value="">All Subjects</option></select>
     </div>
-
     <div id="libraryList">
       <div class="skel" style="height:64px;margin-bottom:8px;border-radius:12px"></div>
       <div class="skel" style="height:64px;margin-bottom:8px;border-radius:12px"></div>
       <div class="skel" style="height:64px;border-radius:12px"></div>
     </div>
+  </div>
+
+  <!-- ══ PAGE: PROFILE ══ -->
+  <div id="pg-profile" class="pg">
+    <div class="pg-hd">
+      <div class="pg-title">👤 Profile</div>
+      <div class="pg-sub">MINDSKYRA Admin</div>
+    </div>
+
+    <!-- Hero -->
+    <div style="background:linear-gradient(135deg,#5B5EF4,#818CF8);border-radius:var(--radius);padding:28px 20px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden;">
+      <div style="position:absolute;inset:0;background:radial-gradient(circle at 70% 20%,rgba(255,255,255,0.12) 0%,transparent 60%);pointer-events:none"></div>
+      <div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.45);display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 14px;position:relative;z-index:1;">🎓</div>
+      <div style="font-family:'Outfit',sans-serif;font-size:1.3rem;font-weight:800;color:white;position:relative;z-index:1;">Course Manager</div>
+      <div style="font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:4px;position:relative;z-index:1;">MINDSKYRA Admin Panel</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><div class="card-title">📊 App Summary</div></div>
+      <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
+        <div>
+          <div style="font-size:1.5rem;font-weight:800;color:var(--primary);font-family:'Outfit',sans-serif" id="prof-subjects">—</div>
+          <div style="font-size:0.68rem;color:var(--text2);margin-top:3px">Subjects</div>
+        </div>
+        <div>
+          <div style="font-size:1.5rem;font-weight:800;color:var(--blue);font-family:'Outfit',sans-serif" id="prof-chapters">—</div>
+          <div style="font-size:0.68rem;color:var(--text2);margin-top:3px">Chapters</div>
+        </div>
+        <div>
+          <div style="font-size:1.5rem;font-weight:800;color:var(--green);font-family:'Outfit',sans-serif" id="prof-content">—</div>
+          <div style="font-size:0.68rem;color:var(--text2);margin-top:3px">Content</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><div class="card-title">🔥 Firebase Project</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:10px">
+          <span style="font-size:0.75rem;color:var(--text2);font-weight:600">Project ID</span>
+          <span style="font-size:0.75rem;color:var(--text);font-weight:700">mind-skyra-institute</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:10px">
+          <span style="font-size:0.75rem;color:var(--text2);font-weight:600">Database</span>
+          <span style="font-size:0.75rem;color:var(--green);font-weight:700">✅ Firestore</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:10px">
+          <span style="font-size:0.75rem;color:var(--text2);font-weight:600">Storage</span>
+          <span style="font-size:0.75rem;color:var(--blue);font-weight:700">Google Drive</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><div class="card-title">🔐 Account</div></div>
+      <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg3);border-radius:10px">
+          <span style="font-size:0.75rem;color:var(--text2);font-weight:600">Mode</span>
+          <span style="font-size:0.75rem;color:var(--primary);font-weight:700">Admin (No Auth)</span>
+        </div>
+        <!-- ✅ FIXED: Now calls doLogout() which is properly defined -->
+        <button class="btn btn-danger" style="width:100%;justify-content:center;padding:13px" onclick="doLogout()">
+          🚪 Logout / Sign Out
+        </button>
+        <div style="font-size:0.7rem;color:var(--text3);text-align:center">This will redirect to the login page</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:10px 0 4px;font-size:0.68rem;color:var(--text3)">MINDSKYRA Course Manager · v2.0</div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -640,6 +689,9 @@ tbody td:first-child{color:var(--text);font-weight:600;}
     <div class="ni" onclick="goTo('library')" id="nav-library">
       <div class="ni-bar"></div><div class="ni-icon">📚</div><div class="ni-lbl">Library</div>
     </div>
+    <div class="ni" onclick="goTo('profile')" id="nav-profile">
+      <div class="ni-bar"></div><div class="ni-icon">👤</div><div class="ni-lbl">Profile</div>
+    </div>
   </div>
 </div>
 
@@ -654,11 +706,8 @@ tbody td:first-child{color:var(--text);font-weight:600;}
       <div class="fg"><label class="fl">Class Number</label>
         <select class="fi" id="subClass">
           <option value="">— Select Class —</option>
-          <option value="8">Class 8</option>
-          <option value="9">Class 9</option>
-          <option value="10">Class 10</option>
-          <option value="11">Class 11</option>
-          <option value="12">Class 12</option>
+          <option value="8">Class 8</option><option value="9">Class 9</option>
+          <option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option>
         </select>
       </div>
       <div class="fg"><label class="fl">Subject Name</label><input class="fi" id="subName" placeholder="e.g. Physics"></div>
@@ -778,7 +827,6 @@ let libFilter   = 'all';
 let currentPage = 'dash';
 let currentDashTab = 'overview';
 
-// Attendance state
 let attMarked   = {};
 let attStudents = [];
 let allClasses  = [];
@@ -845,12 +893,10 @@ async function loadContent() {
   }
 }
 
-/* ── Load distinct classes from students collection ── */
 async function loadClasses() {
   try {
     const snap = await db.collection('students').get();
     const set  = new Set();
-    // also pull from subjects
     subjects.forEach(s => { if (s.class) set.add(String(s.class)); });
     snap.forEach(d => {
       const c = d.data().class || d.data().roleData?.class;
@@ -859,7 +905,6 @@ async function loadClasses() {
     allClasses = [...set].sort((a,b) => Number(a)-Number(b) || a.localeCompare(b));
     populateAttClassDrops();
   } catch(e) {
-    // fallback: use classes from subjects
     const set = new Set(subjects.map(s => String(s.class)).filter(Boolean));
     allClasses = [...set].sort((a,b) => Number(a)-Number(b));
     populateAttClassDrops();
@@ -909,7 +954,7 @@ function switchDashTab(tab) {
 }
 
 /* ═══════════════════════════════════════════════════
-   TODAY'S ATTENDANCE SUMMARY (on Overview tab)
+   TODAY'S ATTENDANCE SUMMARY
 ════════════════════════════════════════════════════ */
 async function loadTodayAttSummary() {
   const el = document.getElementById('todayAttSummary');
@@ -924,7 +969,6 @@ async function loadTodayAttSummary() {
       </div>`;
       return;
     }
-
     const subjects = {};
     snap.forEach(d => {
       const r = d.data();
@@ -935,7 +979,6 @@ async function loadTodayAttSummary() {
       else if (r.status === 'absent') subjects[key].a++;
       else subjects[key].l++;
     });
-
     el.innerHTML = Object.values(subjects).map(s => {
       const pct = Math.round(((s.p + s.l) / s.total) * 100);
       const col = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
@@ -962,22 +1005,17 @@ async function loadAttStudents() {
   const cls  = document.getElementById('attClass').value;
   const date = document.getElementById('attDate').value;
   const el   = document.getElementById('attStudentList');
-
   if (!cls) {
     el.innerHTML = `<div class="empty"><div class="empty-icon">🏫</div><div class="empty-title">Select a class first</div></div>`;
     return;
   }
-
   el.innerHTML = '<div style="padding:10px"><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px"></div></div>';
   attMarked = {};
-
   try {
-    // Try direct class field first, then roleData.class
     const snap1 = await db.collection('students').where('class','==',cls).get();
     const snap2 = await db.collection('students').get();
     const seen  = new Set();
     const students = [];
-
     snap1.forEach(d => { seen.add(d.id); students.push({ id: d.id, ...d.data() }); });
     snap2.forEach(d => {
       if (seen.has(d.id)) return;
@@ -986,10 +1024,7 @@ async function loadAttStudents() {
         students.push({ id: d.id, ...dd });
       }
     });
-
     attStudents = students;
-
-    // Load any existing records for this date+class
     if (date) {
       const subject = document.getElementById('attSubject').value.trim();
       let q = db.collection('attendance').where('date','==',date).where('class','==',cls);
@@ -1000,7 +1035,6 @@ async function loadAttStudents() {
         attMarked[dd.studentId] = { status: dd.status, note: dd.note||'', docId: d.id };
       });
     }
-
     renderAttStudents();
     updateAttCount();
   } catch(e) {
@@ -1060,17 +1094,13 @@ async function saveAtt() {
   const room    = document.getElementById('attRoom').value.trim();
   const period  = document.getElementById('attPeriod').value;
   const sNote   = document.getElementById('attNote').value.trim();
-
   if (!date)    { showToast('Select a date','error'); return; }
   if (!cls)     { showToast('Select a class','error'); return; }
   if (!subject) { showToast('Enter subject name','error'); return; }
-
   const unmarked = attStudents.filter(s => !attMarked[s.id]?.status);
   if (unmarked.length > 0 && !confirm(`${unmarked.length} student(s) not marked. Continue?`)) return;
-
   const btn = document.getElementById('attSaveBtn');
   btn.disabled = true; btn.textContent = '⏳ Saving…';
-
   try {
     const batch = db.batch();
     let count = 0;
@@ -1079,14 +1109,12 @@ async function saveAtt() {
       if (!m?.status) continue;
       const name = s.fullName || ((s.firstName||'') + ' ' + (s.lastName||'')).trim();
       const data = {
-        studentId: s.id,
-        studentName: name,
+        studentId: s.id, studentName: name,
         class: cls, date, subject,
         room: room||'', period,
         status: m.status,
         note: m.note || sNote || '',
-        mode: 'offline',
-        markedBy: 'admin',
+        mode: 'offline', markedBy: 'admin',
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       };
       if (m.docId) batch.update(db.collection('attendance').doc(m.docId), data);
@@ -1117,38 +1145,25 @@ async function loadAttHistory() {
   const date = document.getElementById('hfDate')?.value  || '';
   const tbody = document.getElementById('histTbody');
   if (!tbody) return;
-
   tbody.innerHTML = '<tr><td colspan="5"><div class="skel" style="height:38px;margin:6px 0"></div></td></tr>'.repeat(3);
-
   try {
     let snap;
     if (cls && date) snap = await db.collection('attendance').where('class','==',cls).where('date','==',date).get();
     else if (cls)    snap = await db.collection('attendance').where('class','==',cls).get();
     else if (date)   snap = await db.collection('attendance').where('date','==',date).get();
     else             snap = await db.collection('attendance').get();
-
     let records = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-      .sort((a,b) => (b.date||'').localeCompare(a.date||''))
-      .slice(0, 200);
-
+      .sort((a,b) => (b.date||'').localeCompare(a.date||'')).slice(0, 200);
     if (!records.length) {
       tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:20px"><div class="empty-icon">📭</div><div class="empty-title">No records found</div></div></td></tr>`;
       return;
     }
-
     tbody.innerHTML = records.map(r => `<tr>
-      <td>
-        <div style="font-weight:700">${esc(r.studentName||'—')}</div>
-        <div style="font-size:0.65rem;color:var(--text3)">Cls ${r.class||'—'}</div>
-      </td>
+      <td><div style="font-weight:700">${esc(r.studentName||'—')}</div><div style="font-size:0.65rem;color:var(--text3)">Cls ${r.class||'—'}</div></td>
       <td>${formatDate(r.date)}</td>
       <td>${esc(r.subject||'—')}</td>
       <td>P${r.period||'—'}</td>
-      <td>
-        <span class="badge badge-${r.status?.[0]||'p'}">
-          ${r.status==='present'?'✅':r.status==='absent'?'❌':'⏰'} ${cap(r.status)}
-        </span>
-      </td>
+      <td><span class="badge badge-${r.status?.[0]||'p'}">${r.status==='present'?'✅':r.status==='absent'?'❌':'⏰'} ${cap(r.status)}</span></td>
     </tr>`).join('');
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red);text-align:center;padding:16px">Error: ${e.message}</td></tr>`;
@@ -1169,12 +1184,10 @@ async function loadAttReport() {
   const el  = document.getElementById('rpBody');
   if (!el) return;
   el.innerHTML = '<div class="skel" style="height:50px;margin-bottom:8px"></div>'.repeat(4);
-
   try {
     let snap;
     if (cls) snap = await db.collection('attendance').where('class','==',cls).get();
     else     snap = await db.collection('attendance').get();
-
     const map = {};
     snap.forEach(d => {
       const r = d.data();
@@ -1184,14 +1197,11 @@ async function loadAttReport() {
       else if (r.status === 'absent') map[r.studentId].a++;
       else map[r.studentId].l++;
     });
-
     const entries = Object.values(map).sort((a,b) => a.name.localeCompare(b.name));
-
     if (!entries.length) {
       el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No data yet</div><div class="empty-sub">Mark attendance to see reports</div></div>`;
       return;
     }
-
     el.innerHTML = entries.map(s => {
       const pct = s.total > 0 ? Math.round(((s.p + s.l) / s.total) * 100) : 0;
       const col = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
@@ -1220,6 +1230,13 @@ function updateStats() {
   document.getElementById('st-chapters').textContent = chapters.length;
   document.getElementById('st-videos').textContent   = videos;
   document.getElementById('st-pdfs').textContent     = pdfs;
+  // Also update profile page stats
+  const ps = document.getElementById('prof-subjects');
+  const pc = document.getElementById('prof-chapters');
+  const pct= document.getElementById('prof-content');
+  if (ps) ps.textContent  = subjects.length;
+  if (pc) pc.textContent  = chapters.length;
+  if (pct) pct.textContent = allContent.length;
 }
 
 function renderDash() {
@@ -1238,16 +1255,13 @@ function renderDash() {
 function renderStructure(filter = '') {
   const el = document.getElementById('structureTree');
   const q  = filter.toLowerCase();
-
   const filtSubjects = subjects.filter(s =>
     !q || s.name?.toLowerCase().includes(q) || String(s.class).includes(q)
   );
-
   if (!filtSubjects.length) {
     el.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">No subjects found</div><div class="empty-sub">Add a subject to get started</div></div>`;
     return;
   }
-
   el.innerHTML = filtSubjects.map((sub, si) => {
     const chaps = chapters.filter(c => c.subjectId === sub.id)
       .filter(c => !q || c.name?.toLowerCase().includes(q));
@@ -1268,7 +1282,6 @@ function renderStructure(filter = '') {
           </div>`)
         .join('')
       : `<div style="padding:10px 16px 10px 36px;font-size:0.75rem;color:var(--text3);font-style:italic;border-bottom:1px solid var(--border)">No chapters yet</div>`;
-
     return `<div class="subj-item" id="si-${si}">
       <div class="subj-hd" onclick="toggleAccordion('si-${si}')">
         <span class="subj-arrow">▶</span>
@@ -1775,15 +1788,55 @@ document.querySelectorAll('.modal').forEach(m => {
 });
 
 /* ═══════════════════════════════════════════════════
+   ✅ LOGOUT — FIXED & FULLY WORKING
+════════════════════════════════════════════════════ */
+function doLogout() {
+  // Show the custom logout confirmation modal
+  document.getElementById('logoutModal').classList.add('open');
+}
+
+function closeLogoutModal() {
+  document.getElementById('logoutModal').classList.remove('open');
+}
+
+async function confirmLogout() {
+  const btn = document.getElementById('logoutConfirmBtn');
+  btn.disabled    = true;
+  btn.textContent = '⏳ Signing out…';
+
+  try {
+    // Sign out from Firebase Auth (works even if not signed in)
+    await firebase.auth().signOut();
+  } catch(e) {
+    // Ignore sign-out errors — still redirect
+    console.warn('Firebase signOut:', e.message);
+  }
+
+  showToast('👋 Logged out successfully', 'info');
+
+  // Redirect after a short delay so the toast is visible
+  setTimeout(() => {
+    // ⚠️ CHANGE THIS to your actual login page URL
+    // Examples: 'login.html', 'index.html', '/login', '../login.html'
+    window.location.href = 'login.html';
+  }, 900);
+}
+
+// Close logout modal when clicking backdrop
+document.getElementById('logoutModal').addEventListener('click', function(e) {
+  if (e.target === this) closeLogoutModal();
+});
+
+/* ═══════════════════════════════════════════════════
    TOAST
 ════════════════════════════════════════════════════ */
 function showToast(msg, type='success') {
   const t = document.getElementById('toast');
   const c = {
     success:'linear-gradient(135deg,#065F46,#059669)',
-    error:'linear-gradient(135deg,#7F1D1D,#DC2626)',
+    error:  'linear-gradient(135deg,#7F1D1D,#DC2626)',
     warning:'linear-gradient(135deg,#78350F,#D97706)',
-    info:'linear-gradient(135deg,#1E3A5F,#2563EB)'
+    info:   'linear-gradient(135deg,#1E3A5F,#2563EB)'
   };
   t.style.background = c[type]||c.success;
   t.textContent = msg; t.classList.add('show');
