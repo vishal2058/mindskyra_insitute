@@ -2,1342 +2,1410 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Teacher Portal — MINDSKYRA</title>
-<meta name="theme-color" content="#060B14">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Course Manager — MINDSKYRA</title>
+<meta name="theme-color" content="#FFFFFF">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<!-- Firebase Storage SDK removed: PDFs go via Apps Script → Google Drive -->
 <style>
+/* ═══════════ TOKENS ═══════════ */
 :root {
-    --bg:#060B14; --bg2:#0C1220; --card:#0F1828; --card2:#141F2E;
-    --border:rgba(20,184,166,0.14); --border2:rgba(20,184,166,0.3);
-    --teal:#14B8A6; --teal2:#2DD4BF; --teal3:#5EEAD4;
-    --emerald:#10B981; --cyan:#06B6D4; --blue:#3B82F6;
-    --amber:#F59E0B; --red:#EF4444; --green:#22C55E;
-    --text:#EEF9F8; --text2:#7FB8B0; --text3:#2D5550;
-    --grad:linear-gradient(135deg,#0F766E,#14B8A6,#2DD4BF);
-    --grad2:linear-gradient(135deg,#065F46,#059669,#34D399);
-    --grad-card:linear-gradient(135deg,#0F1828,#0D2029);
-    --shadow:0 8px 32px rgba(0,0,0,0.6);
-    --glow:0 0 30px rgba(20,184,166,0.12);
-    --nav-h:62px;
+  --bg:      #F7F8FA;
+  --bg2:     #FFFFFF;
+  --bg3:     #EEF0F5;
+  --card:    #FFFFFF;
+  --border:  rgba(0,0,0,0.08);
+  --border2: rgba(91,94,244,0.3);
+  --primary:    #5B5EF4;
+  --primary2:   #818CF8;
+  --primary3:   #C7D2FE;
+  --primary-bg: rgba(91,94,244,0.08);
+  --green:    #10B981;
+  --green-bg: rgba(16,185,129,0.1);
+  --red:      #EF4444;
+  --red-bg:   rgba(239,68,68,0.1);
+  --amber:    #F59E0B;
+  --amber-bg: rgba(245,158,11,0.1);
+  --blue:     #3B82F6;
+  --blue-bg:  rgba(59,130,246,0.1);
+  --pink:     #EC4899;
+  --pink-bg:  rgba(236,72,153,0.1);
+  --orange:   #EA580C;
+  --orange-bg:rgba(234,88,12,0.1);
+  --text:  #0F172A;
+  --text2: #64748B;
+  --text3: #CBD5E1;
+  --shadow:  0 1px 3px rgba(0,0,0,0.06),0 4px 16px rgba(0,0,0,0.06);
+  --shadow2: 0 8px 30px rgba(0,0,0,0.1);
+  --nav-h:    68px;
+  --header-h: 60px;
+  --radius:  16px;
+  --radius2: 12px;
 }
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;}
-html,body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-    background:radial-gradient(ellipse 80% 50% at 50% -20%,rgba(20,184,166,0.07) 0%,transparent 65%),
-               radial-gradient(ellipse 50% 60% at 90% 80%,rgba(6,182,212,0.04) 0%,transparent 60%);}
-::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-track{background:var(--bg);}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;}
+h1,h2,h3,.brand,.val,.title{font-family:'Outfit',sans-serif;}
+::-webkit-scrollbar{width:3px;}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
-/* ── AUTH ── */
-#authScreen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:20px;}
-.auth-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:380px;box-shadow:var(--shadow),var(--glow);}
-.auth-logo{text-align:center;margin-bottom:28px;}
-.auth-icon{width:56px;height:56px;border-radius:16px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 12px;box-shadow:0 0 30px rgba(20,184,166,0.35);}
-.auth-title{font-size:1.4rem;font-weight:800;color:var(--text);}
-.auth-sub{font-size:0.8rem;color:var(--text2);margin-top:4px;}
-.auth-label{display:block;font-size:0.72rem;font-weight:700;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
-.auth-input{width:100%;background:rgba(20,184,166,0.05)!important;color:var(--text)!important;border:1.5px solid var(--border)!important;border-radius:11px;padding:11px 14px;font-size:0.875rem;font-family:inherit;outline:none;transition:border-color 0.2s;margin-bottom:16px;}
-.auth-input:focus{border-color:var(--teal)!important;}
-.auth-btn{width:100%;padding:13px;border-radius:11px;background:var(--grad);border:none;color:white;font-size:0.9rem;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(20,184,166,0.3);transition:all 0.2s;}
-.auth-btn:hover{filter:brightness(1.1);box-shadow:0 6px 28px rgba(20,184,166,0.45);}
-.auth-err{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);border-radius:10px;padding:10px 14px;font-size:0.8rem;color:#FCA5A5;margin-bottom:14px;display:none;}
-
-/* ── NAV ── */
-#mainNav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,11,20,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);height:var(--nav-h);display:flex;align-items:center;justify-content:space-around;padding:0 8px;}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;transition:all 0.2s;border-radius:12px;position:relative;}
-.nav-item .nav-icon{font-size:1.3rem;transition:transform 0.2s;}
-.nav-item .nav-label{font-size:0.6rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.05em;transition:color 0.2s;}
-.nav-item.active .nav-label{color:var(--teal);}
-.nav-item.active .nav-icon{transform:scale(1.15);}
-.nav-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:3px;border-radius:0 0 4px 4px;background:var(--teal);}
+/* ── LOADING ── */
+#splash{position:fixed;inset:0;z-index:9999;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.sp-logo{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,#5B5EF4,#818CF8);display:flex;align-items:center;justify-content:center;font-size:2.4rem;box-shadow:0 12px 40px rgba(91,94,244,0.4);animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.06);}}
+.sp-name{font-family:'Outfit',sans-serif;font-weight:900;font-size:1.5rem;background:linear-gradient(135deg,#5B5EF4,#818CF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.sp-sub{font-size:0.78rem;color:var(--text2);letter-spacing:0.06em;text-transform:uppercase;}
+.spinner{width:30px;height:30px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── HEADER ── */
-#appHeader{position:fixed;top:0;left:0;right:0;z-index:99;background:rgba(6,11,20,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;padding:0 16px;gap:12px;}
-.header-brand{display:flex;align-items:center;gap:9px;flex:1;}
-.h-icon{width:34px;height:34px;border-radius:10px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1rem;box-shadow:0 0 16px rgba(20,184,166,0.3);}
-.h-name{font-weight:800;font-size:0.9rem;color:var(--text);}
-.h-role{font-size:0.65rem;color:var(--teal);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;}
-.h-actions{display:flex;gap:8px;align-items:center;}
-.h-btn{background:rgba(20,184,166,0.08);border:1px solid var(--border);padding:6px 10px;border-radius:9px;color:var(--text2);font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.2s;}
-.h-btn:hover{background:rgba(20,184,166,0.15);color:var(--teal);}
-.streak-badge{background:linear-gradient(135deg,#78350F,#D97706);padding:5px 10px;border-radius:20px;font-size:0.72rem;font-weight:800;color:white;display:flex;align-items:center;gap:4px;box-shadow:0 2px 12px rgba(245,158,11,0.3);}
+#hdr{position:fixed;top:0;left:0;right:0;z-index:99;height:var(--header-h);display:flex;align-items:center;padding:0 16px;gap:12px;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.hdr-logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#5B5EF4,#818CF8);display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;}
+.hdr-info{flex:1;min-width:0;}
+.hdr-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;color:var(--text);}
+.hdr-sub{font-size:0.65rem;color:var(--primary);font-weight:700;text-transform:uppercase;letter-spacing:0.07em;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
 
-/* ── MAIN ── */
-#mainApp{display:none;padding-top:68px;padding-bottom:calc(var(--nav-h)+16px);}
-.page{display:none;padding:14px 14px 0;position:relative;z-index:1;}
-.page.active{display:block;}
-.page-hd{margin-bottom:18px;}
-.page-title{font-size:1.5rem;font-weight:800;color:var(--text);}
-.page-sub{font-size:0.8rem;color:var(--text2);margin-top:3px;}
+/* ── NAV ── */
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);display:flex;align-items:center;justify-content:space-around;padding:0 6px 6px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;border-radius:12px;position:relative;user-select:none;transition:all 0.2s;}
+.ni-icon{font-size:1.2rem;transition:transform 0.2s;}
+.ni-lbl{font-size:0.57rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;transition:color 0.2s;}
+.ni.on .ni-lbl{color:var(--primary);}
+.ni.on .ni-icon{transform:scale(1.15);}
+.ni-bar{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:30px;height:3px;border-radius:2px;background:var(--primary);opacity:0;transition:opacity 0.2s;}
+.ni.on .ni-bar{opacity:1;}
 
-/* ── CARDS ── */
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;}
-.card-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
-.card-title{font-size:0.9rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
+/* ── WRAP ── */
+#app{display:none;padding-top:calc(var(--header-h) + 10px);padding-bottom:calc(var(--nav-h) + 10px);}
+.pg{display:none;padding:14px 14px 0;animation:fi 0.25s ease;}
+.pg.on{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ── PAGE HEADER ── */
+.pg-hd{margin-bottom:18px;}
+.pg-title{font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:800;color:var(--text);}
+.pg-sub{font-size:0.78rem;color:var(--text2);margin-top:2px;}
+
+/* ── CARD ── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:14px;}
+.card-hd{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;}
+.card-title{font-family:'Outfit',sans-serif;font-size:0.9rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
 .card-body{padding:16px;}
 
-/* ── BUTTONS ── */
-.btn-primary{background:var(--grad);border:none;color:white;padding:10px 18px;border-radius:11px;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 16px rgba(20,184,166,0.25);}
-.btn-primary:hover{filter:brightness(1.08);box-shadow:0 6px 24px rgba(20,184,166,0.4);}
-.btn-primary:disabled{opacity:0.5;cursor:not-allowed;}
-.btn-ghost{background:rgba(20,184,166,0.07);border:1px solid var(--border);color:var(--text2);padding:9px 16px;border-radius:11px;font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s;}
-.btn-ghost:hover{background:rgba(20,184,166,0.14);color:var(--teal);}
-.btn-danger{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);color:#FCA5A5;padding:6px 12px;border-radius:9px;font-weight:700;font-size:0.75rem;cursor:pointer;transition:all 0.2s;}
-.btn-danger:hover{background:rgba(239,68,68,0.2);}
-.btn-sm{padding:6px 12px!important;font-size:0.75rem!important;border-radius:9px!important;}
-
-/* ── FORM INPUTS ── */
-.f-group{margin-bottom:14px;}
-.f-label{display:block;font-size:0.72rem;font-weight:700;color:var(--teal3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
-.f-input{width:100%;background:rgba(20,184,166,0.05)!important;color:var(--text)!important;border:1.5px solid var(--border)!important;border-radius:11px;padding:10px 14px;font-size:0.85rem;font-family:inherit;outline:none;transition:border-color 0.2s;}
-.f-input:focus{border-color:var(--teal)!important;}
-.f-input::placeholder{color:var(--text3)!important;}
-select.f-input option{background:#0C1220;}
-textarea.f-input{resize:vertical;min-height:80px;}
-
 /* ── STATS ── */
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
-.stat-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;text-align:center;}
-.stat-val{font-size:1.7rem;font-weight:800;line-height:1;}
-.stat-lbl{font-size:0.68rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-top:5px;}
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 12px;box-shadow:var(--shadow);}
+.stat-val{font-family:'Outfit',sans-serif;font-size:1.8rem;font-weight:800;line-height:1;}
+.stat-lbl{font-size:0.68rem;font-weight:600;color:var(--text2);margin-top:4px;text-transform:uppercase;letter-spacing:0.05em;}
+.stat-icon{font-size:1.4rem;margin-bottom:6px;}
 
-/* ── STREAK CALENDAR ── */
-.streak-wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:12px 0;}
-.streak-day{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;cursor:default;}
-.streak-day.attended{background:rgba(20,184,166,0.3);color:var(--teal);border:1px solid rgba(20,184,166,0.4);}
-.streak-day.missed{background:rgba(239,68,68,0.12);color:rgba(239,68,68,0.5);border:1px solid rgba(239,68,68,0.15);}
-.streak-day.future{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);color:var(--text3);}
-.streak-day.today{border:2px solid var(--teal)!important;color:var(--teal2);}
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:10px;font-weight:700;font-size:0.82rem;cursor:pointer;border:none;transition:all 0.2s;font-family:'DM Sans',sans-serif;user-select:none;}
+.btn-primary{background:linear-gradient(135deg,#5B5EF4,#818CF8);color:white;box-shadow:0 4px 14px rgba(91,94,244,0.3);}
+.btn-primary:hover{box-shadow:0 6px 20px rgba(91,94,244,0.4);transform:translateY(-1px);}
+.btn-primary:active{transform:translateY(0);}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--text2);}
+.btn-ghost:hover{background:var(--primary3);color:var(--primary);border-color:var(--border2);}
+.btn-danger{background:var(--red-bg);border:1px solid rgba(239,68,68,0.2);color:var(--red);}
+.btn-success{background:var(--green-bg);border:1px solid rgba(16,185,129,0.2);color:var(--green);}
+.btn-sm{padding:6px 13px!important;font-size:0.76rem!important;border-radius:8px!important;}
+.btn-xs{padding:4px 10px!important;font-size:0.7rem!important;border-radius:7px!important;}
 
-/* ── ATTENDANCE MARK ── */
-.att-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0;}
-@media(max-width:480px){.att-form-grid{grid-template-columns:1fr;}}
-.bulk-bar{display:flex;gap:8px;align-items:center;padding:10px 14px;background:rgba(20,184,166,0.04);border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-wrap:wrap;}
-.bulk-lbl{font-size:0.75rem;font-weight:700;color:var(--text2);}
-.bulk-btn{padding:5px 12px;border-radius:8px;font-size:0.72rem;font-weight:700;cursor:pointer;border:none;transition:all 0.18s;}
-.bb-p{background:rgba(34,197,94,0.12);color:#4ADE80;}
-.bb-p:hover{background:rgba(34,197,94,0.22);}
-.bb-a{background:rgba(239,68,68,0.1);color:#F87171;}
-.bb-a:hover{background:rgba(239,68,68,0.2);}
-
-.s-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:rgba(20,184,166,0.03);margin:6px 14px;transition:all 0.18s;}
-.s-row.mp{border-color:rgba(34,197,94,0.35);background:rgba(34,197,94,0.06);}
-.s-row.ma{border-color:rgba(239,68,68,0.35);background:rgba(239,68,68,0.05);}
-.s-row.ml{border-color:rgba(245,158,11,0.35);background:rgba(245,158,11,0.05);}
-.s-ava{width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;}
-.s-info{flex:1;min-width:0;}
-.s-name{font-weight:700;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.s-meta{font-size:0.65rem;color:var(--text2);margin-top:1px;}
-.sbns{display:flex;gap:5px;flex-shrink:0;}
-.sbn{padding:5px 9px;border-radius:7px;font-size:0.68rem;font-weight:800;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;}
-.sbn-p{background:rgba(34,197,94,0.08);color:#4ADE80;border-color:rgba(34,197,94,0.15);}
-.sbn-p.on,.sbn-p:hover{background:rgba(34,197,94,0.2);border-color:#4ADE80;}
-.sbn-l{background:rgba(245,158,11,0.08);color:#FBBF24;border-color:rgba(245,158,11,0.15);}
-.sbn-l.on,.sbn-l:hover{background:rgba(245,158,11,0.2);border-color:#FBBF24;}
-.sbn-a{background:rgba(239,68,68,0.08);color:#F87171;border-color:rgba(239,68,68,0.15);}
-.sbn-a.on,.sbn-a:hover{background:rgba(239,68,68,0.2);border-color:#F87171;}
-
-/* ── COURSE CARDS ── */
-.course-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:0.7rem;font-weight:700;background:rgba(20,184,166,0.1);color:var(--teal);border:1px solid rgba(20,184,166,0.2);}
-.content-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;transition:all 0.2s;}
-.content-card:hover{border-color:var(--border2);}
-.content-type-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.68rem;font-weight:700;}
-.ctb-note{background:rgba(59,130,246,0.12);color:#93C5FD;border:1px solid rgba(59,130,246,0.2);}
-.ctb-video{background:rgba(239,68,68,0.1);color:#FCA5A5;border:1px solid rgba(239,68,68,0.2);}
-.ctb-assign{background:rgba(245,158,11,0.1);color:#FCD34D;border:1px solid rgba(245,158,11,0.2);}
-.ctb-announce{background:rgba(168,85,247,0.1);color:#D8B4FE;border:1px solid rgba(168,85,247,0.2);}
-.ctb-link{background:rgba(20,184,166,0.1);color:var(--teal3);border:1px solid var(--border);}
-
-/* ── MODAL ── */
-.modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);padding:20px;align-items:center;justify-content:center;}
-.modal.open{display:flex;}
-.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow),var(--glow);}
-.modal-head{padding:18px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.modal-title{font-weight:800;font-size:1rem;color:var(--text);}
-.modal-close{background:rgba(255,255,255,0.07);border:none;width:30px;height:30px;border-radius:8px;color:var(--text2);font-size:1rem;cursor:pointer;}
-.modal-body{padding:18px;}
-
-/* ── BADGE ── */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.68rem;font-weight:700;}
-.badge-p{background:rgba(34,197,94,0.1);color:#4ADE80;border:1px solid rgba(34,197,94,0.2);}
-.badge-a{background:rgba(239,68,68,0.1);color:#F87171;border:1px solid rgba(239,68,68,0.2);}
-.badge-l{background:rgba(245,158,11,0.08);color:#FBBF24;border:1px solid rgba(245,158,11,0.2);}
-
-/* ── SKELETON ── */
-.skel{background:linear-gradient(90deg,#0F1828 25%,#1A2840 50%,#0F1828 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
-@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
-
-/* ── TOAST ── */
-#toast{position:fixed;top:70px;right:14px;z-index:999;padding:11px 18px;border-radius:12px;font-weight:700;font-size:0.82rem;color:white;transform:translateX(320px);transition:transform 0.3s cubic-bezier(0.68,-0.55,0.265,1.55);max-width:300px;pointer-events:none;}
-#toast.show{transform:translateX(0);}
-
-/* ── EMPTY ── */
-.empty-state{text-align:center;padding:40px 20px;color:var(--text3);}
-.empty-state .ei{font-size:2.6rem;margin-bottom:10px;}
-.empty-state .et{font-weight:700;font-size:0.95rem;color:var(--text2);margin-bottom:4px;}
-.empty-state .es{font-size:0.78rem;}
+/* ── INPUTS ── */
+.fg{margin-bottom:13px;}
+.fl{display:block;font-size:0.7rem;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:5px;}
+.fi{width:100%;background:var(--bg3);color:var(--text);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-size:0.85rem;font-family:'DM Sans',sans-serif;outline:none;transition:all 0.2s;appearance:none;}
+.fi:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(91,94,244,0.1);}
+.fi::placeholder{color:var(--text3);}
+select.fi option{background:#fff;color:var(--text);}
+textarea.fi{resize:vertical;min-height:80px;}
 
 /* ── TABS ── */
 .tab-row{display:flex;gap:6px;padding-bottom:14px;overflow-x:auto;scrollbar-width:none;}
 .tab-row::-webkit-scrollbar{display:none;}
-.tab-pill{padding:7px 16px;border-radius:20px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;white-space:nowrap;border:1px solid var(--border);background:rgba(20,184,166,0.04);color:var(--text3);}
-.tab-pill.on{background:rgba(20,184,166,0.14);color:var(--teal);border-color:var(--border2);}
+.tab-pill{padding:7px 16px;border-radius:20px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.18s;white-space:nowrap;border:1.5px solid var(--border);background:var(--card);color:var(--text2);}
+.tab-pill.on{background:var(--primary);color:white;border-color:var(--primary);box-shadow:0 3px 12px rgba(91,94,244,0.25);}
 
-/* ── HISTORY TABLE ── */
-.hist-scroll{overflow-x:auto;}
-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
-thead th{padding:10px 12px;text-align:left;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;}
-tbody tr{border-bottom:1px solid rgba(20,184,166,0.06);transition:background 0.15s;}
-tbody tr:hover{background:rgba(20,184,166,0.04);}
-tbody td{padding:10px 12px;color:var(--text2);vertical-align:middle;}
-tbody td:first-child{color:var(--text);font-weight:600;}
+/* ── TYPE SWITCHER ── */
+.type-sw{display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;background:var(--bg3);border-radius:11px;padding:3px;margin-bottom:16px;}
+.type-btn{padding:9px 4px;border:none;border-radius:9px;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--text2);}
+.type-btn.on{background:var(--primary);color:white;box-shadow:0 2px 8px rgba(91,94,244,0.3);}
 
-/* ── PROFILE ── */
-.profile-hero{background:var(--grad);border-radius:16px;padding:24px;text-align:center;margin-bottom:16px;position:relative;overflow:hidden;}
-.profile-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 70% 30%,rgba(255,255,255,0.1),transparent 60%);}
-.p-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.2);border:3px solid rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:800;margin:0 auto 12px;position:relative;z-index:1;}
-.p-name{font-size:1.3rem;font-weight:800;color:white;position:relative;z-index:1;}
-.p-role{font-size:0.78rem;color:rgba(255,255,255,0.75);margin-top:4px;position:relative;z-index:1;}
+/* ── SUBJECT ACCORDION ── */
+.subj-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius2);margin-bottom:8px;overflow:hidden;}
+.subj-hd{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;transition:background 0.15s;}
+.subj-hd:hover{background:var(--bg3);}
+.subj-arrow{font-size:0.72rem;color:var(--text3);transition:transform 0.22s;flex-shrink:0;}
+.subj-item.open .subj-arrow{transform:rotate(90deg);}
+.subj-body{display:none;border-top:1px solid var(--border);}
+.subj-item.open .subj-body{display:block;}
 
-/* ── STUDENT LIST TAB ── */
-.student-tile{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:13px;background:var(--card2);border:1px solid var(--border);margin-bottom:8px;transition:all 0.18s;}
-.student-tile:hover{border-color:var(--border2);}
+/* ── CHAPTER ── */
+.chap-row{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;user-select:none;}
+.chap-row:hover{background:var(--bg3);}
+.chap-row:last-child{border-bottom:none;}
+.chap-row.sel{background:var(--primary-bg);border-left:3px solid var(--primary);}
 
-/* ── Quick actions ── */
-.qa-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;}
-.qa-btn{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all 0.2s;text-align:center;}
-.qa-btn:hover{border-color:var(--border2);background:var(--card2);}
-.qa-icon{font-size:1.6rem;margin-bottom:6px;}
-.qa-lbl{font-size:0.75rem;font-weight:700;color:var(--text2);}
+/* ── CONTENT LIST ITEM ── */
+.cl-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--border);transition:background 0.15s;}
+.cl-item:hover{background:var(--bg3);}
+.cl-item:last-child{border-bottom:none;}
+.cl-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+
+/* ── DROP ZONE ── */
+.drop-zone{border:2px dashed var(--border2);border-radius:12px;padding:26px 16px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--primary-bg);}
+.drop-zone.drag-over{border-color:var(--primary);background:rgba(91,94,244,0.12);}
+.drop-zone.has-file{border-style:solid;border-color:var(--green);background:var(--green-bg);}
+
+/* ── PROGRESS ── */
+.prog-wrap{margin-bottom:12px;}
+.prog-row{display:flex;justify-content:space-between;font-size:0.72rem;color:var(--text2);margin-bottom:5px;}
+.prog-bar{height:7px;background:var(--bg3);border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--primary),var(--primary2));transition:width 0.4s ease;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:20px;font-size:0.66rem;font-weight:700;}
+.badge-video{background:var(--red-bg);color:var(--red);}
+.badge-notes{background:var(--blue-bg);color:var(--blue);}
+.badge-dpp{background:var(--green-bg);color:var(--green);}
+
+/* ── MODAL ── */
+.modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);padding:16px;align-items:flex-end;justify-content:center;}
+.modal.open{display:flex;}
+.modal-box{background:var(--card);border-radius:20px 20px 16px 16px;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow2);animation:slideUp 0.32s cubic-bezier(0.34,1.56,0.64,1);}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0;}to{transform:none;opacity:1;}}
+.modal-hd{padding:18px 18px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:1;border-radius:20px 20px 0 0;}
+.modal-title{font-family:'Outfit',sans-serif;font-weight:800;font-size:1rem;color:var(--text);}
+.modal-close{background:var(--bg3);border:none;width:30px;height:30px;border-radius:8px;color:var(--text2);font-size:1rem;cursor:pointer;}
+.modal-body{padding:18px;}
+
+/* ── TOAST ── */
+#toast{position:fixed;top:70px;right:14px;z-index:9999;padding:12px 18px;border-radius:12px;font-weight:700;font-size:0.82rem;color:white;transform:translateX(400px);transition:transform 0.35s cubic-bezier(0.68,-0.55,0.265,1.55);max-width:300px;pointer-events:none;box-shadow:var(--shadow2);font-family:'DM Sans',sans-serif;}
+#toast.show{transform:translateX(0);}
+
+/* ── SKELETON ── */
+.skel{background:linear-gradient(90deg,#F0F0F0 25%,#E0E0E0 50%,#F0F0F0 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:10px;}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:36px 20px;color:var(--text3);}
+.empty-icon{font-size:2.8rem;margin-bottom:10px;opacity:0.5;}
+.empty-title{font-weight:700;font-size:0.9rem;color:var(--text2);margin-bottom:4px;}
+.empty-sub{font-size:0.76rem;}
+
+/* ── YT PREVIEW ── */
+.yt-prev{display:none;background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px;}
+.yt-prev img{width:100%;height:140px;object-fit:cover;display:block;}
+.yt-meta{padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:0.72rem;font-weight:600;color:var(--text2);}
+
+/* ── CHAPTER BANNER ── */
+.chap-banner{background:var(--primary-bg);border:1.5px solid var(--primary3);border-radius:var(--radius2);padding:13px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.chap-banner-label{font-size:0.6rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--primary);margin-bottom:3px;}
+.chap-banner-name{font-weight:800;font-size:0.9rem;color:var(--text);}
+.chap-banner-meta{font-size:0.7rem;color:var(--text2);margin-top:2px;}
+
+/* ── SECTION LABEL ── */
+.sec-lbl{font-size:0.67rem;font-weight:800;text-transform:uppercase;letter-spacing:0.09em;color:var(--text3);margin:14px 0 6px;}
+
+/* ── CLASS TAG ── */
+.cls-tag{background:var(--primary-bg);color:var(--primary);border:1px solid var(--primary3);padding:3px 8px;border-radius:20px;font-size:0.63rem;font-weight:700;}
+
+/* ── ACTION ROW ── */
+.action-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+
+/* ── SEARCH BAR ── */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-wrap input{padding-left:36px;}
+.search-ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:1rem;color:var(--text3);pointer-events:none;}
+
+/* ── MINI GRID ── */
+.mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding-bottom:14px;}
+.mini-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius2);padding:14px 12px;cursor:pointer;transition:all 0.2s;text-align:center;}
+.mini-card:hover{border-color:var(--border2);box-shadow:var(--shadow2);transform:translateY(-2px);}
+.mini-icon{font-size:1.8rem;margin-bottom:6px;}
+.mini-lbl{font-size:0.75rem;font-weight:700;color:var(--text2);}
+
+@media(max-width:380px){.stats-grid{grid-template-columns:1fr 1fr;}.mini-grid{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
 
-<!-- ══ TOAST ══ -->
 <div id="toast"></div>
 
-<!-- Loading screen while auth checks -->
-<div id="loadingScreen" style="position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px">
-    <div style="width:52px;height:52px;border-radius:16px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 0 30px rgba(20,184,166,0.35)">🎓</div>
-    <div style="font-size:1rem;font-weight:800;color:var(--text)">MINDSKYRA</div>
-    <div style="font-size:0.75rem;color:var(--text2)">Loading Teacher Portal…</div>
-    <div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite"></div>
-</div>
-<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-
-<!-- ══ MAIN APP ══ -->
-<div id="mainApp">
-
-    <!-- HEADER -->
-    <div id="appHeader">
-        <div class="header-brand">
-            <div class="h-icon">🎓</div>
-            <div>
-                <div class="h-name" id="hName">Loading…</div>
-                <div class="h-role">Teacher · MINDSKYRA</div>
-            </div>
-        </div>
-        <div class="h-actions">
-            <div class="streak-badge" id="hStreak">🔥 0</div>
-            <button class="h-btn" onclick="doLogout()">Logout</button>
-        </div>
-    </div>
-
-    <!-- ══ PAGE: DASHBOARD ══ -->
-    <div id="page-dash" class="page active">
-        <div class="page-hd">
-            <div class="page-title" id="dashGreet">Good Morning! 👋</div>
-            <div class="page-sub" id="dashDate"></div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-box"><div class="stat-val" style="color:var(--teal)" id="dsTotalClasses">—</div><div class="stat-lbl">Classes Taken</div></div>
-            <div class="stat-box"><div class="stat-val" style="color:var(--green)" id="dsStreak">—</div><div class="stat-lbl">🔥 Day Streak</div></div>
-            <div class="stat-box"><div class="stat-val" style="color:var(--amber)" id="dsStudents">—</div><div class="stat-lbl">My Students</div></div>
-            <div class="stat-box"><div class="stat-val" style="color:var(--blue)" id="dsContent">—</div><div class="stat-lbl">Content Posted</div></div>
-        </div>
-
-        <!-- Streak calendar -->
-        <div class="card" style="margin-bottom:14px">
-            <div class="card-head">
-                <div class="card-title">🔥 Teaching Streak — Last 28 Days</div>
-                <div id="streakLabel" style="font-size:0.75rem;color:var(--amber);font-weight:700"></div>
-            </div>
-            <div class="card-body">
-                <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                    <span style="font-size:0.7rem;color:var(--text3)">4 weeks ago</span>
-                    <span style="font-size:0.7rem;color:var(--text3)">Today</span>
-                </div>
-                <div class="streak-wrap" id="streakCal"></div>
-                <div style="display:flex;gap:16px;margin-top:10px;font-size:0.7rem;color:var(--text2)">
-                    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(20,184,166,0.3);display:inline-block;border:1px solid rgba(20,184,166,0.4)"></span>Attended</span>
-                    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(239,68,68,0.12);display:inline-block;border:1px solid rgba(239,68,68,0.15)"></span>Missed</span>
-                    <span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:rgba(255,255,255,0.03);display:inline-block;border:1px solid rgba(255,255,255,0.06)"></span>Future</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Today's attendance summary -->
-        <div class="card" style="margin-bottom:14px">
-            <div class="card-head">
-                <div class="card-title">📋 Today's Attendance</div>
-                <button class="btn-primary btn-sm" onclick="navigateTo('att')">+ Mark Now</button>
-            </div>
-            <div class="card-body" id="dashAttSummary">
-                <div class="skel" style="height:40px;margin-bottom:8px"></div>
-                <div class="skel" style="height:40px"></div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="card" style="margin-bottom:14px">
-            <div class="card-head"><div class="card-title">⚡ Quick Actions</div></div>
-            <div class="card-body">
-                <div class="qa-grid">
-                    <div class="qa-btn" onclick="navigateTo('att')"><div class="qa-icon">📋</div><div class="qa-lbl">Mark Attendance</div></div>
-                    <div class="qa-btn" onclick="openPostModal('note')"><div class="qa-icon">📝</div><div class="qa-lbl">Post Notes</div></div>
-                    <div class="qa-btn" onclick="openPostModal('assign')"><div class="qa-icon">📚</div><div class="qa-lbl">Give Assignment</div></div>
-                    <div class="qa-btn" onclick="openPostModal('announce')"><div class="qa-icon">📣</div><div class="qa-lbl">Announcement</div></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══ PAGE: ATTENDANCE ══ -->
-    <div id="page-att" class="page">
-        <div class="page-hd">
-            <div class="page-title">📋 Attendance</div>
-            <div class="page-sub">Mark & view student attendance</div>
-        </div>
-
-        <div class="tab-row">
-            <div class="tab-pill on" id="atab-mark" onclick="switchAttTab('mark')">✏️ Mark</div>
-            <div class="tab-pill"    id="atab-hist" onclick="switchAttTab('hist')">📊 History</div>
-            <div class="tab-pill"    id="atab-report" onclick="switchAttTab('report')">📈 Report</div>
-        </div>
-
-        <!-- MARK TAB -->
-        <div id="attc-mark">
-            <div class="card" style="margin-bottom:12px">
-                <div class="card-head">
-                    <div class="card-title">📝 Session Details</div>
-                    <div id="attDateLabel" style="font-size:0.75rem;color:var(--text2)"></div>
-                </div>
-                <div class="att-form-grid">
-                    <div class="f-group"><label class="f-label">Date</label><input type="date" id="attDate" class="f-input"></div>
-                    <div class="f-group"><label class="f-label">Class</label>
-                        <select id="attClass" class="f-input" onchange="loadAttStudents()">
-                            <option value="">— Select —</option>
-                        </select>
-                    </div>
-                    <div class="f-group"><label class="f-label">Subject</label><input type="text" id="attSubject" class="f-input" placeholder="e.g. Physics"></div>
-                    <div class="f-group"><label class="f-label">Room No.</label><input type="text" id="attRoom" class="f-input" placeholder="e.g. 101"></div>
-                    <div class="f-group"><label class="f-label">Period</label>
-                        <select id="attPeriod" class="f-input">
-                            <option value="1">Period 1</option><option value="2">Period 2</option>
-                            <option value="3">Period 3</option><option value="4">Period 4</option>
-                            <option value="5">Period 5</option><option value="6">Period 6</option>
-                            <option value="7">Period 7</option><option value="8">Period 8</option>
-                        </select>
-                    </div>
-                    <div class="f-group"><label class="f-label">Session Note</label><input type="text" id="attNote" class="f-input" placeholder="Optional note"></div>
-                </div>
-                <div style="padding:0 14px 14px;display:flex;justify-content:flex-end">
-                    <button class="btn-primary btn-sm" onclick="loadAttStudents()">🔄 Load Students</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="bulk-bar">
-                    <span class="bulk-lbl">Mark All:</span>
-                    <button class="bulk-btn bb-p" onclick="markAllAtt('present')">✅ Present</button>
-                    <button class="bulk-btn bb-a" onclick="markAllAtt('absent')">❌ Absent</button>
-                    <div style="flex:1"></div>
-                    <span id="attMarkedCnt" style="font-size:0.72rem;color:var(--text3)">0 marked</span>
-                </div>
-                <div id="attStudentList" style="padding-bottom:8px">
-                    <div class="empty-state"><div class="ei">🏫</div><div class="et">Select class & date to load students</div></div>
-                </div>
-                <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
-                    <button class="btn-ghost" onclick="resetAtt()">↺ Reset</button>
-                    <button class="btn-primary" id="attSaveBtn" onclick="saveAtt()">💾 Save Attendance</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- HISTORY TAB -->
-        <div id="attc-hist" style="display:none">
-            <div class="card">
-                <div class="card-head">
-                    <div class="card-title">Recent Records</div>
-                    <div style="display:flex;gap:7px;flex-wrap:wrap">
-                        <select id="hfClass" class="f-input" style="padding:7px 10px;font-size:0.78rem" onchange="loadAttHistory()"><option value="">All Classes</option></select>
-                        <input type="date" id="hfDate" class="f-input" style="padding:7px 10px;font-size:0.78rem" onchange="loadAttHistory()">
-                        <button class="btn-ghost btn-sm" onclick="clearHistFilters()">✕</button>
-                    </div>
-                </div>
-                <div class="hist-scroll">
-                    <table>
-                        <thead><tr><th>Student</th><th>Date</th><th>Subject</th><th>Period</th><th>Status</th><th>Note</th></tr></thead>
-                        <tbody id="histTbody"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- REPORT TAB -->
-        <div id="attc-report" style="display:none">
-            <div class="card">
-                <div class="card-head">
-                    <div class="card-title">Per-Student Attendance %</div>
-                    <select id="rpClass" class="f-input" style="padding:7px 10px;font-size:0.78rem;width:140px" onchange="loadAttReport()"><option value="">All Classes</option></select>
-                </div>
-                <div class="card-body" id="rpBody">
-                    <div class="skel" style="height:50px;margin-bottom:8px"></div>
-                    <div class="skel" style="height:50px;margin-bottom:8px"></div>
-                    <div class="skel" style="height:50px"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ══ PAGE: COURSES / CONTENT ══ -->
-    <div id="page-courses" class="page">
-        <div class="page-hd">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-                <div>
-                    <div class="page-title">📚 Courses & Content</div>
-                    <div class="page-sub">Post notes, videos, assignments & announcements</div>
-                </div>
-                <button class="btn-primary btn-sm" onclick="openPostModal('note')">+ Post</button>
-            </div>
-        </div>
-
-        <div class="tab-row" id="contentTypeTabs">
-            <div class="tab-pill on" onclick="filterContent('all',this)">All</div>
-            <div class="tab-pill" onclick="filterContent('note',this)">📝 Notes</div>
-            <div class="tab-pill" onclick="filterContent('video',this)">🎥 Videos</div>
-            <div class="tab-pill" onclick="filterContent('assign',this)">📚 Assignments</div>
-            <div class="tab-pill" onclick="filterContent('announce',this)">📣 Announcements</div>
-            <div class="tab-pill" onclick="filterContent('link',this)">🔗 Links</div>
-        </div>
-
-        <div id="contentList">
-            <div class="skel" style="height:80px;margin-bottom:10px;border-radius:14px"></div>
-            <div class="skel" style="height:80px;margin-bottom:10px;border-radius:14px"></div>
-            <div class="skel" style="height:80px;border-radius:14px"></div>
-        </div>
-    </div>
-
-    <!-- ══ PAGE: STUDENTS ══ -->
-    <div id="page-students" class="page">
-        <div class="page-hd">
-            <div class="page-title">👥 My Students</div>
-            <div class="page-sub">View class roster & attendance stats</div>
-        </div>
-        <div class="f-group" style="margin-bottom:12px">
-            <select id="stuFilterClass" class="f-input" onchange="loadMyStudents()"><option value="">All My Classes</option></select>
-        </div>
-        <div id="studentTileList">
-            <div class="skel" style="height:58px;margin-bottom:8px;border-radius:13px"></div>
-            <div class="skel" style="height:58px;margin-bottom:8px;border-radius:13px"></div>
-            <div class="skel" style="height:58px;border-radius:13px"></div>
-        </div>
-    </div>
-
-    <!-- ══ PAGE: PROFILE ══ -->
-    <div id="page-profile" class="page">
-        <div class="page-hd"><div class="page-title">👤 Profile</div></div>
-        <div class="profile-hero">
-            <div class="p-avatar" id="pAvatar">T</div>
-            <div class="p-name" id="pName">—</div>
-            <div class="p-role" id="pRole">Teacher</div>
-        </div>
-
-        <div class="card" style="margin-bottom:12px">
-            <div class="card-head"><div class="card-title">📊 My Stats</div></div>
-            <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center">
-                <div><div style="font-size:1.4rem;font-weight:800;color:var(--teal)" id="profClasses">—</div><div style="font-size:0.68rem;color:var(--text2);margin-top:3px">Classes</div></div>
-                <div><div style="font-size:1.4rem;font-weight:800;color:var(--amber)" id="profStreak">—</div><div style="font-size:0.68rem;color:var(--text2);margin-top:3px">🔥 Streak</div></div>
-                <div><div style="font-size:1.4rem;font-weight:800;color:var(--blue)" id="profPosts">—</div><div style="font-size:0.68rem;color:var(--text2);margin-top:3px">Posts</div></div>
-            </div>
-        </div>
-
-        <div class="card" style="margin-bottom:12px">
-            <div class="card-head"><div class="card-title">⚙️ Edit Profile</div></div>
-            <div class="card-body">
-                <div class="f-group"><label class="f-label">Full Name</label><input type="text" id="profNameInput" class="f-input" placeholder="Your full name"></div>
-                <div class="f-group"><label class="f-label">Subjects (comma separated)</label><input type="text" id="profSubjects" class="f-input" placeholder="Physics, Chemistry, Maths"></div>
-                <div class="f-group"><label class="f-label">Assigned Classes</label><input type="text" id="profClsInput" class="f-input" placeholder="9, 10, 11"></div>
-                <div class="f-group"><label class="f-label">Phone</label><input type="tel" id="profPhone" class="f-input" placeholder="+91 XXXXX XXXXX"></div>
-                <button class="btn-primary" onclick="saveProfile()">💾 Save Profile</button>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-head"><div class="card-title">🔐 Account</div></div>
-            <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-                <div style="font-size:0.8rem;color:var(--text2)">Email: <span id="profEmail" style="color:var(--teal);font-weight:700"></span></div>
-                <button class="btn-danger" onclick="doLogout()" style="width:fit-content">🚪 Logout</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BOTTOM NAV -->
-    <div id="mainNav">
-        <div class="nav-item active" onclick="navigateTo('dash')" id="nav-dash"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
-        <div class="nav-item" onclick="navigateTo('att')"     id="nav-att"><div class="nav-icon">📋</div><div class="nav-label">Attendance</div></div>
-        <div class="nav-item" onclick="navigateTo('courses')" id="nav-courses"><div class="nav-icon">📚</div><div class="nav-label">Courses</div></div>
-        <div class="nav-item" onclick="navigateTo('students')" id="nav-students"><div class="nav-icon">👥</div><div class="nav-label">Students</div></div>
-        <div class="nav-item" onclick="navigateTo('profile')" id="nav-profile"><div class="nav-icon">👤</div><div class="nav-label">Profile</div></div>
-    </div>
+<!-- ══ SPLASH ══ -->
+<div id="splash">
+  <div class="sp-logo">🎓</div>
+  <div class="sp-name">MINDSKYRA</div>
+  <div class="sp-sub">Course Manager</div>
+  <div class="spinner"></div>
 </div>
 
-<!-- ══ POST CONTENT MODAL ══ -->
-<div class="modal" id="postModal">
-    <div class="modal-box">
-        <div class="modal-head">
-            <div class="modal-title" id="postModalTitle">📝 Post Content</div>
-            <button class="modal-close" onclick="closeModal('postModal')">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="f-group"><label class="f-label">Content Type</label>
-                <select id="postType" class="f-input" onchange="updatePostForm()">
-                    <option value="note">📝 Notes / Study Material</option>
-                    <option value="video">🎥 Video Link</option>
-                    <option value="assign">📚 Assignment / Homework</option>
-                    <option value="announce">📣 Announcement</option>
-                    <option value="link">🔗 Reference Link</option>
-                </select>
-            </div>
-            <div class="f-group"><label class="f-label">Title</label><input type="text" id="postTitle" class="f-input" placeholder="e.g. Chapter 3 Notes — Newton's Laws"></div>
-            <div class="f-group"><label class="f-label">Description / Content</label><textarea id="postDesc" class="f-input" rows="4" placeholder="Write content, instructions, or description here…"></textarea></div>
-            <div id="postLinkWrap" class="f-group" style="display:none"><label class="f-label">URL / Link</label><input type="url" id="postLink" class="f-input" placeholder="https://…"></div>
-            <div id="postDueWrap" class="f-group" style="display:none"><label class="f-label">Due Date</label><input type="date" id="postDue" class="f-input"></div>
-            <div class="f-group"><label class="f-label">Target Class</label>
-                <select id="postClass" class="f-input">
-                    <option value="all">📢 All Classes</option>
-                </select>
-            </div>
-            <div class="f-group"><label class="f-label">Subject</label><input type="text" id="postSubject" class="f-input" placeholder="e.g. Physics"></div>
-            <div style="display:flex;gap:8px;justify-content:flex-end">
-                <button class="btn-ghost" onclick="closeModal('postModal')">Cancel</button>
-                <button class="btn-primary" onclick="savePost()">🚀 Publish</button>
-            </div>
-        </div>
+<!-- ══ MAIN ══ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="hdr">
+    <div class="hdr-logo">📚</div>
+    <div class="hdr-info">
+      <div class="hdr-title">Course Manager</div>
+      <div class="hdr-sub">MINDSKYRA Admin</div>
     </div>
+    <div class="hdr-right">
+      <button class="btn btn-ghost btn-sm" onclick="refreshAll()">↺ Sync</button>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: DASHBOARD ══ -->
+  <div id="pg-dash" class="pg on">
+    <div class="pg-hd">
+      <div class="pg-title">📊 Overview</div>
+      <div class="pg-sub" id="dashDate"></div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-icon">📁</div><div class="stat-val" style="color:var(--primary)" id="st-subjects">—</div><div class="stat-lbl">Subjects</div></div>
+      <div class="stat-box"><div class="stat-icon">📑</div><div class="stat-val" style="color:var(--blue)" id="st-chapters">—</div><div class="stat-lbl">Chapters</div></div>
+      <div class="stat-box"><div class="stat-icon">🎬</div><div class="stat-val" style="color:var(--red)" id="st-videos">—</div><div class="stat-lbl">Videos</div></div>
+      <div class="stat-box"><div class="stat-icon">📄</div><div class="stat-val" style="color:var(--green)" id="st-pdfs">—</div><div class="stat-lbl">PDFs</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><div class="card-title">⚡ Quick Actions</div></div>
+      <div class="card-body">
+        <div class="mini-grid">
+          <div class="mini-card" onclick="goTo('structure');openModal('addSubjModal')">
+            <div class="mini-icon">📁</div><div class="mini-lbl">Add Subject</div>
+          </div>
+          <div class="mini-card" onclick="goTo('structure');openModal('addChapModal')">
+            <div class="mini-icon">📑</div><div class="mini-lbl">Add Chapter</div>
+          </div>
+          <div class="mini-card" onclick="goTo('upload');setContentType('video')">
+            <div class="mini-icon">🎬</div><div class="mini-lbl">Upload Video</div>
+          </div>
+          <div class="mini-card" onclick="goTo('upload');setContentType('notes')">
+            <div class="mini-icon">📄</div><div class="mini-lbl">Upload PDF</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent content -->
+    <div class="card">
+      <div class="card-hd"><div class="card-title">🕐 Recently Added</div></div>
+      <div id="recentList">
+        <div style="padding:14px"><div class="skel" style="height:44px;margin-bottom:8px"></div><div class="skel" style="height:44px;margin-bottom:8px"></div><div class="skel" style="height:44px"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: STRUCTURE ══ -->
+  <div id="pg-structure" class="pg">
+    <div class="pg-hd">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div class="pg-title">🗂️ Structure</div><div class="pg-sub">Subjects → Chapters</div></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm" onclick="openModal('addChapModal')">+ Chapter</button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('addSubjModal')">+ Subject</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-wrap">
+      <div class="search-ico">🔍</div>
+      <input class="fi" id="structSearch" placeholder="Search subjects / chapters…" oninput="filterStructure()">
+    </div>
+
+    <div id="structureTree">
+      <div class="skel" style="height:52px;margin-bottom:8px;border-radius:12px"></div>
+      <div class="skel" style="height:52px;margin-bottom:8px;border-radius:12px"></div>
+      <div class="skel" style="height:52px;border-radius:12px"></div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: UPLOAD ══ -->
+  <div id="pg-upload" class="pg">
+    <div class="pg-hd">
+      <div class="pg-title">☁️ Upload Content</div>
+      <div class="pg-sub">Videos, Notes & DPPs</div>
+    </div>
+
+    <!-- Chapter selector -->
+    <div class="card">
+      <div class="card-hd"><div class="card-title">📌 Select Target Chapter</div></div>
+      <div class="card-body">
+        <div class="fg">
+          <label class="fl">Class</label>
+          <select class="fi" id="upClass" onchange="populateSubjectFilter()">
+            <option value="">— All Classes —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl">Subject</label>
+          <select class="fi" id="upSubject" onchange="populateChapterFilter()">
+            <option value="">— Select Subject —</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl">Chapter</label>
+          <select class="fi" id="upChapter">
+            <option value="">— Select Chapter —</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Form -->
+    <div class="card">
+      <div class="card-hd"><div class="card-title">📋 Content Details</div></div>
+      <div class="card-body">
+
+        <div class="type-sw">
+          <button class="type-btn on" id="ct-video"  onclick="setContentType('video')">🎬 Video</button>
+          <button class="type-btn"    id="ct-notes"  onclick="setContentType('notes')">📝 Notes</button>
+          <button class="type-btn"    id="ct-dpp"    onclick="setContentType('dpp')">✏️ DPP</button>
+        </div>
+
+        <div class="fg">
+          <label class="fl">Title</label>
+          <input class="fi" id="ctTitle" placeholder="e.g. Rotational Dynamics — Part 1">
+        </div>
+        <div class="fg">
+          <label class="fl">Description (optional)</label>
+          <textarea class="fi" id="ctDesc" rows="2" placeholder="Brief description…"></textarea>
+        </div>
+
+        <!-- YouTube zone -->
+        <div id="yt-zone">
+          <div class="fg">
+            <label class="fl">YouTube URL</label>
+            <div style="display:flex;gap:6px">
+              <input class="fi" id="ytUrl" placeholder="https://youtu.be/... or youtube.com/watch?v=…" oninput="previewYT()" style="flex:1">
+              <button onclick="clearYT()" style="width:40px;height:42px;border:none;border-radius:10px;background:var(--red-bg);color:var(--red);font-size:1rem;cursor:pointer;flex-shrink:0">✕</button>
+            </div>
+          </div>
+          <div class="yt-prev" id="ytPrev">
+            <img id="ytThumb" src="" alt="">
+            <div class="yt-meta">🎬 <span id="ytVidId"></span></div>
+          </div>
+        </div>
+
+        <!-- PDF zone -->
+        <div id="pdf-zone" style="display:none">
+          <div class="drop-zone" id="dropZone"
+            ondrop="onDrop(event)" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)"
+            onclick="document.getElementById('pdfFile').click()">
+            <div style="font-size:2.2rem;margin-bottom:8px">📄</div>
+            <div style="font-weight:700;font-size:0.85rem;color:var(--text);margin-bottom:3px">Tap to browse or drag & drop</div>
+            <div style="font-size:0.72rem;color:var(--text2)">PDF only · max 100 MB</div>
+          </div>
+          <input type="file" id="pdfFile" accept="application/pdf,.pdf" style="display:none" onchange="onFileSelect(event)">
+
+          <div id="filePrev" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:8px">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="font-size:1.8rem">📄</div>
+              <div style="flex:1;min-width:0">
+                <div id="fName" style="font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)"></div>
+                <div id="fSize" style="font-size:0.7rem;color:var(--text2);margin-top:2px"></div>
+              </div>
+              <button onclick="clearFile()" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--red-bg);color:var(--red);cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+            </div>
+          </div>
+
+          <div id="uploadProg" style="display:none;margin-top:10px">
+            <div class="prog-wrap">
+              <div class="prog-row"><span id="upStatus">Uploading…</span><span id="upPct">0%</span></div>
+              <div class="prog-bar"><div id="upFill" class="prog-fill" style="width:0%"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" id="uploadBtn" style="width:100%;justify-content:center;padding:14px;margin-top:4px" onclick="doUpload()">
+          ☁️ <span id="uploadBtnTxt">Save YouTube Link</span>
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PAGE: LIBRARY ══ -->
+  <div id="pg-library" class="pg">
+    <div class="pg-hd">
+      <div class="pg-title">📚 Content Library</div>
+      <div class="pg-sub">Browse all uploaded content</div>
+    </div>
+
+    <div class="tab-row">
+      <div class="tab-pill on" id="lt-all"   onclick="switchLibTab('all')">All</div>
+      <div class="tab-pill"   id="lt-video"  onclick="switchLibTab('video')">🎬 Videos</div>
+      <div class="tab-pill"   id="lt-notes"  onclick="switchLibTab('notes')">📝 Notes</div>
+      <div class="tab-pill"   id="lt-dpp"    onclick="switchLibTab('dpp')">✏️ DPP</div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <select class="fi" id="libClass" style="flex:1;min-width:100px;padding:8px 12px" onchange="loadLibrary()">
+        <option value="">All Classes</option>
+      </select>
+      <select class="fi" id="libSubject" style="flex:1;min-width:120px;padding:8px 12px" onchange="loadLibrary()">
+        <option value="">All Subjects</option>
+      </select>
+    </div>
+
+    <div id="libraryList">
+      <div class="skel" style="height:64px;margin-bottom:8px;border-radius:12px"></div>
+      <div class="skel" style="height:64px;margin-bottom:8px;border-radius:12px"></div>
+      <div class="skel" style="height:64px;border-radius:12px"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div id="nav">
+    <div class="ni on" onclick="goTo('dash')" id="nav-dash">
+      <div class="ni-bar"></div><div class="ni-icon">🏠</div><div class="ni-lbl">Home</div>
+    </div>
+    <div class="ni" onclick="goTo('structure')" id="nav-structure">
+      <div class="ni-bar"></div><div class="ni-icon">🗂️</div><div class="ni-lbl">Structure</div>
+    </div>
+    <div class="ni" onclick="goTo('upload')" id="nav-upload">
+      <div class="ni-bar"></div><div class="ni-icon">☁️</div><div class="ni-lbl">Upload</div>
+    </div>
+    <div class="ni" onclick="goTo('library')" id="nav-library">
+      <div class="ni-bar"></div><div class="ni-icon">📚</div><div class="ni-lbl">Library</div>
+    </div>
+  </div>
 </div>
 
-<!-- ══ VIEW CONTENT MODAL ══ -->
-<div class="modal" id="viewModal">
-    <div class="modal-box">
-        <div class="modal-head">
-            <div class="modal-title" id="vmTitle">—</div>
-            <button class="modal-close" onclick="closeModal('viewModal')">✕</button>
-        </div>
-        <div class="modal-body" id="vmBody"></div>
+<!-- ══ MODAL: Add Subject ══ -->
+<div class="modal" id="addSubjModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title">📁 Add New Subject</div>
+      <button class="modal-close" onclick="closeModal('addSubjModal')">✕</button>
     </div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Class Number</label>
+        <select class="fi" id="subClass">
+          <option value="">— Select Class —</option>
+          <option value="8">Class 8</option>
+          <option value="9">Class 9</option>
+          <option value="10">Class 10</option>
+          <option value="11">Class 11</option>
+          <option value="12">Class 12</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Subject Name</label>
+        <input class="fi" id="subName" placeholder="e.g. Physics">
+      </div>
+      <div class="fg"><label class="fl">Subject Code (optional)</label>
+        <input class="fi" id="subCode" placeholder="e.g. PHY-11">
+      </div>
+      <div class="fg"><label class="fl">Description (optional)</label>
+        <textarea class="fi" id="subDesc" placeholder="Brief description…" rows="2"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="saveSubject()">
+        💾 Save Subject
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Add Chapter ══ -->
+<div class="modal" id="addChapModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title">📑 Add New Chapter</div>
+      <button class="modal-close" onclick="closeModal('addChapModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Subject</label>
+        <select class="fi" id="chapSubject">
+          <option value="">— Select Subject —</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Chapter Number</label>
+        <input class="fi" type="number" id="chapNum" placeholder="e.g. 1">
+      </div>
+      <div class="fg"><label class="fl">Chapter Name</label>
+        <input class="fi" id="chapName" placeholder="e.g. Laws of Motion">
+      </div>
+      <div class="fg"><label class="fl">Description (optional)</label>
+        <textarea class="fi" id="chapDesc" placeholder="Brief description…" rows="2"></textarea>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="saveChapter()">
+        💾 Save Chapter
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Edit Subject ══ -->
+<div class="modal" id="editSubjModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title">✏️ Edit Subject</div>
+      <button class="modal-close" onclick="closeModal('editSubjModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editSubjId">
+      <div class="fg"><label class="fl">Class</label>
+        <select class="fi" id="editSubClass">
+          <option value="8">Class 8</option><option value="9">Class 9</option>
+          <option value="10">Class 10</option><option value="11">Class 11</option><option value="12">Class 12</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Subject Name</label><input class="fi" id="editSubName"></div>
+      <div class="fg"><label class="fl">Code</label><input class="fi" id="editSubCode"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="updateSubject()">💾 Update</button>
+      <button class="btn btn-danger btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="deleteSubject()">🗑 Delete Subject</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: Edit Chapter ══ -->
+<div class="modal" id="editChapModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title">✏️ Edit Chapter</div>
+      <button class="modal-close" onclick="closeModal('editChapModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editChapId">
+      <div class="fg"><label class="fl">Chapter Number</label><input class="fi" type="number" id="editChapNum"></div>
+      <div class="fg"><label class="fl">Chapter Name</label><input class="fi" id="editChapName"></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fi" id="editChapDesc" rows="2"></textarea></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="updateChapter()">💾 Update</button>
+      <button class="btn btn-danger btn-sm" style="margin-top:8px;width:100%;justify-content:center" onclick="deleteChapter()">🗑 Delete Chapter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: View Chapter Content ══ -->
+<div class="modal" id="chapContentModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title" id="ccmTitle">Chapter Content</div>
+      <button class="modal-close" onclick="closeModal('chapContentModal')">✕</button>
+    </div>
+    <div class="modal-body" id="ccmBody"></div>
+  </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════
-// FIREBASE INIT
-// ═══════════════════════════════════════════
-const firebaseConfig = {
-    apiKey:"AIzaSyB5TTCXCD74IUeLmM7bynlgCUvcmcM6rTw",
-    authDomain:"mind-skyra-institute.firebaseapp.com",
-    projectId:"mind-skyra-institute",
-    storageBucket:"mind-skyra-institute.firebasestorage.app",
-    messagingSenderId:"333988573281",
-    appId:"1:333988573281:web:7d775f902b55d2e15aba20"
-};
-firebase.initializeApp(firebaseConfig);
-const db   = firebase.firestore();
-const auth = firebase.auth();
-
-// ═══════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════
-let teacherData    = null;
-let currentUser    = null;
-let allClasses     = [];
-let attMarked      = {};   // { studentId: {status, note} }
-let attStudents    = [];
-let allContent     = [];
-let contentFilter  = 'all';
-let streakDays     = 0;
-let currentPage    = 'dash';
-
-// ═══════════════════════════════════════════
-// AUTH
-// ═══════════════════════════════════════════
-auth.onAuthStateChanged(async user => {
-    if (!user) {
-        window.location.href = 'login.html';
-        return;
-    }
-    currentUser = user;
-    await loadTeacherData();
-    showApp();
+/* ═══════════════════════════════════════════════════
+   FIREBASE INIT  — replace with your config if needed
+════════════════════════════════════════════════════ */
+firebase.initializeApp({
+  apiKey:            "AIzaSyB5TTCXCD74IUeLmM7bynlgCUvcmcM6rTw",
+  authDomain:        "mind-skyra-institute.firebaseapp.com",
+  projectId:         "mind-skyra-institute",
+  storageBucket:     "mind-skyra-institute.appspot.com",
+  messagingSenderId: "333988573281",
+  appId:             "1:333988573281:web:7d775f902b55d2e15aba20"
 });
 
-async function doLogout() {
-    await auth.signOut();
-    window.location.href = 'login.html';
-}
-function showApp() {
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    initApp();
-}
+const db = firebase.firestore();
+// Firebase Storage NOT used — PDFs upload via Apps Script → Google Drive (no CORS issues)
 
-// ═══════════════════════════════════════════
-// LOAD TEACHER DATA
-// ═══════════════════════════════════════════
-async function loadTeacherData() {
-    try {
-        const doc = await db.collection('teachers').doc(currentUser.uid).get();
-        if (doc.exists) {
-            teacherData = { id: doc.id, ...doc.data() };
-        } else {
-            // Auto-create teacher profile
-            teacherData = {
-                id: currentUser.uid, email: currentUser.email,
-                fullName: currentUser.displayName || currentUser.email.split('@')[0],
-                subjects: [], classes: [], phone: '', streak: 0, lastActive: null
-            };
-            await db.collection('teachers').doc(currentUser.uid).set(teacherData);
-        }
-    } catch(e) { console.error(e); }
-}
+/* ═══════════════════════════════════════════════════
+   APPS SCRIPT (for PDF → Google Drive path)
+   If you prefer Firebase Storage only, set this to ''
+════════════════════════════════════════════════════ */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzY5dUqfwAdHk1iSav4kIowOgVNk6KCkfIzH2KTf4-FSChUX6hQvruQwyVCbHl_hUk2/exec';
 
-// ═══════════════════════════════════════════
-// INIT APP
-// ═══════════════════════════════════════════
-async function initApp() {
-    // Header
-    const name = teacherData?.fullName || 'Teacher';
-    document.getElementById('hName').textContent = name;
-    document.getElementById('pName').textContent = name;
-    document.getElementById('pRole').textContent = (teacherData?.subjects||[]).join(', ') || 'Teacher';
-    document.getElementById('pAvatar').textContent = name.charAt(0).toUpperCase();
-    document.getElementById('profEmail').textContent = currentUser.email;
-    document.getElementById('profNameInput').value = name;
-    document.getElementById('profSubjects').value  = (teacherData?.subjects||[]).join(', ');
-    document.getElementById('profClsInput').value  = (teacherData?.classes||[]).join(', ');
-    document.getElementById('profPhone').value     = teacherData?.phone || '';
+/* ═══════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════════ */
+let subjects    = [];   // [{id, ...data}]
+let chapters    = [];   // [{id, ...data}]
+let allContent  = [];   // [{id, ...data}]
+let pickedFile  = null;
+let libFilter   = 'all';
+let currentPage = 'dash';
 
-    // Dashboard date/greeting
-    const now = new Date();
-    const hr  = now.getHours();
-    const greet = hr < 12 ? 'Good Morning' : hr < 17 ? 'Good Afternoon' : 'Good Evening';
-    document.getElementById('dashGreet').textContent = `${greet}, ${name.split(' ')[0]}! 👋`;
-    document.getElementById('dashDate').textContent  = now.toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-    document.getElementById('attDateLabel').textContent = now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'});
+/* ═══════════════════════════════════════════════════
+   BOOT
+════════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('dashDate').textContent =
+    new Date().toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 
-    // Set today's date in attendance form
-    document.getElementById('attDate').value = todayStr();
+  await Promise.all([loadSubjects(), loadChapters(), loadContent()]);
+  hideSplash();
+  renderDash();
+});
 
-    await loadClasses();
-    await updateStreak();
-    loadDashStats();
-    loadDashAttSummary();
-    loadContent();
-    loadAttHistory();
-    loadMyStudents();
+function hideSplash() {
+  const s = document.getElementById('splash');
+  s.style.transition = 'opacity 0.4s';
+  s.style.opacity    = '0';
+  setTimeout(() => s.style.display = 'none', 420);
+  document.getElementById('app').style.display = 'block';
 }
 
-// ═══════════════════════════════════════════
-// CLASSES
-// ═══════════════════════════════════════════
-async function loadClasses() {
-    try {
-        const snap = await db.collection('students').get();
-        const set  = new Set();
-        snap.forEach(d => {
-            const c = d.data().class || d.data().roleData?.class;
-            if (c) set.add(String(c));
-        });
-        allClasses = [...set].sort((a,b) => Number(a)-Number(b)||a.localeCompare(b));
-
-        ['attClass','hfClass','rpClass','stuFilterClass'].forEach(id => {
-            const s = document.getElementById(id);
-            if (!s) return;
-            const first = s.options[0].cloneNode(true);
-            s.innerHTML = '';
-            s.appendChild(first);
-            allClasses.forEach(c => {
-                const o = document.createElement('option');
-                o.value = c; o.textContent = 'Class ' + c;
-                s.appendChild(o);
-            });
-        });
-        const pc = document.getElementById('postClass');
-        if (pc) {
-            pc.innerHTML = '<option value="all">📢 All Classes</option>';
-            allClasses.forEach(c => {
-                const o = document.createElement('option'); o.value=c; o.textContent='Class '+c; pc.appendChild(o);
-            });
-        }
-    } catch(e) { console.error(e); }
+/* ═══════════════════════════════════════════════════
+   FIRESTORE LOADERS
+════════════════════════════════════════════════════ */
+async function loadSubjects() {
+  try {
+    const snap = await db.collection('subjects').orderBy('class').get();
+    subjects = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    populateClassDrops();
+    populateSubjectDrops();
+  } catch(e) { console.error('loadSubjects:', e); }
 }
 
-// ═══════════════════════════════════════════
-// STREAK SYSTEM
-// ═══════════════════════════════════════════
-async function updateStreak() {
-    try {
-        // Simple query — no orderBy to avoid composite index
-        const snap = await db.collection('attendance')
-            .where('markedBy', '==', currentUser.uid)
-            .get();
-
-        const daysWithClass = new Set();
-        snap.forEach(d => { if (d.data().date) daysWithClass.add(d.data().date); });
-
-        // Build last 28 days
-        const days = [];
-        let streak = 0, countingStreak = true;
-        for (let i = 27; i >= 0; i--) {
-            const d    = new Date(); d.setDate(d.getDate() - i);
-            const dStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-            const isWeekend = d.getDay()===0 || d.getDay()===6;
-            const isFuture  = i < 0;
-            const attended  = daysWithClass.has(dStr);
-            days.push({ dStr, day: d.getDate(), attended, isFuture: i<0, isToday: i===0, isWeekend });
-            // Count streak (backwards from today, skip weekends)
-            if (countingStreak && i <= 0) {
-                if (attended) streak++;
-                else if (!isWeekend && i < 0) countingStreak = false;
-            }
-        }
-        streakDays = streak;
-
-        // Update streak in Firestore
-        await db.collection('teachers').doc(currentUser.uid).update({
-            streak: streak, lastActive: firebase.firestore.FieldValue.serverTimestamp()
-        });
-
-        // Render calendar
-        const cal = document.getElementById('streakCal');
-        cal.innerHTML = days.map(d => {
-            let cls = 'streak-day ';
-            if (d.dStr > todayStr()) cls += 'future';
-            else if (d.attended) cls += 'attended';
-            else cls += 'missed';
-            if (d.isToday) cls += ' today';
-            return `<div class="${cls}" title="${d.dStr}">${d.day}</div>`;
-        }).join('');
-
-        // Update labels
-        const lbl = streak >= 7 ? `🏆 ${streak} Day Streak!` : streak >= 3 ? `🔥 ${streak} Day Streak` : streak > 0 ? `✅ ${streak} Day Streak` : '⚡ Start your streak!';
-        document.getElementById('streakLabel').textContent = lbl;
-        document.getElementById('hStreak').textContent     = '🔥 ' + streak;
-        document.getElementById('dsStreak').textContent    = streak;
-        document.getElementById('profStreak').textContent  = streak;
-    } catch(e) {
-        // If no records yet, show empty streak
-        buildEmptyStreak();
-    }
+async function loadChapters() {
+  try {
+    const snap = await db.collection('chapters').get();
+    chapters = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => (a.order||a.number||0) - (b.order||b.number||0));
+  } catch(e) { console.error('loadChapters:', e); }
 }
 
-function buildEmptyStreak() {
-    const cal = document.getElementById('streakCal');
-    let html = '';
-    for (let i = 27; i >= 0; i--) {
-        const d = new Date(); d.setDate(d.getDate() - i);
-        html += `<div class="streak-day ${i===0?'today future':'future'}">${d.getDate()}</div>`;
-    }
-    cal.innerHTML = html;
-    document.getElementById('streakLabel').textContent = '⚡ Start teaching to build streak!';
-    document.getElementById('hStreak').textContent = '🔥 0';
-}
-
-// ═══════════════════════════════════════════
-// DASHBOARD STATS
-// ═══════════════════════════════════════════
-async function loadDashStats() {
-    try {
-        const [attSnap, stuSnap, cntSnap] = await Promise.all([
-            db.collection('attendance').where('markedBy','==',currentUser.uid).get(),
-            db.collection('students').get(),
-            db.collection('courseContent').where('teacherId','==',currentUser.uid).get()
-        ]);
-        const classDates = new Set();
-        attSnap.forEach(d => { if (d.data().date) classDates.add(d.data().date + '_' + (d.data().class||'')); });
-        document.getElementById('dsTotalClasses').textContent = classDates.size;
-        document.getElementById('dsStudents').textContent     = stuSnap.size;
-        document.getElementById('dsContent').textContent      = cntSnap.size;
-        document.getElementById('profClasses').textContent    = classDates.size;
-        document.getElementById('profPosts').textContent      = cntSnap.size;
-    } catch(e) {}
-}
-
-async function loadDashAttSummary() {
-    const el  = document.getElementById('dashAttSummary');
-    try {
-        // Simple query — no orderBy
-        const snap = await db.collection('attendance')
-            .where('markedBy','==',currentUser.uid)
-            .where('date','==',todayStr())
-            .get();
-
-        if (snap.empty) {
-            el.innerHTML = `<div class="empty-state" style="padding:20px"><div class="ei">📋</div><div class="et">No attendance marked today</div><button class="btn-primary btn-sm" onclick="navigateTo('att')" style="margin-top:10px">Mark Now →</button></div>`;
-            return;
-        }
-
-        // Group by subject
-        const subjects = {};
-        snap.forEach(d => {
-            const s = d.data().subject || 'General';
-            if (!subjects[s]) subjects[s] = {p:0,a:0,l:0,total:0};
-            subjects[s].total++;
-            if (d.data().status==='present') subjects[s].p++;
-            else if (d.data().status==='absent') subjects[s].a++;
-            else subjects[s].l++;
-        });
-
-        el.innerHTML = Object.entries(subjects).map(([subj, c]) => {
-            const pct = Math.round(((c.p+c.l)/c.total)*100);
-            const col = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
-            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-                <div style="flex:1"><div style="font-weight:700;font-size:0.85rem">${subj}</div>
-                <div style="font-size:0.7rem;color:var(--text2);margin-top:2px">✅${c.p} ⏰${c.l} ❌${c.a} · ${c.total} students</div></div>
-                <div style="font-weight:800;font-size:1.1rem;color:${col}">${pct}%</div>
-            </div>`;
-        }).join('') + `<div style="text-align:right;margin-top:8px"><button class="btn-ghost btn-sm" onclick="navigateTo('att');switchAttTab('hist')">View All →</button></div>`;
-    } catch(e) {
-        el.innerHTML = '<div style="color:#F87171;font-size:0.8rem;padding:10px">Could not load today\'s data</div>';
-    }
-}
-
-// ═══════════════════════════════════════════
-// ATTENDANCE — MARK
-// ═══════════════════════════════════════════
-async function loadAttStudents() {
-    const cls  = document.getElementById('attClass').value;
-    const date = document.getElementById('attDate').value;
-    const el   = document.getElementById('attStudentList');
-    if (!cls) { el.innerHTML = '<div class="empty-state"><div class="ei">🏫</div><div class="et">Select a class first</div></div>'; return; }
-
-    el.innerHTML = '<div style="padding:14px"><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px"></div></div>';
-    attMarked = {};
-
-    try {
-        // Load students
-        const snap = await db.collection('students').where('class','==',cls).get();
-        const snap2 = await db.collection('students').get();
-        const students = [];
-        snap.forEach(d => students.push({id:d.id,...d.data()}));
-        snap2.forEach(d => {
-            const dd = d.data();
-            if (dd.roleData?.class===cls && !students.find(s=>s.id===d.id)) students.push({id:d.id,...dd});
-        });
-        attStudents = students;
-
-        // Check existing attendance
-        if (date) {
-            const subject = document.getElementById('attSubject').value.trim();
-            let q = db.collection('attendance').where('date','==',date).where('class','==',cls);
-            if (subject) q = q.where('subject','==',subject);
-            const eSnap = await q.where('markedBy','==',currentUser.uid).get();
-            eSnap.forEach(d => { const dd=d.data(); attMarked[dd.studentId]={status:dd.status,note:dd.note||'',docId:d.id}; });
-        }
-
-        renderAttStudents();
-        updateAttCount();
-    } catch(e) {
-        el.innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><div class="et" style="color:#F87171">Error loading: ${e.message}</div></div>`;
-    }
-}
-
-function renderAttStudents() {
-    const el = document.getElementById('attStudentList');
-    if (!attStudents.length) {
-        el.innerHTML = '<div class="empty-state"><div class="ei">👥</div><div class="et">No students in this class</div></div>';
-        return;
-    }
-    el.innerHTML = attStudents.map(s => {
-        const name = s.fullName || ((s.firstName||'')+' '+(s.lastName||'')).trim() || 'Student';
-        const m    = attMarked[s.id];
-        const rc   = m ? (m.status==='present'?'mp':m.status==='absent'?'ma':'ml') : '';
-        return `<div class="s-row ${rc}" id="srow-${s.id}">
-            <div class="s-ava">${name.charAt(0).toUpperCase()}</div>
-            <div class="s-info">
-                <div class="s-name">${name}</div>
-                <div class="s-meta">Roll ${s.rollNumber||s.id.slice(-4).toUpperCase()} · Class ${s.class||s.roleData?.class||'—'}</div>
-            </div>
-            <div class="sbns">
-                <button class="sbn sbn-p ${m?.status==='present'?'on':''}" onclick="markAtt('${s.id}','present')">✅</button>
-                <button class="sbn sbn-l ${m?.status==='late'?'on':''}"    onclick="markAtt('${s.id}','late')">⏰</button>
-                <button class="sbn sbn-a ${m?.status==='absent'?'on':''}"  onclick="markAtt('${s.id}','absent')">❌</button>
-            </div>
-        </div>`;
-    }).join('');
-}
-
-function markAtt(id, status) {
-    if (!attMarked[id]) attMarked[id] = {status:'',note:''};
-    attMarked[id].status = status;
-    const row = document.getElementById('srow-'+id);
-    if (row) {
-        row.className = `s-row m${status[0]}`;
-        row.querySelectorAll('.sbn').forEach(b => b.classList.remove('on'));
-        const map = {present:'sbn-p',late:'sbn-l',absent:'sbn-a'};
-        row.querySelector('.'+map[status])?.classList.add('on');
-    }
-    updateAttCount();
-}
-
-function markAllAtt(status) { attStudents.forEach(s => markAtt(s.id, status)); }
-
-function updateAttCount() {
-    const cnt = Object.values(attMarked).filter(v=>v.status).length;
-    document.getElementById('attMarkedCnt').textContent = `${cnt} / ${attStudents.length} marked`;
-}
-
-async function saveAtt() {
-    const date    = document.getElementById('attDate').value;
-    const cls     = document.getElementById('attClass').value;
-    const subject = document.getElementById('attSubject').value.trim();
-    const room    = document.getElementById('attRoom').value.trim();
-    const period  = document.getElementById('attPeriod').value;
-    const sNote   = document.getElementById('attNote').value.trim();
-
-    if (!date)    { showToast('Select a date','error'); return; }
-    if (!cls)     { showToast('Select a class','error'); return; }
-    if (!subject) { showToast('Enter subject name','error'); return; }
-
-    const unmarked = attStudents.filter(s => !attMarked[s.id]?.status);
-    if (unmarked.length > 0 && !confirm(`${unmarked.length} student(s) not marked. Continue?`)) return;
-
-    const btn = document.getElementById('attSaveBtn');
-    btn.disabled = true; btn.textContent = '⏳ Saving…';
-
-    try {
-        const batch = db.batch();
-        let count = 0;
-        const teacherName = teacherData?.fullName || currentUser.email;
-
-        for (const s of attStudents) {
-            const m = attMarked[s.id];
-            if (!m?.status) continue;
-            const data = {
-                studentId: s.id,
-                studentName: s.fullName || ((s.firstName||'')+' '+(s.lastName||'')).trim(),
-                class: cls, date, subject, teacherName,
-                teacherId: currentUser.uid,
-                room: room||'', period, status: m.status,
-                note: m.note||sNote||'', mode:'offline',
-                markedBy: currentUser.uid,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            if (m.docId) batch.update(db.collection('attendance').doc(m.docId), data);
-            else batch.set(db.collection('attendance').doc(), data);
-            count++;
-        }
-        await batch.commit();
-
-        // Update teacher streak
-        await updateStreak();
-        loadDashAttSummary();
-        loadDashStats();
-
-        showToast(`✅ Attendance saved for ${count} students!`, 'success');
-        switchAttTab('hist'); loadAttHistory();
-    } catch(e) {
-        showToast('Error: '+e.message,'error');
-    } finally {
-        btn.disabled=false; btn.textContent='💾 Save Attendance';
-    }
-}
-
-function resetAtt() {
-    attMarked = {};
-    document.getElementById('attSubject').value = '';
-    document.getElementById('attRoom').value    = '';
-    renderAttStudents(); updateAttCount();
-}
-
-// ═══════════════════════════════════════════
-// ATTENDANCE — HISTORY
-// ═══════════════════════════════════════════
-async function loadAttHistory() {
-    const cls  = document.getElementById('hfClass')?.value  || '';
-    const date = document.getElementById('hfDate')?.value   || '';
-    const tbody = document.getElementById('histTbody');
-    if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="6"><div class="skel" style="height:38px;margin:6px 0"></div></td></tr>'.repeat(3);
-
-    try {
-        // Simple single-field queries to avoid composite index requirement
-        let snap;
-        if (cls && date) {
-            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).where('class','==',cls).get();
-        } else if (cls) {
-            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).where('class','==',cls).get();
-        } else if (date) {
-            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).where('date','==',date).get();
-        } else {
-            snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).get();
-        }
-
-        let records = snap.docs.map(d => ({id:d.id,...d.data()}));
-        // Client-side filter
-        if (cls && date) records = records.filter(r => r.class===cls && r.date===date);
-        else if (date)   records = records.filter(r => r.date===date);
-        // Client-side sort by date desc
-        records.sort((a,b) => (b.date||'').localeCompare(a.date||''));
-        records = records.slice(0, 150);
-
-        if (!records.length) { tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state" style="padding:20px"><div class="ei">📭</div><div class="et">No records found</div></div></td></tr>'; return; }
-
-        tbody.innerHTML = records.map(r => {
-            return `<tr>
-                <td><div style="font-weight:700">${r.studentName||'—'}</div><div style="font-size:0.65rem;color:var(--text3)">Class ${r.class||'—'}</div></td>
-                <td>${formatDate(r.date)}</td>
-                <td>${r.subject||'—'}</td>
-                <td>P${r.period||'—'}</td>
-                <td><span class="badge badge-${r.status?.[0]||'p'}">${r.status==='present'?'✅':r.status==='absent'?'❌':'⏰'} ${cap(r.status)}</span></td>
-                <td style="font-size:0.75rem">${r.note||'—'}</td>
-            </tr>`;
-        }).join('');
-    } catch(e) {
-        tbody.innerHTML = `<tr><td colspan="6" style="color:#F87171;text-align:center;padding:16px">Error: ${e.message}</td></tr>`;
-    }
-}
-
-function clearHistFilters() {
-    document.getElementById('hfClass').value = '';
-    document.getElementById('hfDate').value  = '';
-    loadAttHistory();
-}
-
-async function loadAttReport() {
-    const cls = document.getElementById('rpClass').value;
-    const el  = document.getElementById('rpBody');
-    el.innerHTML = '<div class="skel" style="height:50px;margin-bottom:8px"></div>'.repeat(4);
-
-    try {
-        // Simple query, filter client-side
-        const snap = await db.collection('attendance').where('markedBy','==',currentUser.uid).get();
-        const map  = {};
-        snap.forEach(d => {
-            const dd = d.data();
-            if (cls && dd.class !== cls) return;
-            if (!map[dd.studentId]) map[dd.studentId] = {name:dd.studentName||'?',class:dd.class||'—',p:0,a:0,l:0,total:0};
-            map[dd.studentId].total++;
-            if (dd.status==='present') map[dd.studentId].p++;
-            else if (dd.status==='absent') map[dd.studentId].a++;
-            else map[dd.studentId].l++;
-        });
-        const entries = Object.values(map).sort((a,b)=>a.name.localeCompare(b.name));
-        if (!entries.length) { el.innerHTML='<div class="empty-state"><div class="ei">📭</div><div class="et">No data yet</div></div>'; return; }
-        el.innerHTML = entries.map(s => {
-            const pct = s.total>0 ? Math.round(((s.p+s.l)/s.total)*100) : 0;
-            const col = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
-            return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)">
-                <div style="width:34px;height:34px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;flex-shrink:0">${s.name.charAt(0).toUpperCase()}</div>
-                <div style="flex:1;min-width:0">
-                    <div style="font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${s.name}</div>
-                    <div style="font-size:0.68rem;color:var(--text3)">Class ${s.class} · ${s.total} classes · ✅${s.p} ❌${s.a} ⏰${s.l}</div>
-                </div>
-                <div style="text-align:right;flex-shrink:0">
-                    <div style="font-weight:800;color:${col}">${pct}%</div>
-                    <div style="height:4px;width:60px;background:rgba(255,255,255,0.06);border-radius:2px;margin-top:3px"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div></div>
-                </div>
-            </div>`;
-        }).join('');
-    } catch(e) { el.innerHTML=`<div style="color:#F87171;padding:12px">Error: ${e.message}</div>`; }
-}
-
-function switchAttTab(tab) {
-    ['mark','hist','report'].forEach(t => {
-        document.getElementById('atab-'+t).className = 'tab-pill' + (t===tab?' on':'');
-        document.getElementById('attc-'+t).style.display = t===tab?'block':'none';
-    });
-    if (tab==='hist')   loadAttHistory();
-    if (tab==='report') loadAttReport();
-}
-
-// ═══════════════════════════════════════════
-// COURSE CONTENT
-// ═══════════════════════════════════════════
 async function loadContent() {
-    const el = document.getElementById('contentList');
+  try {
+    const snap = await db.collection('courseContent').orderBy('uploadedAt','desc').get();
+    allContent = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    updateStats();
+  } catch(e) {
     try {
-        // No orderBy to avoid composite index — sort client-side
-        const snap = await db.collection('courseContent')
-            .where('teacherId','==',currentUser.uid)
-            .get();
-        allContent = snap.docs.map(d => ({id:d.id,...d.data()}));
-        // Client-side sort by date desc
-        allContent.sort((a,b) => (b.createdAt?.toMillis?.()||0) - (a.createdAt?.toMillis?.()||0));
-        renderContent();
-    } catch(e) {
-        el.innerHTML = `<div class="empty-state"><div class="ei">⚠️</div><div class="et" style="color:#F87171">Error: ${e.message}</div></div>`;
-    }
+      // fallback if no index
+      const snap = await db.collection('courseContent').get();
+      allContent = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a,b) => (b.uploadedAt?.toMillis?.() || 0) - (a.uploadedAt?.toMillis?.() || 0));
+      updateStats();
+    } catch(e2) { console.error('loadContent:', e2); }
+  }
 }
 
-function renderContent() {
-    const el  = document.getElementById('contentList');
-    const arr = contentFilter==='all' ? allContent : allContent.filter(c=>c.type===contentFilter);
-    if (!arr.length) {
-        el.innerHTML='<div class="empty-state"><div class="ei">📭</div><div class="et">No content yet</div><div class="es">Tap + Post to add notes, videos or assignments</div></div>';
-        return;
-    }
-    const typeMap = {note:['📝','ctb-note'],video:['🎥','ctb-video'],assign:['📚','ctb-assign'],announce:['📣','ctb-announce'],link:['🔗','ctb-link']};
-    el.innerHTML = arr.map(c => {
-        const [icon, cls] = typeMap[c.type]||['📄','ctb-note'];
-        const target = c.targetClass==='all' ? 'All Classes' : 'Class '+c.targetClass;
-        return `<div class="content-card">
-            <div style="display:flex;align-items:flex-start;gap:10px">
-                <div style="font-size:1.5rem;flex-shrink:0">${icon}</div>
-                <div style="flex:1;min-width:0">
-                    <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px">
-                        <span class="content-type-badge ${cls}">${cap(c.type)}</span>
-                        <span class="course-chip">${c.subject||'General'}</span>
-                        <span style="font-size:0.68rem;color:var(--text3)">${target}</span>
-                    </div>
-                    <div style="font-weight:700;font-size:0.875rem;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.title||'Untitled'}</div>
-                    <div style="font-size:0.75rem;color:var(--text2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${c.description||''}</div>
-                    ${c.dueDate?`<div style="font-size:0.7rem;color:var(--amber);margin-top:4px">📅 Due: ${formatDate(c.dueDate)}</div>`:''}
-                    ${c.link?`<a href="${c.link}" target="_blank" style="font-size:0.72rem;color:var(--teal);margin-top:4px;display:inline-block">🔗 Open Link</a>`:''}
-                </div>
-                <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
-                    <button class="btn-ghost btn-sm" onclick="viewContent('${c.id}')">👁</button>
-                    <button class="btn-danger btn-sm" onclick="deleteContent('${c.id}')">🗑</button>
-                </div>
+async function refreshAll() {
+  showToast('Syncing…','info');
+  await Promise.all([loadSubjects(), loadChapters(), loadContent()]);
+  renderDash();
+  if (currentPage === 'structure') renderStructure();
+  if (currentPage === 'library')  loadLibrary();
+  if (currentPage === 'upload')   { populateSubjectFilter(); }
+  showToast('✅ Synced!','success');
+}
+
+/* ═══════════════════════════════════════════════════
+   DASH
+════════════════════════════════════════════════════ */
+function updateStats() {
+  const videos = allContent.filter(c => c.type === 'video').length;
+  const pdfs   = allContent.filter(c => c.type !== 'video').length;
+  document.getElementById('st-subjects').textContent = subjects.length;
+  document.getElementById('st-chapters').textContent = chapters.length;
+  document.getElementById('st-videos').textContent   = videos;
+  document.getElementById('st-pdfs').textContent     = pdfs;
+}
+
+function renderDash() {
+  updateStats();
+  const el = document.getElementById('recentList');
+  if (!allContent.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No content yet</div><div class="empty-sub">Upload videos or PDFs to get started</div></div>`;
+    return;
+  }
+  const recent = allContent.slice(0, 8);
+  el.innerHTML = recent.map(c => contentRow(c, true)).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   STRUCTURE TREE
+════════════════════════════════════════════════════ */
+function renderStructure(filter = '') {
+  const el = document.getElementById('structureTree');
+  const q  = filter.toLowerCase();
+
+  const filtSubjects = subjects.filter(s =>
+    !q || s.name?.toLowerCase().includes(q) || String(s.class).includes(q)
+  );
+
+  if (!filtSubjects.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🗂️</div><div class="empty-title">No subjects found</div><div class="empty-sub">Add a subject to get started</div></div>`;
+    return;
+  }
+
+  el.innerHTML = filtSubjects.map((sub, si) => {
+    const chaps = chapters.filter(c => c.subjectId === sub.id)
+      .filter(c => !q || c.name?.toLowerCase().includes(q));
+    const chapHtml = chaps.length
+      ? chaps.map(ch => `
+          <div class="chap-row" onclick="openChapterContent('${ch.id}','${esc(ch.name||'')}')">
+            <span style="color:var(--primary);font-size:0.75rem">📄</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-weight:700;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                ${ch.number ? `<span style="color:var(--text3);font-size:0.68rem">Ch.${ch.number}:</span> ` : ''}${esc(ch.name||'Chapter')}
+              </div>
+              ${ch.description ? `<div style="font-size:0.65rem;color:var(--text3)">${esc(ch.description)}</div>` : ''}
             </div>
-            <div style="font-size:0.65rem;color:var(--text3);margin-top:8px;text-align:right">${c.createdAt?.toDate?c.createdAt.toDate().toLocaleDateString('en-IN'):''}</div>
-        </div>`;
-    }).join('');
-}
+            <div style="display:flex;gap:4px;flex-shrink:0">
+              <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openEditChap('${ch.id}')">✏️</button>
+              <span style="font-size:0.7rem;color:var(--text3)">›</span>
+            </div>
+          </div>`)
+        .join('')
+      : `<div style="padding:10px 16px 10px 36px;font-size:0.75rem;color:var(--text3);font-style:italic;border-bottom:1px solid var(--border)">No chapters yet</div>`;
 
-function filterContent(type, btn) {
-    contentFilter = type;
-    document.querySelectorAll('#contentTypeTabs .tab-pill').forEach(b => b.classList.remove('on'));
-    btn.classList.add('on');
-    renderContent();
-}
-
-function openPostModal(type) {
-    document.getElementById('postType').value = type;
-    document.getElementById('postTitle').value   = '';
-    document.getElementById('postDesc').value    = '';
-    document.getElementById('postLink').value    = '';
-    document.getElementById('postSubject').value = '';
-    document.getElementById('postClass').value   = 'all';
-    updatePostForm();
-    openModal('postModal');
-    navigateTo('courses');
-}
-
-function updatePostForm() {
-    const t = document.getElementById('postType').value;
-    document.getElementById('postLinkWrap').style.display = (t==='video'||t==='link') ? 'block':'none';
-    document.getElementById('postDueWrap').style.display  = t==='assign' ? 'block':'none';
-    const titles = {note:'📝 Post Study Notes',video:'🎥 Post Video',assign:'📚 Post Assignment',announce:'📣 Post Announcement',link:'🔗 Share Link'};
-    document.getElementById('postModalTitle').textContent = titles[t]||'Post Content';
-}
-
-async function savePost() {
-    const title   = document.getElementById('postTitle').value.trim();
-    const desc    = document.getElementById('postDesc').value.trim();
-    const type    = document.getElementById('postType').value;
-    const subj    = document.getElementById('postSubject').value.trim();
-    const cls     = document.getElementById('postClass').value;
-    const link    = document.getElementById('postLink').value.trim();
-    const due     = document.getElementById('postDue').value;
-
-    if (!title) { showToast('Enter a title','error'); return; }
-
-    try {
-        await db.collection('courseContent').add({
-            title, description:desc, type, subject:subj||'General',
-            targetClass:cls, link:link||'', dueDate:due||'',
-            teacherId: currentUser.uid,
-            teacherName: teacherData?.fullName || currentUser.email,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        closeModal('postModal');
-        showToast('✅ Content published!','success');
-        loadContent(); loadDashStats();
-    } catch(e) { showToast('Error: '+e.message,'error'); }
-}
-
-function viewContent(id) {
-    const c = allContent.find(x=>x.id===id);
-    if (!c) return;
-    document.getElementById('vmTitle').textContent = c.title||'Content';
-    document.getElementById('vmBody').innerHTML = `
-        <div style="margin-bottom:12px;display:flex;gap:7px;flex-wrap:wrap">
-            <span class="course-chip">${cap(c.type)}</span>
-            <span class="course-chip">${c.subject||'General'}</span>
-            <span class="course-chip">${c.targetClass==='all'?'All Classes':'Class '+c.targetClass}</span>
+    return `<div class="subj-item" id="si-${si}">
+      <div class="subj-hd" onclick="toggleAccordion('si-${si}')">
+        <span class="subj-arrow">▶</span>
+        <span style="font-size:1.1rem">📁</span>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:800;font-size:0.85rem;color:var(--text)">${esc(sub.name||'Subject')}</div>
+          <div style="font-size:0.65rem;color:var(--text2);margin-top:1px">${chaps.length} chapter${chaps.length!==1?'s':''}</div>
         </div>
-        <div style="font-size:0.875rem;line-height:1.7;color:var(--text2);margin-bottom:12px;white-space:pre-wrap">${c.description||'No description'}</div>
-        ${c.link?`<a href="${c.link}" target="_blank" class="btn-primary" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-size:0.82rem;padding:8px 14px">🔗 Open Link</a>`:''}
-        ${c.dueDate?`<div style="font-size:0.8rem;color:var(--amber);margin-top:8px">📅 Due Date: ${formatDate(c.dueDate)}</div>`:''}
-        <div style="font-size:0.7rem;color:var(--text3);margin-top:12px">Posted by ${c.teacherName||'You'}</div>`;
-    openModal('viewModal');
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+          <span class="cls-tag">Cls ${sub.class||'?'}</span>
+          <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openEditSubj('${sub.id}')">✏️</button>
+        </div>
+      </div>
+      <div class="subj-body">${chapHtml}</div>
+    </div>`;
+  }).join('');
 }
 
-async function deleteContent(id) {
-    if (!confirm('Delete this content?')) return;
+function toggleAccordion(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+function filterStructure() {
+  renderStructure(document.getElementById('structSearch').value);
+}
+
+/* ═══════════════════════════════════════════════════
+   SAVE SUBJECT
+════════════════════════════════════════════════════ */
+async function saveSubject() {
+  const cls  = document.getElementById('subClass').value.trim();
+  const name = document.getElementById('subName').value.trim();
+  const code = document.getElementById('subCode').value.trim();
+  const desc = document.getElementById('subDesc').value.trim();
+
+  if (!cls)  { showToast('Select a class','error'); return; }
+  if (!name) { showToast('Enter subject name','error'); return; }
+
+  try {
+    const ref = await db.collection('subjects').add({
+      class: cls, name, code, description: desc,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    subjects.push({ id: ref.id, class: cls, name, code, description: desc });
+    subjects.sort((a,b) => (parseInt(a.class)||0) - (parseInt(b.class)||0));
+    closeModal('addSubjModal');
+    clearForm(['subClass','subName','subCode','subDesc']);
+    populateSubjectDrops();
+    populateClassDrops();
+    renderStructure(document.getElementById('structSearch').value);
+    updateStats();
+    showToast('✅ Subject added!','success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   SAVE CHAPTER
+════════════════════════════════════════════════════ */
+async function saveChapter() {
+  const subId = document.getElementById('chapSubject').value;
+  const num   = document.getElementById('chapNum').value.trim();
+  const name  = document.getElementById('chapName').value.trim();
+  const desc  = document.getElementById('chapDesc').value.trim();
+
+  if (!subId) { showToast('Select a subject','error'); return; }
+  if (!name)  { showToast('Enter chapter name','error'); return; }
+
+  const sub = subjects.find(s => s.id === subId);
+
+  try {
+    const ref = await db.collection('chapters').add({
+      subjectId: subId,
+      subjectName: sub?.name || '',
+      class: sub?.class || '',
+      number: num ? parseInt(num) : null,
+      order:  num ? parseInt(num) : chapters.length + 1,
+      name, description: desc,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    chapters.push({ id: ref.id, subjectId: subId, subjectName: sub?.name||'', class: sub?.class||'', number: num?parseInt(num):null, order: num?parseInt(num):chapters.length, name, description: desc });
+    chapters.sort((a,b) => (a.order||0) - (b.order||0));
+    closeModal('addChapModal');
+    clearForm(['chapSubject','chapNum','chapName','chapDesc']);
+    renderStructure(document.getElementById('structSearch').value);
+    updateStats();
+    showToast('✅ Chapter added!','success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   EDIT / DELETE SUBJECT
+════════════════════════════════════════════════════ */
+function openEditSubj(id) {
+  const sub = subjects.find(s => s.id === id);
+  if (!sub) return;
+  document.getElementById('editSubjId').value   = id;
+  document.getElementById('editSubClass').value = sub.class || '';
+  document.getElementById('editSubName').value  = sub.name  || '';
+  document.getElementById('editSubCode').value  = sub.code  || '';
+  openModal('editSubjModal');
+}
+
+async function updateSubject() {
+  const id   = document.getElementById('editSubjId').value;
+  const cls  = document.getElementById('editSubClass').value;
+  const name = document.getElementById('editSubName').value.trim();
+  const code = document.getElementById('editSubCode').value.trim();
+  if (!name) { showToast('Enter name','error'); return; }
+  try {
+    await db.collection('subjects').doc(id).update({ class: cls, name, code });
+    const i = subjects.findIndex(s => s.id === id);
+    if (i >= 0) subjects[i] = { ...subjects[i], class: cls, name, code };
+    closeModal('editSubjModal');
+    renderStructure(document.getElementById('structSearch').value);
+    populateSubjectDrops();
+    showToast('✅ Updated!','success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+async function deleteSubject() {
+  const id = document.getElementById('editSubjId').value;
+  if (!confirm('Delete this subject and ALL its chapters? This cannot be undone.')) return;
+  try {
+    // Delete chapters
+    const chaps = chapters.filter(c => c.subjectId === id);
+    const batch = db.batch();
+    batch.delete(db.collection('subjects').doc(id));
+    chaps.forEach(c => batch.delete(db.collection('chapters').doc(c.id)));
+    await batch.commit();
+    subjects  = subjects.filter(s => s.id !== id);
+    chapters  = chapters.filter(c => c.subjectId !== id);
+    closeModal('editSubjModal');
+    renderStructure(document.getElementById('structSearch').value);
+    populateSubjectDrops();
+    updateStats();
+    showToast('🗑 Subject deleted','info');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   EDIT / DELETE CHAPTER
+════════════════════════════════════════════════════ */
+function openEditChap(id) {
+  const ch = chapters.find(c => c.id === id);
+  if (!ch) return;
+  document.getElementById('editChapId').value   = id;
+  document.getElementById('editChapNum').value  = ch.number || '';
+  document.getElementById('editChapName').value = ch.name   || '';
+  document.getElementById('editChapDesc').value = ch.description || '';
+  openModal('editChapModal');
+}
+
+async function updateChapter() {
+  const id   = document.getElementById('editChapId').value;
+  const num  = document.getElementById('editChapNum').value.trim();
+  const name = document.getElementById('editChapName').value.trim();
+  const desc = document.getElementById('editChapDesc').value.trim();
+  if (!name) { showToast('Enter name','error'); return; }
+  try {
+    const upd = { name, description: desc };
+    if (num) upd.number = parseInt(num), upd.order = parseInt(num);
+    await db.collection('chapters').doc(id).update(upd);
+    const i = chapters.findIndex(c => c.id === id);
+    if (i >= 0) chapters[i] = { ...chapters[i], ...upd };
+    closeModal('editChapModal');
+    renderStructure(document.getElementById('structSearch').value);
+    showToast('✅ Updated!','success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+async function deleteChapter() {
+  const id = document.getElementById('editChapId').value;
+  if (!confirm('Delete this chapter?')) return;
+  try {
+    await db.collection('chapters').doc(id).delete();
+    chapters = chapters.filter(c => c.id !== id);
+    closeModal('editChapModal');
+    renderStructure(document.getElementById('structSearch').value);
+    updateStats();
+    showToast('🗑 Chapter deleted','info');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+/* ═══════════════════════════════════════════════════
+   UPLOAD CONTENT
+════════════════════════════════════════════════════ */
+let ctType = 'video';
+
+function setContentType(type) {
+  ctType = type;
+  ['video','notes','dpp'].forEach(t => {
+    const btn = document.getElementById('ct-'+t);
+    if (!btn) return;
+    btn.classList.toggle('on', t === type);
+  });
+  document.getElementById('yt-zone').style.display   = type === 'video' ? 'block' : 'none';
+  document.getElementById('pdf-zone').style.display  = type !== 'video' ? 'block' : 'none';
+  document.getElementById('uploadBtnTxt').textContent = type === 'video' ? 'Save YouTube Link' : 'Upload PDF to Google Drive';
+}
+
+function previewYT() {
+  const url = document.getElementById('ytUrl').value.trim();
+  const vid = extractYTId(url);
+  const pre = document.getElementById('ytPrev');
+  if (vid) {
+    document.getElementById('ytThumb').src          = `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+    document.getElementById('ytVidId').textContent  = 'Video ID: ' + vid;
+    pre.style.display = 'block';
+  } else {
+    pre.style.display = 'none';
+  }
+}
+function extractYTId(url) {
+  const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
+  return m ? m[1] : null;
+}
+function clearYT() {
+  document.getElementById('ytUrl').value = '';
+  document.getElementById('ytPrev').style.display = 'none';
+}
+
+function onFileSelect(e) { if (e.target.files[0]) setFilePrev(e.target.files[0]); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) setFilePrev(f);
+}
+function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+
+function setFilePrev(file) {
+  if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+    showToast('Please select a PDF file','error'); return;
+  }
+  if (file.size > 100 * 1024 * 1024) { showToast('File too large (max 100 MB)','error'); return; }
+  pickedFile = file;
+  document.getElementById('fName').textContent = file.name;
+  document.getElementById('fSize').textContent = (file.size / (1024*1024)).toFixed(2) + ' MB';
+  document.getElementById('filePrev').style.display = 'block';
+  document.getElementById('dropZone').classList.add('has-file');
+}
+function clearFile() {
+  pickedFile = null;
+  document.getElementById('pdfFile').value = '';
+  document.getElementById('filePrev').style.display = 'none';
+  document.getElementById('dropZone').classList.remove('has-file');
+}
+
+function setUpProg(pct, status) {
+  document.getElementById('upFill').style.width    = pct + '%';
+  document.getElementById('upPct').textContent     = pct + '%';
+  document.getElementById('upStatus').textContent  = status;
+}
+
+async function doUpload() {
+  const chapId  = document.getElementById('upChapter').value;
+  const title   = document.getElementById('ctTitle').value.trim();
+  const desc    = document.getElementById('ctDesc').value.trim();
+
+  if (!chapId) { showToast('Select a chapter','error'); return; }
+  if (!title)  { showToast('Enter a title','error'); return; }
+
+  const ch  = chapters.find(c => c.id === chapId);
+  const sub = subjects.find(s => s.id === ch?.subjectId);
+
+  const btn = document.getElementById('uploadBtn');
+  btn.disabled = true;
+
+  /* ── VIDEO ── */
+  if (ctType === 'video') {
+    const ytUrl = document.getElementById('ytUrl').value.trim();
+    const vidId = extractYTId(ytUrl);
+    if (!ytUrl)  { showToast('Enter a YouTube URL','error'); btn.disabled=false; return; }
+    if (!vidId)  { showToast('Invalid YouTube URL','error'); btn.disabled=false; return; }
+
+    btn.innerHTML = '⏳ Saving…';
     try {
-        await db.collection('courseContent').doc(id).delete();
-        showToast('Deleted','info');
-        loadContent(); loadDashStats();
+      const ref = await db.collection('courseContent').add({
+        type: 'video', title, description: desc,
+        chapterId: chapId, chapterName: ch?.name || '',
+        subjectId: ch?.subjectId || '', subjectName: sub?.name || '',
+        class: sub?.class || '',
+        youtubeUrl: ytUrl, youtubeVideoId: vidId,
+        embedUrl: `https://www.youtube.com/embed/${vidId}`,
+        driveUrl: '', fileId: '', fileName: '',
+        uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      allContent.unshift({ id: ref.id, type:'video', title, chapterName: ch?.name||'', subjectName: sub?.name||'', class: sub?.class||'', youtubeUrl: ytUrl, youtubeVideoId: vidId });
+      showToast('✅ Video saved!','success');
+      document.getElementById('ctTitle').value = '';
+      document.getElementById('ctDesc').value  = '';
+      clearYT();
+      updateStats();
+      renderDash();
     } catch(e) { showToast('Error: '+e.message,'error'); }
+    btn.disabled = false;
+    btn.innerHTML = '☁️ <span id="uploadBtnTxt">Save YouTube Link</span>';
+    return;
+  }
+
+  /* ── PDF → Apps Script → Google Drive ── */
+  if (!pickedFile) { showToast('Select a PDF file','error'); btn.disabled=false; return; }
+
+  document.getElementById('uploadProg').style.display = 'block';
+  setUpProg(5, 'Reading file…');
+  btn.innerHTML = '⏳ Uploading…';
+
+  try {
+    /* Step 1 — convert PDF to base64 */
+    setUpProg(15, 'Converting to base64…');
+    const base64Data = await fileToBase64(pickedFile);
+
+    /* Step 2 — create / resolve the Drive folder structure via Apps Script */
+    setUpProg(30, 'Creating Drive folders…');
+    const structRes = await gasPost({
+      action:      'createCourseStructure',
+      className:   String(sub?.class || 'General'),
+      subjectName: sub?.name || 'Subject',
+      chapterName: ch?.name  || 'Chapter'
+    });
+
+    /* structRes.structure has keys: notes, dpp, videos — pick the right one */
+    const folderKey = ctType === 'notes' ? 'notes' : ctType === 'dpp' ? 'dpp' : 'videos';
+    const folderId  = structRes?.structure?.[folderKey] || structRes?.structure?.videos || '';
+    if (!folderId) throw new Error('Could not get Drive folder ID from Apps Script. Check doPost/createCourseStructure action.');
+
+    /* Step 3 — upload the actual PDF bytes */
+    setUpProg(55, 'Uploading PDF to Google Drive…');
+    const upRes = await gasPost({
+      action:      'uploadContent',
+      folderId,
+      file:        base64Data,
+      fileName:    pickedFile.name,
+      mimeType:    'application/pdf',
+      contentType: ctType,
+      metadata: {
+        title,
+        description: desc,
+        subjectId:  ch?.subjectId || '',
+        chapterId:  chapId,
+        class:      String(sub?.class || '')
+      }
+    });
+
+    /* upRes should have: { success, url, directUrl, fileId } */
+    const driveUrl   = upRes?.url        || upRes?.driveUrl   || '';
+    const directUrl  = upRes?.directUrl  || driveUrl;
+    const embedUrl   = upRes?.embedUrl   || '';
+    const fileId     = upRes?.fileId     || '';
+
+    if (!driveUrl) throw new Error('Apps Script did not return a Drive URL. Upload may have failed.');
+
+    /* Step 4 — save metadata to Firestore */
+    setUpProg(85, 'Saving to Firestore…');
+    const ref = await db.collection('courseContent').add({
+      type:        ctType,
+      title,
+      description: desc,
+      chapterId:   chapId,
+      chapterName: ch?.name        || '',
+      subjectId:   ch?.subjectId   || '',
+      subjectName: sub?.name       || '',
+      class:       String(sub?.class || ''),
+      driveUrl,
+      directUrl,
+      embedUrl,
+      fileId,
+      fileName:    pickedFile.name,
+      mimeType:    'application/pdf',
+      youtubeUrl:       '',
+      youtubeVideoId:   '',
+      source:      'teacher',
+      uploadedAt:  firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    allContent.unshift({
+      id: ref.id, type: ctType, title,
+      chapterName: ch?.name||'', subjectName: sub?.name||'',
+      class: sub?.class||'', driveUrl, directUrl, fileName: pickedFile.name
+    });
+
+    setUpProg(100, '✅ Done!');
+    setTimeout(() => { document.getElementById('uploadProg').style.display = 'none'; }, 1500);
+    showToast('✅ PDF saved to Google Drive!', 'success');
+    document.getElementById('ctTitle').value = '';
+    document.getElementById('ctDesc').value  = '';
+    clearFile();
+    updateStats();
+    renderDash();
+
+  } catch(e) {
+    console.error('PDF upload error:', e);
+    document.getElementById('uploadProg').style.display = 'none';
+    showToast('❌ ' + e.message, 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '☁️ <span id="uploadBtnTxt">Upload PDF to Drive</span>';
 }
 
-// ═══════════════════════════════════════════
-// STUDENTS
-// ═══════════════════════════════════════════
-async function loadMyStudents() {
-    const cls = document.getElementById('stuFilterClass')?.value || '';
-    const el  = document.getElementById('studentTileList');
-    el.innerHTML = '<div class="skel" style="height:58px;margin-bottom:8px;border-radius:13px"></div>'.repeat(4);
+/* ═══════════════════════════════════════════════════
+   CHAPTER CONTENT VIEWER
+════════════════════════════════════════════════════ */
+async function openChapterContent(chapId, chapName) {
+  document.getElementById('ccmTitle').textContent = '📂 ' + chapName;
+  document.getElementById('ccmBody').innerHTML = '<div class="skel" style="height:52px;margin-bottom:8px"></div><div class="skel" style="height:52px;margin-bottom:8px"></div><div class="skel" style="height:52px"></div>';
+  openModal('chapContentModal');
 
-    try {
-        let snap;
-        if (cls) snap = await db.collection('students').where('class','==',cls).get();
-        else snap = await db.collection('students').get();
-
-        if (snap.empty) { el.innerHTML='<div class="empty-state"><div class="ei">👥</div><div class="et">No students found</div></div>'; return; }
-
-        // Get attendance % for each student
-        const students = snap.docs.map(d=>({id:d.id,...d.data()}));
-        el.innerHTML = students.map(s => {
-            const name = s.fullName||((s.firstName||'')+' '+(s.lastName||'')).trim()||'Student';
-            const cls  = s.class||s.roleData?.class||'—';
-            return `<div class="student-tile">
-                <div style="width:38px;height:38px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;flex-shrink:0">${name.charAt(0).toUpperCase()}</div>
-                <div style="flex:1;min-width:0">
-                    <div style="font-weight:700;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
-                    <div style="font-size:0.7rem;color:var(--text2);margin-top:1px">Class ${cls} · Roll ${s.rollNumber||s.id.slice(-4).toUpperCase()}</div>
-                </div>
-                <button class="btn-ghost btn-sm" onclick="viewStudentAtt('${s.id}','${name}')">📊</button>
-            </div>`;
-        }).join('');
-    } catch(e) {
-        el.innerHTML=`<div class="empty-state"><div class="ei">⚠️</div><div class="et" style="color:#F87171">Error: ${e.message}</div></div>`;
+  try {
+    const snap = await db.collection('courseContent').where('chapterId','==',chapId).get();
+    if (snap.empty) {
+      document.getElementById('ccmBody').innerHTML = `<div class="empty"><div class="empty-icon">📂</div><div class="empty-title">No content yet</div><div class="empty-sub">Upload videos or PDFs for this chapter</div></div>`;
+      return;
     }
+    const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => (b.uploadedAt?.toMillis?.() || 0) - (a.uploadedAt?.toMillis?.() || 0));
+    document.getElementById('ccmBody').innerHTML = docs.map(c => contentRow(c, false, true)).join('');
+  } catch(e) {
+    document.getElementById('ccmBody').innerHTML = `<div style="color:var(--red);font-size:0.8rem;padding:10px">Error: ${e.message}</div>`;
+  }
 }
 
-async function viewStudentAtt(id, name) {
-    document.getElementById('vmTitle').textContent = '📊 ' + name;
-    document.getElementById('vmBody').innerHTML = '<div class="skel" style="height:200px"></div>';
-    openModal('viewModal');
-
-    try {
-        // Simple query, sort client-side
-        const snap = await db.collection('attendance')
-            .where('studentId','==',id)
-            .where('markedBy','==',currentUser.uid)
-            .get();
-        const docs = snap.docs.sort((a,b) => (b.data().date||'').localeCompare(a.data().date||'')).slice(0,50);
-        if (snap.empty) { document.getElementById('vmBody').innerHTML='<div class="empty-state"><div class="ei">📭</div><div class="et">No attendance records for this student</div></div>'; return; }
-        let p=0,a=0,l=0,total=0;
-        const rows = docs.map(d => {
-            const r=d.data(); total++;
-            if (r.status==='present') p++;
-            else if (r.status==='absent') a++;
-            else l++;
-            return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
-                <div style="flex:1"><div style="font-weight:600;font-size:0.82rem">${r.subject||'—'}</div><div style="font-size:0.7rem;color:var(--text3)">${formatDate(r.date)} · P${r.period||'—'}</div></div>
-                <span class="badge badge-${r.status?.[0]||'p'}">${r.status==='present'?'✅':r.status==='absent'?'❌':'⏰'} ${cap(r.status)}</span>
-            </div>`;
-        }).join('');
-        const pct = total>0?Math.round(((p+l)/total)*100):0;
-        const col = pct>=75?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
-        document.getElementById('vmBody').innerHTML = `
-            <div style="display:flex;gap:14px;margin-bottom:16px;background:var(--card2);border-radius:12px;padding:14px;text-align:center">
-                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:var(--green)">✅ ${p}</div><div style="font-size:0.68rem;color:var(--text2)">Present</div></div>
-                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:var(--amber)">⏰ ${l}</div><div style="font-size:0.68rem;color:var(--text2)">Late</div></div>
-                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:var(--red)">❌ ${a}</div><div style="font-size:0.68rem;color:var(--text2)">Absent</div></div>
-                <div style="flex:1"><div style="font-size:1.5rem;font-weight:800;color:${col}">${pct}%</div><div style="font-size:0.68rem;color:var(--text2)">Overall</div></div>
-            </div>
-            <div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;margin-bottom:16px">
-                <div style="height:100%;width:${pct}%;background:${col};border-radius:3px;transition:width 0.5s"></div>
-            </div>
-            <div style="max-height:300px;overflow-y:auto">${rows}</div>`;
-    } catch(e) { document.getElementById('vmBody').innerHTML=`<div style="color:#F87171">Error: ${e.message}</div>`; }
+/* ═══════════════════════════════════════════════════
+   LIBRARY
+════════════════════════════════════════════════════ */
+function switchLibTab(type) {
+  libFilter = type;
+  ['all','video','notes','dpp'].forEach(t => {
+    document.getElementById('lt-'+t).classList.toggle('on', t === type);
+  });
+  loadLibrary();
 }
 
-// ═══════════════════════════════════════════
-// PROFILE
-// ═══════════════════════════════════════════
-async function saveProfile() {
-    const name     = document.getElementById('profNameInput').value.trim();
-    const subjects = document.getElementById('profSubjects').value.split(',').map(s=>s.trim()).filter(Boolean);
-    const classes  = document.getElementById('profClsInput').value.split(',').map(s=>s.trim()).filter(Boolean);
-    const phone    = document.getElementById('profPhone').value.trim();
+async function loadLibrary() {
+  const cls     = document.getElementById('libClass').value;
+  const subject = document.getElementById('libSubject').value;
+  const el      = document.getElementById('libraryList');
 
-    try {
-        await db.collection('teachers').doc(currentUser.uid).update({ fullName:name, subjects, classes, phone });
-        teacherData = { ...teacherData, fullName:name, subjects, classes, phone };
-        document.getElementById('hName').textContent  = name;
-        document.getElementById('pName').textContent  = name;
-        document.getElementById('pRole').textContent  = subjects.join(', ')||'Teacher';
-        document.getElementById('pAvatar').textContent = name.charAt(0).toUpperCase();
-        showToast('✅ Profile saved!','success');
-    } catch(e) { showToast('Error: '+e.message,'error'); }
+  el.innerHTML = '<div class="skel" style="height:64px;margin-bottom:8px;border-radius:12px"></div>'.repeat(4);
+
+  let filtered = [...allContent];
+  if (libFilter !== 'all') filtered = filtered.filter(c => c.type === libFilter);
+  if (cls)     filtered = filtered.filter(c => String(c.class) === String(cls));
+  if (subject) filtered = filtered.filter(c => c.subjectId === subject || c.subjectName === subject);
+
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No content found</div><div class="empty-sub">Try changing the filters</div></div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(c => contentRow(c, false, false, true)).join('');
 }
 
-// ═══════════════════════════════════════════
-// NAVIGATION
-// ═══════════════════════════════════════════
-function navigateTo(page) {
-    currentPage = page;
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('page-'+page)?.classList.add('active');
-    document.getElementById('nav-'+page)?.classList.add('active');
-    if (page==='att') { loadAttHistory(); }
-    if (page==='courses') { loadContent(); }
-    if (page==='students') { loadMyStudents(); }
+/* ═══════════════════════════════════════════════════
+   CONTENT ROW RENDERER (shared)
+════════════════════════════════════════════════════ */
+function contentRow(c, compact = false, deletable = false, withDelete = false) {
+  const typeConfig = {
+    video: { icon:'🎬', bg:'var(--red-bg)',   label:'Video',  badge:'badge-video' },
+    notes: { icon:'📄', bg:'var(--blue-bg)',  label:'Notes',  badge:'badge-notes' },
+    dpp:   { icon:'✏️', bg:'var(--green-bg)', label:'DPP',    badge:'badge-dpp'   },
+    note:  { icon:'📝', bg:'var(--blue-bg)',  label:'Notes',  badge:'badge-notes' },
+  };
+  const tc   = typeConfig[c.type] || typeConfig.notes;
+  const link = c.type === 'video' ? (c.youtubeUrl || c.driveUrl || '') : (c.directUrl || c.driveUrl || '');
+  const date = c.uploadedAt?.toDate?.() ? c.uploadedAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
+  const canDel = deletable || withDelete;
+
+  return `<div class="cl-item">
+    <div class="cl-icon" style="background:${tc.bg}">${tc.icon}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">${esc(c.title||'Untitled')}</div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+        <span class="badge ${tc.badge}">${tc.label}</span>
+        ${c.chapterName ? `<span style="font-size:0.62rem;color:var(--text3)">${esc(c.chapterName)}</span>` : ''}
+        ${c.class ? `<span class="cls-tag">Cls ${c.class}</span>` : ''}
+        ${date ? `<span style="font-size:0.62rem;color:var(--text3)">${date}</span>` : ''}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
+      ${link ? `<a href="${link}" target="_blank" style="font-size:0.72rem;color:var(--primary);font-weight:700;text-decoration:none;background:var(--primary-bg);padding:5px 10px;border-radius:7px;border:1px solid var(--primary3);white-space:nowrap">Open ↗</a>` : ''}
+      ${canDel ? `<button onclick="deleteContent('${c.id}','${c.fileId||''}')" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--red-bg);color:var(--red);cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif">🗑</button>` : ''}
+    </div>
+  </div>`;
 }
 
-// ═══════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
-
-// ═══════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════
-function showToast(msg, type='success') {
-    const t = document.getElementById('toast');
-    const c = {success:'linear-gradient(135deg,#065F46,#059669)',error:'linear-gradient(135deg,#7F1D1D,#DC2626)',warning:'linear-gradient(135deg,#78350F,#D97706)',info:'linear-gradient(135deg,#1E3A5F,#2563EB)'};
-    t.style.background = c[type]||c.success;
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3200);
+async function deleteContent(docId, fileId) {
+  if (!confirm('Delete this content item?')) return;
+  try {
+    await db.collection('courseContent').doc(docId).delete();
+    if (fileId && !fileId.startsWith('http')) {
+      storage.ref(fileId).delete().catch(() => {});
+    }
+    allContent = allContent.filter(c => c.id !== docId);
+    updateStats();
+    renderDash();
+    loadLibrary();
+    showToast('🗑 Deleted','info');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
 }
 
-// ═══════════════════════════════════════════
-// HELPERS
-// ═══════════════════════════════════════════
-function todayStr() {
-    const d = new Date();
-    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+/* ═══════════════════════════════════════════════════
+   DROPDOWN POPULATORS
+════════════════════════════════════════════════════ */
+function populateClassDrops() {
+  const classes = [...new Set(subjects.map(s => s.class).filter(Boolean))].sort((a,b) => parseInt(a)-parseInt(b));
+  ['upClass','libClass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const first = el.options[0].cloneNode(true);
+    el.innerHTML = '';
+    el.appendChild(first);
+    classes.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = 'Class ' + c;
+      el.appendChild(o);
+    });
+  });
 }
-function formatDate(str) {
-    if (!str) return '—';
-    try { return new Date(str+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
-    catch(e) { return str; }
+
+function populateSubjectDrops() {
+  ['chapSubject','libSubject'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const first = el.options[0].cloneNode(true);
+    el.innerHTML = ''; el.appendChild(first);
+    subjects.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id; o.textContent = `${s.name} (Cls ${s.class})`;
+      el.appendChild(o);
+    });
+  });
 }
-function cap(s) { return s?s.charAt(0).toUpperCase()+s.slice(1):'—'; }
+
+function populateSubjectFilter() {
+  const cls = document.getElementById('upClass').value;
+  const el  = document.getElementById('upSubject');
+  const first = el.options[0].cloneNode(true);
+  el.innerHTML = ''; el.appendChild(first);
+  const filtered = cls ? subjects.filter(s => String(s.class) === String(cls)) : subjects;
+  filtered.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.id; o.textContent = s.name;
+    el.appendChild(o);
+  });
+  populateChapterFilter();
+}
+
+function populateChapterFilter() {
+  const subId = document.getElementById('upSubject').value;
+  const el    = document.getElementById('upChapter');
+  const first = el.options[0].cloneNode(true);
+  el.innerHTML = ''; el.appendChild(first);
+  const filtered = subId ? chapters.filter(c => c.subjectId === subId) : chapters;
+  filtered.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c.id; o.textContent = `${c.number ? 'Ch.'+c.number+': ' : ''}${c.name}`;
+    el.appendChild(o);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════════ */
+function goTo(page) {
+  currentPage = page;
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  document.getElementById('pg-'+page)?.classList.add('on');
+  document.getElementById('nav-'+page)?.classList.add('on');
+  window.scrollTo(0, 0);
+
+  if (page === 'structure') { renderStructure(document.getElementById('structSearch')?.value || ''); }
+  if (page === 'library')   { loadLibrary(); }
+  if (page === 'upload')    { populateSubjectFilter(); }
+}
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+════════════════════════════════════════════════════ */
+function openModal(id)  { document.getElementById(id)?.classList.add('open'); }
+function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+
+document.querySelectorAll('.modal').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════════ */
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  const c = {
+    success: 'linear-gradient(135deg,#065F46,#059669)',
+    error:   'linear-gradient(135deg,#7F1D1D,#DC2626)',
+    warning: 'linear-gradient(135deg,#78350F,#D97706)',
+    info:    'linear-gradient(135deg,#1E3A5F,#2563EB)'
+  };
+  t.style.background = c[type] || c.success;
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+/* ═══════════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════════════ */
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function clearForm(ids) { ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+
+/* ─── File → Base64 ─────────────────────────────── */
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    // result is "data:application/pdf;base64,XXXXXX" — we only want the XXXXXX part
+    reader.onload  = () => resolve(reader.result.split(',')[1]);
+    reader.onerror = () => reject(new Error('Could not read file'));
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ─── Apps Script POST ───────────────────────────── */
+// Sends JSON, follows redirects, parses JSON back.
+// Throws a descriptive Error so callers can catch + toast it.
+async function gasPost(payload) {
+  let res;
+  try {
+    res = await fetch(GAS_URL, {
+      method:   'POST',
+      redirect: 'follow',
+      headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
+      body:     JSON.stringify(payload)
+    });
+  } catch(networkErr) {
+    throw new Error('Network error reaching Apps Script: ' + networkErr.message);
+  }
+
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch(e) {
+    // First 300 chars of raw response helps debugging
+    throw new Error('Apps Script returned non-JSON:\n' + text.substring(0, 300));
+  }
+
+  if (data.success === false || data.error) {
+    throw new Error(data.error || 'Apps Script returned a failure response');
+  }
+  return data; // { success:true, url, directUrl, embedUrl, fileId, structure, … }
+}
 </script>
 </body>
 </html>
