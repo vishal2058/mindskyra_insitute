@@ -9,7 +9,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-<!-- Firebase Storage SDK removed: PDFs go via Apps Script → Google Drive -->
 <style>
 /* ═══════════ TOKENS ═══════════ */
 :root {
@@ -172,6 +171,9 @@ textarea.fi{resize:vertical;min-height:80px;}
 .badge-video{background:var(--red-bg);color:var(--red);}
 .badge-notes{background:var(--blue-bg);color:var(--blue);}
 .badge-dpp{background:var(--green-bg);color:var(--green);}
+.badge-p{background:var(--green-bg);color:var(--green);}
+.badge-a{background:var(--red-bg);color:var(--red);}
+.badge-l{background:var(--amber-bg);color:var(--amber);}
 
 /* ── MODAL ── */
 .modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);padding:16px;align-items:flex-end;justify-content:center;}
@@ -229,6 +231,55 @@ textarea.fi{resize:vertical;min-height:80px;}
 .mini-icon{font-size:1.8rem;margin-bottom:6px;}
 .mini-lbl{font-size:0.75rem;font-weight:700;color:var(--text2);}
 
+/* ══════════════════════════════════
+   ATTENDANCE STYLES
+══════════════════════════════════ */
+/* ── STUDENT ROW ── */
+.s-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:var(--card);margin:5px 0;transition:all 0.18s;}
+.s-row.mp{border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);}
+.s-row.ma{border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.04);}
+.s-row.ml{border-color:rgba(245,158,11,0.3);background:rgba(245,158,11,0.04);}
+.s-ava{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5B5EF4,#818CF8);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;color:white;flex-shrink:0;}
+.s-info{flex:1;min-width:0;}
+.s-name{font-weight:700;font-size:0.82rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.s-meta{font-size:0.65rem;color:var(--text2);margin-top:1px;}
+.sbns{display:flex;gap:4px;flex-shrink:0;}
+.sbn{padding:5px 9px;border-radius:8px;font-size:0.68rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--bg3);transition:all 0.15s;}
+.sbn-p{color:var(--green);}
+.sbn-p.on{background:var(--green-bg);border-color:rgba(16,185,129,0.3);}
+.sbn-l{color:var(--amber);}
+.sbn-l.on{background:var(--amber-bg);border-color:rgba(245,158,11,0.3);}
+.sbn-a{color:var(--red);}
+.sbn-a.on{background:var(--red-bg);border-color:rgba(239,68,68,0.3);}
+
+/* ── BULK BAR ── */
+.bulk-bar{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.bulk-lbl{font-size:0.72rem;font-weight:700;color:var(--text2);}
+
+/* ── ATT FORM GRID ── */
+.att-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 14px 0;}
+@media(max-width:400px){.att-form-grid{grid-template-columns:1fr;}}
+
+/* ── REPORT ITEM ── */
+.report-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.report-item:last-child{border-bottom:none;}
+
+/* ── TABLE ── */
+.hist-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+thead th{padding:10px 12px;text-align:left;font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody tr{border-bottom:1px solid rgba(0,0,0,0.04);transition:background 0.15s;}
+tbody tr:hover{background:var(--bg3);}
+tbody td{padding:10px 12px;color:var(--text2);vertical-align:middle;}
+tbody td:first-child{color:var(--text);font-weight:600;}
+
+/* ── TODAY ROW ── */
+.today-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.today-row:last-child{border-bottom:none;}
+
+/* ── ATT SECTION HEADER ── */
+.att-section-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);}
+
 @media(max-width:380px){.stats-grid{grid-template-columns:1fr 1fr;}.mini-grid{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
@@ -266,41 +317,155 @@ textarea.fi{resize:vertical;min-height:80px;}
       <div class="pg-sub" id="dashDate"></div>
     </div>
 
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-icon">📁</div><div class="stat-val" style="color:var(--primary)" id="st-subjects">—</div><div class="stat-lbl">Subjects</div></div>
-      <div class="stat-box"><div class="stat-icon">📑</div><div class="stat-val" style="color:var(--blue)" id="st-chapters">—</div><div class="stat-lbl">Chapters</div></div>
-      <div class="stat-box"><div class="stat-icon">🎬</div><div class="stat-val" style="color:var(--red)" id="st-videos">—</div><div class="stat-lbl">Videos</div></div>
-      <div class="stat-box"><div class="stat-icon">📄</div><div class="stat-val" style="color:var(--green)" id="st-pdfs">—</div><div class="stat-lbl">PDFs</div></div>
+    <!-- Dashboard section tabs -->
+    <div class="tab-row" id="dashTabRow">
+      <div class="tab-pill on" id="dtab-overview" onclick="switchDashTab('overview')">📊 Overview</div>
+      <div class="tab-pill" id="dtab-mark"     onclick="switchDashTab('mark')">✏️ Mark Att.</div>
+      <div class="tab-pill" id="dtab-history"  onclick="switchDashTab('history')">📋 History</div>
+      <div class="tab-pill" id="dtab-report"   onclick="switchDashTab('report')">📈 Report</div>
     </div>
 
-    <div class="card">
-      <div class="card-hd"><div class="card-title">⚡ Quick Actions</div></div>
-      <div class="card-body">
-        <div class="mini-grid">
-          <div class="mini-card" onclick="goTo('structure');openModal('addSubjModal')">
-            <div class="mini-icon">📁</div><div class="mini-lbl">Add Subject</div>
-          </div>
-          <div class="mini-card" onclick="goTo('structure');openModal('addChapModal')">
-            <div class="mini-icon">📑</div><div class="mini-lbl">Add Chapter</div>
-          </div>
-          <div class="mini-card" onclick="goTo('upload');setContentType('video')">
-            <div class="mini-icon">🎬</div><div class="mini-lbl">Upload Video</div>
-          </div>
-          <div class="mini-card" onclick="goTo('upload');setContentType('notes')">
-            <div class="mini-icon">📄</div><div class="mini-lbl">Upload PDF</div>
+    <!-- ─── OVERVIEW SECTION ─── -->
+    <div id="dsec-overview">
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-icon">📁</div><div class="stat-val" style="color:var(--primary)" id="st-subjects">—</div><div class="stat-lbl">Subjects</div></div>
+        <div class="stat-box"><div class="stat-icon">📑</div><div class="stat-val" style="color:var(--blue)" id="st-chapters">—</div><div class="stat-lbl">Chapters</div></div>
+        <div class="stat-box"><div class="stat-icon">🎬</div><div class="stat-val" style="color:var(--red)" id="st-videos">—</div><div class="stat-lbl">Videos</div></div>
+        <div class="stat-box"><div class="stat-icon">📄</div><div class="stat-val" style="color:var(--green)" id="st-pdfs">—</div><div class="stat-lbl">PDFs</div></div>
+      </div>
+
+      <!-- Today's Attendance Summary -->
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">📋 Today's Attendance</div>
+          <button class="btn btn-primary btn-sm" onclick="switchDashTab('mark')">+ Mark</button>
+        </div>
+        <div class="card-body" id="todayAttSummary">
+          <div class="skel" style="height:40px;margin-bottom:8px"></div>
+          <div class="skel" style="height:40px"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hd"><div class="card-title">⚡ Quick Actions</div></div>
+        <div class="card-body">
+          <div class="mini-grid">
+            <div class="mini-card" onclick="goTo('structure');openModal('addSubjModal')">
+              <div class="mini-icon">📁</div><div class="mini-lbl">Add Subject</div>
+            </div>
+            <div class="mini-card" onclick="goTo('structure');openModal('addChapModal')">
+              <div class="mini-icon">📑</div><div class="mini-lbl">Add Chapter</div>
+            </div>
+            <div class="mini-card" onclick="goTo('upload');setContentType('video')">
+              <div class="mini-icon">🎬</div><div class="mini-lbl">Upload Video</div>
+            </div>
+            <div class="mini-card" onclick="goTo('upload');setContentType('notes')">
+              <div class="mini-icon">📄</div><div class="mini-lbl">Upload PDF</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Recent content -->
-    <div class="card">
-      <div class="card-hd"><div class="card-title">🕐 Recently Added</div></div>
-      <div id="recentList">
-        <div style="padding:14px"><div class="skel" style="height:44px;margin-bottom:8px"></div><div class="skel" style="height:44px;margin-bottom:8px"></div><div class="skel" style="height:44px"></div></div>
+      <!-- Recent content -->
+      <div class="card">
+        <div class="card-hd"><div class="card-title">🕐 Recently Added</div></div>
+        <div id="recentList">
+          <div style="padding:14px"><div class="skel" style="height:44px;margin-bottom:8px"></div><div class="skel" style="height:44px;margin-bottom:8px"></div><div class="skel" style="height:44px"></div></div>
+        </div>
       </div>
-    </div>
-  </div>
+    </div><!-- end dsec-overview -->
+
+    <!-- ─── MARK ATTENDANCE SECTION ─── -->
+    <div id="dsec-mark" style="display:none">
+
+      <div class="card">
+        <div class="card-hd"><div class="card-title">📝 Session Details</div><div id="attDateLabel" style="font-size:0.75rem;color:var(--text2)"></div></div>
+        <div class="att-form-grid">
+          <div class="fg"><label class="fl">Date</label><input type="date" id="attDate" class="fi"></div>
+          <div class="fg">
+            <label class="fl">Class</label>
+            <select id="attClass" class="fi" onchange="loadAttStudents()"><option value="">— Select —</option></select>
+          </div>
+          <div class="fg"><label class="fl">Subject</label><input type="text" id="attSubject" class="fi" placeholder="e.g. Physics"></div>
+          <div class="fg">
+            <label class="fl">Period</label>
+            <select id="attPeriod" class="fi">
+              <option value="1">Period 1</option><option value="2">Period 2</option>
+              <option value="3">Period 3</option><option value="4">Period 4</option>
+              <option value="5">Period 5</option><option value="6">Period 6</option>
+              <option value="7">Period 7</option><option value="8">Period 8</option>
+            </select>
+          </div>
+          <div class="fg"><label class="fl">Room No.</label><input type="text" id="attRoom" class="fi" placeholder="e.g. 101"></div>
+          <div class="fg"><label class="fl">Note</label><input type="text" id="attNote" class="fi" placeholder="Optional"></div>
+        </div>
+        <div style="padding:0 14px 14px;display:flex;justify-content:flex-end">
+          <button class="btn btn-primary btn-sm" onclick="loadAttStudents()">🔄 Load Students</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="bulk-bar">
+          <span class="bulk-lbl">Mark All:</span>
+          <button class="btn btn-sm" style="background:var(--green-bg);color:var(--green);border:1px solid rgba(16,185,129,0.2)" onclick="markAllAtt('present')">✅ Present</button>
+          <button class="btn btn-sm" style="background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,0.2)" onclick="markAllAtt('absent')">❌ Absent</button>
+          <div style="flex:1"></div>
+          <span id="attMarkedCnt" style="font-size:0.72rem;color:var(--text3);font-weight:600">0 marked</span>
+        </div>
+        <div id="attStudentList" style="padding:8px 8px 4px">
+          <div class="empty"><div class="empty-icon">🏫</div><div class="empty-title">Select class to load students</div></div>
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="resetAtt()">↺ Reset</button>
+          <button class="btn btn-primary" id="attSaveBtn" onclick="saveAtt()">💾 Save Attendance</button>
+        </div>
+      </div>
+    </div><!-- end dsec-mark -->
+
+    <!-- ─── HISTORY SECTION ─── -->
+    <div id="dsec-history" style="display:none">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">📋 Attendance Records</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <select id="hfClass" class="fi" style="padding:7px 10px;font-size:0.78rem;width:110px" onchange="loadAttHistory()"><option value="">All Classes</option></select>
+            <input type="date" id="hfDate" class="fi" style="padding:7px 10px;font-size:0.78rem;width:130px" onchange="loadAttHistory()">
+            <button class="btn btn-ghost btn-sm" onclick="clearHistFilters()">✕</button>
+          </div>
+        </div>
+        <div class="hist-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Date</th>
+                <th>Subject</th>
+                <th>Period</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="histTbody"><tr><td colspan="5"><div class="skel" style="height:38px;margin:6px 0"></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- end dsec-history -->
+
+    <!-- ─── REPORT SECTION ─── -->
+    <div id="dsec-report" style="display:none">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">📈 Per-Student Attendance %</div>
+          <select id="rpClass" class="fi" style="padding:7px 10px;font-size:0.78rem;width:130px" onchange="loadAttReport()"><option value="">All Classes</option></select>
+        </div>
+        <div class="card-body" id="rpBody">
+          <div class="skel" style="height:50px;margin-bottom:8px"></div>
+          <div class="skel" style="height:50px;margin-bottom:8px"></div>
+          <div class="skel" style="height:50px"></div>
+        </div>
+      </div>
+    </div><!-- end dsec-report -->
+
+  </div><!-- end pg-dash -->
 
   <!-- ══ PAGE: STRUCTURE ══ -->
   <div id="pg-structure" class="pg">
@@ -496,18 +661,10 @@ textarea.fi{resize:vertical;min-height:80px;}
           <option value="12">Class 12</option>
         </select>
       </div>
-      <div class="fg"><label class="fl">Subject Name</label>
-        <input class="fi" id="subName" placeholder="e.g. Physics">
-      </div>
-      <div class="fg"><label class="fl">Subject Code (optional)</label>
-        <input class="fi" id="subCode" placeholder="e.g. PHY-11">
-      </div>
-      <div class="fg"><label class="fl">Description (optional)</label>
-        <textarea class="fi" id="subDesc" placeholder="Brief description…" rows="2"></textarea>
-      </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="saveSubject()">
-        💾 Save Subject
-      </button>
+      <div class="fg"><label class="fl">Subject Name</label><input class="fi" id="subName" placeholder="e.g. Physics"></div>
+      <div class="fg"><label class="fl">Subject Code (optional)</label><input class="fi" id="subCode" placeholder="e.g. PHY-11"></div>
+      <div class="fg"><label class="fl">Description (optional)</label><textarea class="fi" id="subDesc" placeholder="Brief description…" rows="2"></textarea></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="saveSubject()">💾 Save Subject</button>
     </div>
   </div>
 </div>
@@ -521,22 +678,12 @@ textarea.fi{resize:vertical;min-height:80px;}
     </div>
     <div class="modal-body">
       <div class="fg"><label class="fl">Subject</label>
-        <select class="fi" id="chapSubject">
-          <option value="">— Select Subject —</option>
-        </select>
+        <select class="fi" id="chapSubject"><option value="">— Select Subject —</option></select>
       </div>
-      <div class="fg"><label class="fl">Chapter Number</label>
-        <input class="fi" type="number" id="chapNum" placeholder="e.g. 1">
-      </div>
-      <div class="fg"><label class="fl">Chapter Name</label>
-        <input class="fi" id="chapName" placeholder="e.g. Laws of Motion">
-      </div>
-      <div class="fg"><label class="fl">Description (optional)</label>
-        <textarea class="fi" id="chapDesc" placeholder="Brief description…" rows="2"></textarea>
-      </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="saveChapter()">
-        💾 Save Chapter
-      </button>
+      <div class="fg"><label class="fl">Chapter Number</label><input class="fi" type="number" id="chapNum" placeholder="e.g. 1"></div>
+      <div class="fg"><label class="fl">Chapter Name</label><input class="fi" id="chapName" placeholder="e.g. Laws of Motion"></div>
+      <div class="fg"><label class="fl">Description (optional)</label><textarea class="fi" id="chapDesc" placeholder="Brief description…" rows="2"></textarea></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px" onclick="saveChapter()">💾 Save Chapter</button>
     </div>
   </div>
 </div>
@@ -593,9 +740,20 @@ textarea.fi{resize:vertical;min-height:80px;}
   </div>
 </div>
 
+<!-- ══ MODAL: Student Attendance Detail ══ -->
+<div class="modal" id="stuAttModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title" id="stuAttTitle">Student Attendance</div>
+      <button class="modal-close" onclick="closeModal('stuAttModal')">✕</button>
+    </div>
+    <div class="modal-body" id="stuAttBody"></div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════
-   FIREBASE INIT  — replace with your config if needed
+   FIREBASE INIT
 ════════════════════════════════════════════════════ */
 firebase.initializeApp({
   apiKey:            "AIzaSyB5TTCXCD74IUeLmM7bynlgCUvcmcM6rTw",
@@ -605,25 +763,25 @@ firebase.initializeApp({
   messagingSenderId: "333988573281",
   appId:             "1:333988573281:web:7d775f902b55d2e15aba20"
 });
-
 const db = firebase.firestore();
-// Firebase Storage NOT used — PDFs upload via Apps Script → Google Drive (no CORS issues)
 
-/* ═══════════════════════════════════════════════════
-   APPS SCRIPT (for PDF → Google Drive path)
-   If you prefer Firebase Storage only, set this to ''
-════════════════════════════════════════════════════ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzY5dUqfwAdHk1iSav4kIowOgVNk6KCkfIzH2KTf4-FSChUX6hQvruQwyVCbHl_hUk2/exec';
 
 /* ═══════════════════════════════════════════════════
    STATE
 ════════════════════════════════════════════════════ */
-let subjects    = [];   // [{id, ...data}]
-let chapters    = [];   // [{id, ...data}]
-let allContent  = [];   // [{id, ...data}]
+let subjects    = [];
+let chapters    = [];
+let allContent  = [];
 let pickedFile  = null;
 let libFilter   = 'all';
 let currentPage = 'dash';
+let currentDashTab = 'overview';
+
+// Attendance state
+let attMarked   = {};
+let attStudents = [];
+let allClasses  = [];
 
 /* ═══════════════════════════════════════════════════
    BOOT
@@ -632,9 +790,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('dashDate').textContent =
     new Date().toLocaleDateString('en-IN',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
 
+  const now = new Date();
+  document.getElementById('attDateLabel').textContent =
+    now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'});
+  document.getElementById('attDate').value = todayStr();
+
   await Promise.all([loadSubjects(), loadChapters(), loadContent()]);
+  await loadClasses();
   hideSplash();
   renderDash();
+  loadTodayAttSummary();
 });
 
 function hideSplash() {
@@ -672,7 +837,6 @@ async function loadContent() {
     updateStats();
   } catch(e) {
     try {
-      // fallback if no index
       const snap = await db.collection('courseContent').get();
       allContent = snap.docs.map(d => ({ id: d.id, ...d.data() }))
         .sort((a,b) => (b.uploadedAt?.toMillis?.() || 0) - (a.uploadedAt?.toMillis?.() || 0));
@@ -681,14 +845,369 @@ async function loadContent() {
   }
 }
 
+/* ── Load distinct classes from students collection ── */
+async function loadClasses() {
+  try {
+    const snap = await db.collection('students').get();
+    const set  = new Set();
+    // also pull from subjects
+    subjects.forEach(s => { if (s.class) set.add(String(s.class)); });
+    snap.forEach(d => {
+      const c = d.data().class || d.data().roleData?.class;
+      if (c) set.add(String(c));
+    });
+    allClasses = [...set].sort((a,b) => Number(a)-Number(b) || a.localeCompare(b));
+    populateAttClassDrops();
+  } catch(e) {
+    // fallback: use classes from subjects
+    const set = new Set(subjects.map(s => String(s.class)).filter(Boolean));
+    allClasses = [...set].sort((a,b) => Number(a)-Number(b));
+    populateAttClassDrops();
+  }
+}
+
+function populateAttClassDrops() {
+  ['attClass','hfClass','rpClass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const first = el.options[0].cloneNode(true);
+    el.innerHTML = ''; el.appendChild(first);
+    allClasses.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = 'Class ' + c;
+      el.appendChild(o);
+    });
+  });
+}
+
 async function refreshAll() {
   showToast('Syncing…','info');
   await Promise.all([loadSubjects(), loadChapters(), loadContent()]);
+  await loadClasses();
   renderDash();
+  loadTodayAttSummary();
   if (currentPage === 'structure') renderStructure();
   if (currentPage === 'library')  loadLibrary();
-  if (currentPage === 'upload')   { populateSubjectFilter(); }
+  if (currentPage === 'upload')   populateSubjectFilter();
   showToast('✅ Synced!','success');
+}
+
+/* ═══════════════════════════════════════════════════
+   DASHBOARD TAB SWITCHER
+════════════════════════════════════════════════════ */
+function switchDashTab(tab) {
+  currentDashTab = tab;
+  ['overview','mark','history','report'].forEach(t => {
+    const pill = document.getElementById('dtab-'+t);
+    const sec  = document.getElementById('dsec-'+t);
+    if (pill) pill.classList.toggle('on', t === tab);
+    if (sec)  sec.style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'history') loadAttHistory();
+  if (tab === 'report')  loadAttReport();
+  if (tab === 'overview') loadTodayAttSummary();
+}
+
+/* ═══════════════════════════════════════════════════
+   TODAY'S ATTENDANCE SUMMARY (on Overview tab)
+════════════════════════════════════════════════════ */
+async function loadTodayAttSummary() {
+  const el = document.getElementById('todayAttSummary');
+  if (!el) return;
+  try {
+    const snap = await db.collection('attendance').where('date','==',todayStr()).get();
+    if (snap.empty) {
+      el.innerHTML = `<div style="text-align:center;padding:14px 0">
+        <div style="font-size:1.8rem;margin-bottom:8px">📋</div>
+        <div style="font-weight:700;color:var(--text2);font-size:0.85rem;margin-bottom:10px">No attendance marked today</div>
+        <button class="btn btn-primary btn-sm" onclick="switchDashTab('mark')">Mark Now →</button>
+      </div>`;
+      return;
+    }
+
+    const subjects = {};
+    snap.forEach(d => {
+      const r = d.data();
+      const key = (r.subject||'General') + '_' + (r.class||'');
+      if (!subjects[key]) subjects[key] = { subj: r.subject||'General', cls: r.class||'', p:0, a:0, l:0, total:0 };
+      subjects[key].total++;
+      if (r.status === 'present') subjects[key].p++;
+      else if (r.status === 'absent') subjects[key].a++;
+      else subjects[key].l++;
+    });
+
+    el.innerHTML = Object.values(subjects).map(s => {
+      const pct = Math.round(((s.p + s.l) / s.total) * 100);
+      const col = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+      return `<div class="today-row">
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:0.85rem;color:var(--text)">${esc(s.subj)} ${s.cls ? `<span class="cls-tag">Cls ${s.cls}</span>` : ''}</div>
+          <div style="font-size:0.7rem;color:var(--text2);margin-top:2px">✅ ${s.p} &nbsp;⏰ ${s.l} &nbsp;❌ ${s.a} &nbsp;· ${s.total} students</div>
+          <div class="prog-bar" style="margin-top:5px"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>
+        </div>
+        <div style="font-weight:800;font-size:1.1rem;color:${col};flex-shrink:0;margin-left:12px">${pct}%</div>
+      </div>`;
+    }).join('') + `<div style="text-align:right;margin-top:10px">
+      <button class="btn btn-ghost btn-sm" onclick="switchDashTab('history')">View All →</button>
+    </div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red);font-size:0.8rem;padding:8px">Could not load attendance data.</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   MARK ATTENDANCE
+════════════════════════════════════════════════════ */
+async function loadAttStudents() {
+  const cls  = document.getElementById('attClass').value;
+  const date = document.getElementById('attDate').value;
+  const el   = document.getElementById('attStudentList');
+
+  if (!cls) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">🏫</div><div class="empty-title">Select a class first</div></div>`;
+    return;
+  }
+
+  el.innerHTML = '<div style="padding:10px"><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px"></div></div>';
+  attMarked = {};
+
+  try {
+    // Try direct class field first, then roleData.class
+    const snap1 = await db.collection('students').where('class','==',cls).get();
+    const snap2 = await db.collection('students').get();
+    const seen  = new Set();
+    const students = [];
+
+    snap1.forEach(d => { seen.add(d.id); students.push({ id: d.id, ...d.data() }); });
+    snap2.forEach(d => {
+      if (seen.has(d.id)) return;
+      const dd = d.data();
+      if (dd.roleData?.class === cls || String(dd.class) === String(cls)) {
+        students.push({ id: d.id, ...dd });
+      }
+    });
+
+    attStudents = students;
+
+    // Load any existing records for this date+class
+    if (date) {
+      const subject = document.getElementById('attSubject').value.trim();
+      let q = db.collection('attendance').where('date','==',date).where('class','==',cls);
+      if (subject) q = q.where('subject','==',subject);
+      const eSnap = await q.get();
+      eSnap.forEach(d => {
+        const dd = d.data();
+        attMarked[dd.studentId] = { status: dd.status, note: dd.note||'', docId: d.id };
+      });
+    }
+
+    renderAttStudents();
+    updateAttCount();
+  } catch(e) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title" style="color:var(--red)">Error: ${e.message}</div></div>`;
+  }
+}
+
+function renderAttStudents() {
+  const el = document.getElementById('attStudentList');
+  if (!attStudents.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No students in this class</div><div class="empty-sub">Add students from the admin panel</div></div>`;
+    return;
+  }
+  el.innerHTML = attStudents.map(s => {
+    const name = s.fullName || ((s.firstName||'') + ' ' + (s.lastName||'')).trim() || 'Student';
+    const m    = attMarked[s.id];
+    const rc   = m ? (m.status === 'present' ? 'mp' : m.status === 'absent' ? 'ma' : 'ml') : '';
+    return `<div class="s-row ${rc}" id="srow-${s.id}">
+      <div class="s-ava">${name.charAt(0).toUpperCase()}</div>
+      <div class="s-info">
+        <div class="s-name">${esc(name)}</div>
+        <div class="s-meta">Roll ${s.rollNumber || s.id.slice(-4).toUpperCase()} · Cls ${s.class || s.roleData?.class || '—'}</div>
+      </div>
+      <div class="sbns">
+        <button class="sbn sbn-p ${m?.status==='present'?'on':''}" onclick="markAtt('${s.id}','present')">✅</button>
+        <button class="sbn sbn-l ${m?.status==='late'?'on':''}"    onclick="markAtt('${s.id}','late')">⏰</button>
+        <button class="sbn sbn-a ${m?.status==='absent'?'on':''}"  onclick="markAtt('${s.id}','absent')">❌</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function markAtt(id, status) {
+  if (!attMarked[id]) attMarked[id] = { status:'', note:'' };
+  attMarked[id].status = status;
+  const row = document.getElementById('srow-'+id);
+  if (row) {
+    row.className = `s-row m${status[0]}`;
+    row.querySelectorAll('.sbn').forEach(b => b.classList.remove('on'));
+    const map = { present:'sbn-p', late:'sbn-l', absent:'sbn-a' };
+    row.querySelector('.'+map[status])?.classList.add('on');
+  }
+  updateAttCount();
+}
+
+function markAllAtt(status) { attStudents.forEach(s => markAtt(s.id, status)); }
+
+function updateAttCount() {
+  const cnt = Object.values(attMarked).filter(v => v.status).length;
+  document.getElementById('attMarkedCnt').textContent = `${cnt} / ${attStudents.length} marked`;
+}
+
+async function saveAtt() {
+  const date    = document.getElementById('attDate').value;
+  const cls     = document.getElementById('attClass').value;
+  const subject = document.getElementById('attSubject').value.trim();
+  const room    = document.getElementById('attRoom').value.trim();
+  const period  = document.getElementById('attPeriod').value;
+  const sNote   = document.getElementById('attNote').value.trim();
+
+  if (!date)    { showToast('Select a date','error'); return; }
+  if (!cls)     { showToast('Select a class','error'); return; }
+  if (!subject) { showToast('Enter subject name','error'); return; }
+
+  const unmarked = attStudents.filter(s => !attMarked[s.id]?.status);
+  if (unmarked.length > 0 && !confirm(`${unmarked.length} student(s) not marked. Continue?`)) return;
+
+  const btn = document.getElementById('attSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+
+  try {
+    const batch = db.batch();
+    let count = 0;
+    for (const s of attStudents) {
+      const m = attMarked[s.id];
+      if (!m?.status) continue;
+      const name = s.fullName || ((s.firstName||'') + ' ' + (s.lastName||'')).trim();
+      const data = {
+        studentId: s.id,
+        studentName: name,
+        class: cls, date, subject,
+        room: room||'', period,
+        status: m.status,
+        note: m.note || sNote || '',
+        mode: 'offline',
+        markedBy: 'admin',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (m.docId) batch.update(db.collection('attendance').doc(m.docId), data);
+      else batch.set(db.collection('attendance').doc(), data);
+      count++;
+    }
+    await batch.commit();
+    showToast(`✅ Saved attendance for ${count} students!`, 'success');
+    switchDashTab('history');
+    loadTodayAttSummary();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+  finally { btn.disabled = false; btn.textContent = '💾 Save Attendance'; }
+}
+
+function resetAtt() {
+  attMarked = {};
+  document.getElementById('attSubject').value = '';
+  document.getElementById('attRoom').value    = '';
+  renderAttStudents();
+  updateAttCount();
+}
+
+/* ═══════════════════════════════════════════════════
+   ATTENDANCE HISTORY
+════════════════════════════════════════════════════ */
+async function loadAttHistory() {
+  const cls  = document.getElementById('hfClass')?.value || '';
+  const date = document.getElementById('hfDate')?.value  || '';
+  const tbody = document.getElementById('histTbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="5"><div class="skel" style="height:38px;margin:6px 0"></div></td></tr>'.repeat(3);
+
+  try {
+    let snap;
+    if (cls && date) snap = await db.collection('attendance').where('class','==',cls).where('date','==',date).get();
+    else if (cls)    snap = await db.collection('attendance').where('class','==',cls).get();
+    else if (date)   snap = await db.collection('attendance').where('date','==',date).get();
+    else             snap = await db.collection('attendance').get();
+
+    let records = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+      .sort((a,b) => (b.date||'').localeCompare(a.date||''))
+      .slice(0, 200);
+
+    if (!records.length) {
+      tbody.innerHTML = `<tr><td colspan="5"><div class="empty" style="padding:20px"><div class="empty-icon">📭</div><div class="empty-title">No records found</div></div></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = records.map(r => `<tr>
+      <td>
+        <div style="font-weight:700">${esc(r.studentName||'—')}</div>
+        <div style="font-size:0.65rem;color:var(--text3)">Cls ${r.class||'—'}</div>
+      </td>
+      <td>${formatDate(r.date)}</td>
+      <td>${esc(r.subject||'—')}</td>
+      <td>P${r.period||'—'}</td>
+      <td>
+        <span class="badge badge-${r.status?.[0]||'p'}">
+          ${r.status==='present'?'✅':r.status==='absent'?'❌':'⏰'} ${cap(r.status)}
+        </span>
+      </td>
+    </tr>`).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="5" style="color:var(--red);text-align:center;padding:16px">Error: ${e.message}</td></tr>`;
+  }
+}
+
+function clearHistFilters() {
+  document.getElementById('hfClass').value = '';
+  document.getElementById('hfDate').value  = '';
+  loadAttHistory();
+}
+
+/* ═══════════════════════════════════════════════════
+   ATTENDANCE REPORT
+════════════════════════════════════════════════════ */
+async function loadAttReport() {
+  const cls = document.getElementById('rpClass')?.value || '';
+  const el  = document.getElementById('rpBody');
+  if (!el) return;
+  el.innerHTML = '<div class="skel" style="height:50px;margin-bottom:8px"></div>'.repeat(4);
+
+  try {
+    let snap;
+    if (cls) snap = await db.collection('attendance').where('class','==',cls).get();
+    else     snap = await db.collection('attendance').get();
+
+    const map = {};
+    snap.forEach(d => {
+      const r = d.data();
+      if (!map[r.studentId]) map[r.studentId] = { name: r.studentName||'?', class: r.class||'—', p:0, a:0, l:0, total:0 };
+      map[r.studentId].total++;
+      if (r.status === 'present') map[r.studentId].p++;
+      else if (r.status === 'absent') map[r.studentId].a++;
+      else map[r.studentId].l++;
+    });
+
+    const entries = Object.values(map).sort((a,b) => a.name.localeCompare(b.name));
+
+    if (!entries.length) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No data yet</div><div class="empty-sub">Mark attendance to see reports</div></div>`;
+      return;
+    }
+
+    el.innerHTML = entries.map(s => {
+      const pct = s.total > 0 ? Math.round(((s.p + s.l) / s.total) * 100) : 0;
+      const col = pct >= 75 ? 'var(--green)' : pct >= 50 ? 'var(--amber)' : 'var(--red)';
+      return `<div class="report-item">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#5B5EF4,#818CF8);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:0.82rem;flex-shrink:0">${s.name.charAt(0).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:0.82rem">${esc(s.name)} <span class="cls-tag">Cls ${s.class}</span></div>
+          <div style="font-size:0.68rem;color:var(--text2);margin-top:2px">✅ ${s.p} &nbsp;❌ ${s.a} &nbsp;⏰ ${s.l} &nbsp;· ${s.total} total</div>
+          <div class="prog-bar" style="margin-top:4px"><div class="prog-fill" style="width:${pct}%;background:${col}"></div></div>
+        </div>
+        <div style="font-weight:800;color:${col};font-size:1rem;flex-shrink:0;min-width:40px;text-align:right">${pct}%</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red);padding:12px;font-size:0.8rem">Error: ${e.message}</div>`;
+  }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -710,8 +1229,7 @@ function renderDash() {
     el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No content yet</div><div class="empty-sub">Upload videos or PDFs to get started</div></div>`;
     return;
   }
-  const recent = allContent.slice(0, 8);
-  el.innerHTML = recent.map(c => contentRow(c, true)).join('');
+  el.innerHTML = allContent.slice(0, 8).map(c => contentRow(c, true)).join('');
 }
 
 /* ═══════════════════════════════════════════════════
@@ -770,8 +1288,7 @@ function renderStructure(filter = '') {
 }
 
 function toggleAccordion(id) {
-  const el = document.getElementById(id);
-  el.classList.toggle('open');
+  document.getElementById(id)?.classList.toggle('open');
 }
 
 function filterStructure() {
@@ -779,17 +1296,15 @@ function filterStructure() {
 }
 
 /* ═══════════════════════════════════════════════════
-   SAVE SUBJECT
+   SAVE / EDIT / DELETE — SUBJECT
 ════════════════════════════════════════════════════ */
 async function saveSubject() {
   const cls  = document.getElementById('subClass').value.trim();
   const name = document.getElementById('subName').value.trim();
   const code = document.getElementById('subCode').value.trim();
   const desc = document.getElementById('subDesc').value.trim();
-
   if (!cls)  { showToast('Select a class','error'); return; }
   if (!name) { showToast('Enter subject name','error'); return; }
-
   try {
     const ref = await db.collection('subjects').add({
       class: cls, name, code, description: desc,
@@ -799,51 +1314,14 @@ async function saveSubject() {
     subjects.sort((a,b) => (parseInt(a.class)||0) - (parseInt(b.class)||0));
     closeModal('addSubjModal');
     clearForm(['subClass','subName','subCode','subDesc']);
-    populateSubjectDrops();
-    populateClassDrops();
+    populateSubjectDrops(); populateClassDrops();
+    await loadClasses();
     renderStructure(document.getElementById('structSearch').value);
     updateStats();
     showToast('✅ Subject added!','success');
   } catch(e) { showToast('Error: '+e.message,'error'); }
 }
 
-/* ═══════════════════════════════════════════════════
-   SAVE CHAPTER
-════════════════════════════════════════════════════ */
-async function saveChapter() {
-  const subId = document.getElementById('chapSubject').value;
-  const num   = document.getElementById('chapNum').value.trim();
-  const name  = document.getElementById('chapName').value.trim();
-  const desc  = document.getElementById('chapDesc').value.trim();
-
-  if (!subId) { showToast('Select a subject','error'); return; }
-  if (!name)  { showToast('Enter chapter name','error'); return; }
-
-  const sub = subjects.find(s => s.id === subId);
-
-  try {
-    const ref = await db.collection('chapters').add({
-      subjectId: subId,
-      subjectName: sub?.name || '',
-      class: sub?.class || '',
-      number: num ? parseInt(num) : null,
-      order:  num ? parseInt(num) : chapters.length + 1,
-      name, description: desc,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    chapters.push({ id: ref.id, subjectId: subId, subjectName: sub?.name||'', class: sub?.class||'', number: num?parseInt(num):null, order: num?parseInt(num):chapters.length, name, description: desc });
-    chapters.sort((a,b) => (a.order||0) - (b.order||0));
-    closeModal('addChapModal');
-    clearForm(['chapSubject','chapNum','chapName','chapDesc']);
-    renderStructure(document.getElementById('structSearch').value);
-    updateStats();
-    showToast('✅ Chapter added!','success');
-  } catch(e) { showToast('Error: '+e.message,'error'); }
-}
-
-/* ═══════════════════════════════════════════════════
-   EDIT / DELETE SUBJECT
-════════════════════════════════════════════════════ */
 function openEditSubj(id) {
   const sub = subjects.find(s => s.id === id);
   if (!sub) return;
@@ -875,7 +1353,6 @@ async function deleteSubject() {
   const id = document.getElementById('editSubjId').value;
   if (!confirm('Delete this subject and ALL its chapters? This cannot be undone.')) return;
   try {
-    // Delete chapters
     const chaps = chapters.filter(c => c.subjectId === id);
     const batch = db.batch();
     batch.delete(db.collection('subjects').doc(id));
@@ -885,15 +1362,40 @@ async function deleteSubject() {
     chapters  = chapters.filter(c => c.subjectId !== id);
     closeModal('editSubjModal');
     renderStructure(document.getElementById('structSearch').value);
-    populateSubjectDrops();
-    updateStats();
+    populateSubjectDrops(); updateStats();
     showToast('🗑 Subject deleted','info');
   } catch(e) { showToast('Error: '+e.message,'error'); }
 }
 
 /* ═══════════════════════════════════════════════════
-   EDIT / DELETE CHAPTER
+   SAVE / EDIT / DELETE — CHAPTER
 ════════════════════════════════════════════════════ */
+async function saveChapter() {
+  const subId = document.getElementById('chapSubject').value;
+  const num   = document.getElementById('chapNum').value.trim();
+  const name  = document.getElementById('chapName').value.trim();
+  const desc  = document.getElementById('chapDesc').value.trim();
+  if (!subId) { showToast('Select a subject','error'); return; }
+  if (!name)  { showToast('Enter chapter name','error'); return; }
+  const sub = subjects.find(s => s.id === subId);
+  try {
+    const ref = await db.collection('chapters').add({
+      subjectId: subId, subjectName: sub?.name||'', class: sub?.class||'',
+      number: num ? parseInt(num) : null,
+      order:  num ? parseInt(num) : chapters.length + 1,
+      name, description: desc,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    chapters.push({ id: ref.id, subjectId: subId, subjectName: sub?.name||'', class: sub?.class||'', number: num?parseInt(num):null, order: num?parseInt(num):chapters.length, name, description: desc });
+    chapters.sort((a,b) => (a.order||0) - (b.order||0));
+    closeModal('addChapModal');
+    clearForm(['chapSubject','chapNum','chapName','chapDesc']);
+    renderStructure(document.getElementById('structSearch').value);
+    updateStats();
+    showToast('✅ Chapter added!','success');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
 function openEditChap(id) {
   const ch = chapters.find(c => c.id === id);
   if (!ch) return;
@@ -912,7 +1414,7 @@ async function updateChapter() {
   if (!name) { showToast('Enter name','error'); return; }
   try {
     const upd = { name, description: desc };
-    if (num) upd.number = parseInt(num), upd.order = parseInt(num);
+    if (num) { upd.number = parseInt(num); upd.order = parseInt(num); }
     await db.collection('chapters').doc(id).update(upd);
     const i = chapters.findIndex(c => c.id === id);
     if (i >= 0) chapters[i] = { ...chapters[i], ...upd };
@@ -943,12 +1445,10 @@ let ctType = 'video';
 function setContentType(type) {
   ctType = type;
   ['video','notes','dpp'].forEach(t => {
-    const btn = document.getElementById('ct-'+t);
-    if (!btn) return;
-    btn.classList.toggle('on', t === type);
+    document.getElementById('ct-'+t)?.classList.toggle('on', t === type);
   });
-  document.getElementById('yt-zone').style.display   = type === 'video' ? 'block' : 'none';
-  document.getElementById('pdf-zone').style.display  = type !== 'video' ? 'block' : 'none';
+  document.getElementById('yt-zone').style.display  = type === 'video' ? 'block' : 'none';
+  document.getElementById('pdf-zone').style.display = type !== 'video' ? 'block' : 'none';
   document.getElementById('uploadBtnTxt').textContent = type === 'video' ? 'Save YouTube Link' : 'Upload PDF to Google Drive';
 }
 
@@ -957,12 +1457,10 @@ function previewYT() {
   const vid = extractYTId(url);
   const pre = document.getElementById('ytPrev');
   if (vid) {
-    document.getElementById('ytThumb').src          = `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
-    document.getElementById('ytVidId').textContent  = 'Video ID: ' + vid;
+    document.getElementById('ytThumb').src         = `https://img.youtube.com/vi/${vid}/hqdefault.jpg`;
+    document.getElementById('ytVidId').textContent = 'Video ID: ' + vid;
     pre.style.display = 'block';
-  } else {
-    pre.style.display = 'none';
-  }
+  } else { pre.style.display = 'none'; }
 }
 function extractYTId(url) {
   const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/);
@@ -984,13 +1482,11 @@ function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone')
 function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
 
 function setFilePrev(file) {
-  if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
-    showToast('Please select a PDF file','error'); return;
-  }
-  if (file.size > 100 * 1024 * 1024) { showToast('File too large (max 100 MB)','error'); return; }
+  if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) { showToast('Please select a PDF file','error'); return; }
+  if (file.size > 100*1024*1024) { showToast('File too large (max 100 MB)','error'); return; }
   pickedFile = file;
   document.getElementById('fName').textContent = file.name;
-  document.getElementById('fSize').textContent = (file.size / (1024*1024)).toFixed(2) + ' MB';
+  document.getElementById('fSize').textContent = (file.size/(1024*1024)).toFixed(2)+' MB';
   document.getElementById('filePrev').style.display = 'block';
   document.getElementById('dropZone').classList.add('has-file');
 }
@@ -1002,39 +1498,34 @@ function clearFile() {
 }
 
 function setUpProg(pct, status) {
-  document.getElementById('upFill').style.width    = pct + '%';
-  document.getElementById('upPct').textContent     = pct + '%';
-  document.getElementById('upStatus').textContent  = status;
+  document.getElementById('upFill').style.width   = pct+'%';
+  document.getElementById('upPct').textContent    = pct+'%';
+  document.getElementById('upStatus').textContent = status;
 }
 
 async function doUpload() {
-  const chapId  = document.getElementById('upChapter').value;
-  const title   = document.getElementById('ctTitle').value.trim();
-  const desc    = document.getElementById('ctDesc').value.trim();
-
+  const chapId = document.getElementById('upChapter').value;
+  const title  = document.getElementById('ctTitle').value.trim();
+  const desc   = document.getElementById('ctDesc').value.trim();
   if (!chapId) { showToast('Select a chapter','error'); return; }
   if (!title)  { showToast('Enter a title','error'); return; }
-
   const ch  = chapters.find(c => c.id === chapId);
   const sub = subjects.find(s => s.id === ch?.subjectId);
-
   const btn = document.getElementById('uploadBtn');
   btn.disabled = true;
 
-  /* ── VIDEO ── */
   if (ctType === 'video') {
     const ytUrl = document.getElementById('ytUrl').value.trim();
     const vidId = extractYTId(ytUrl);
     if (!ytUrl)  { showToast('Enter a YouTube URL','error'); btn.disabled=false; return; }
     if (!vidId)  { showToast('Invalid YouTube URL','error'); btn.disabled=false; return; }
-
     btn.innerHTML = '⏳ Saving…';
     try {
       const ref = await db.collection('courseContent').add({
         type: 'video', title, description: desc,
-        chapterId: chapId, chapterName: ch?.name || '',
-        subjectId: ch?.subjectId || '', subjectName: sub?.name || '',
-        class: sub?.class || '',
+        chapterId: chapId, chapterName: ch?.name||'',
+        subjectId: ch?.subjectId||'', subjectName: sub?.name||'',
+        class: sub?.class||'',
         youtubeUrl: ytUrl, youtubeVideoId: vidId,
         embedUrl: `https://www.youtube.com/embed/${vidId}`,
         driveUrl: '', fileId: '', fileName: '',
@@ -1044,111 +1535,67 @@ async function doUpload() {
       showToast('✅ Video saved!','success');
       document.getElementById('ctTitle').value = '';
       document.getElementById('ctDesc').value  = '';
-      clearYT();
-      updateStats();
-      renderDash();
+      clearYT(); updateStats(); renderDash();
     } catch(e) { showToast('Error: '+e.message,'error'); }
     btn.disabled = false;
     btn.innerHTML = '☁️ <span id="uploadBtnTxt">Save YouTube Link</span>';
     return;
   }
 
-  /* ── PDF → Apps Script → Google Drive ── */
   if (!pickedFile) { showToast('Select a PDF file','error'); btn.disabled=false; return; }
-
   document.getElementById('uploadProg').style.display = 'block';
-  setUpProg(5, 'Reading file…');
+  setUpProg(5,'Reading file…');
   btn.innerHTML = '⏳ Uploading…';
 
   try {
-    /* Step 1 — convert PDF to base64 */
-    setUpProg(15, 'Converting to base64…');
+    setUpProg(15,'Converting to base64…');
     const base64Data = await fileToBase64(pickedFile);
-
-    /* Step 2 — create / resolve the Drive folder structure via Apps Script */
-    setUpProg(30, 'Creating Drive folders…');
+    setUpProg(30,'Creating Drive folders…');
     const structRes = await gasPost({
-      action:      'createCourseStructure',
-      className:   String(sub?.class || 'General'),
-      subjectName: sub?.name || 'Subject',
-      chapterName: ch?.name  || 'Chapter'
+      action: 'createCourseStructure',
+      className:   String(sub?.class||'General'),
+      subjectName: sub?.name||'Subject',
+      chapterName: ch?.name||'Chapter'
     });
-
-    /* structRes.structure has keys: notes, dpp, videos — pick the right one */
     const folderKey = ctType === 'notes' ? 'notes' : ctType === 'dpp' ? 'dpp' : 'videos';
     const folderId  = structRes?.structure?.[folderKey] || structRes?.structure?.videos || '';
-    if (!folderId) throw new Error('Could not get Drive folder ID from Apps Script. Check doPost/createCourseStructure action.');
-
-    /* Step 3 — upload the actual PDF bytes */
-    setUpProg(55, 'Uploading PDF to Google Drive…');
+    if (!folderId) throw new Error('Could not get Drive folder ID from Apps Script.');
+    setUpProg(55,'Uploading PDF to Google Drive…');
     const upRes = await gasPost({
-      action:      'uploadContent',
-      folderId,
-      file:        base64Data,
-      fileName:    pickedFile.name,
-      mimeType:    'application/pdf',
+      action: 'uploadContent', folderId,
+      file: base64Data, fileName: pickedFile.name, mimeType: 'application/pdf',
       contentType: ctType,
-      metadata: {
-        title,
-        description: desc,
-        subjectId:  ch?.subjectId || '',
-        chapterId:  chapId,
-        class:      String(sub?.class || '')
-      }
+      metadata: { title, description: desc, subjectId: ch?.subjectId||'', chapterId: chapId, class: String(sub?.class||'') }
     });
-
-    /* upRes should have: { success, url, directUrl, fileId } */
-    const driveUrl   = upRes?.url        || upRes?.driveUrl   || '';
-    const directUrl  = upRes?.directUrl  || driveUrl;
-    const embedUrl   = upRes?.embedUrl   || '';
-    const fileId     = upRes?.fileId     || '';
-
-    if (!driveUrl) throw new Error('Apps Script did not return a Drive URL. Upload may have failed.');
-
-    /* Step 4 — save metadata to Firestore */
-    setUpProg(85, 'Saving to Firestore…');
+    const driveUrl  = upRes?.url       || upRes?.driveUrl || '';
+    const directUrl = upRes?.directUrl || driveUrl;
+    if (!driveUrl) throw new Error('Apps Script did not return a Drive URL.');
+    setUpProg(85,'Saving to Firestore…');
     const ref = await db.collection('courseContent').add({
-      type:        ctType,
-      title,
-      description: desc,
-      chapterId:   chapId,
-      chapterName: ch?.name        || '',
-      subjectId:   ch?.subjectId   || '',
-      subjectName: sub?.name       || '',
-      class:       String(sub?.class || ''),
-      driveUrl,
-      directUrl,
-      embedUrl,
-      fileId,
-      fileName:    pickedFile.name,
-      mimeType:    'application/pdf',
-      youtubeUrl:       '',
-      youtubeVideoId:   '',
-      source:      'teacher',
-      uploadedAt:  firebase.firestore.FieldValue.serverTimestamp()
+      type: ctType, title, description: desc,
+      chapterId: chapId, chapterName: ch?.name||'',
+      subjectId: ch?.subjectId||'', subjectName: sub?.name||'',
+      class: String(sub?.class||''),
+      driveUrl, directUrl,
+      embedUrl: upRes?.embedUrl||'',
+      fileId: upRes?.fileId||'',
+      fileName: pickedFile.name, mimeType: 'application/pdf',
+      youtubeUrl: '', youtubeVideoId: '',
+      source: 'teacher',
+      uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-
-    allContent.unshift({
-      id: ref.id, type: ctType, title,
-      chapterName: ch?.name||'', subjectName: sub?.name||'',
-      class: sub?.class||'', driveUrl, directUrl, fileName: pickedFile.name
-    });
-
-    setUpProg(100, '✅ Done!');
+    allContent.unshift({ id: ref.id, type: ctType, title, chapterName: ch?.name||'', subjectName: sub?.name||'', class: sub?.class||'', driveUrl, directUrl, fileName: pickedFile.name });
+    setUpProg(100,'✅ Done!');
     setTimeout(() => { document.getElementById('uploadProg').style.display = 'none'; }, 1500);
-    showToast('✅ PDF saved to Google Drive!', 'success');
+    showToast('✅ PDF saved to Google Drive!','success');
     document.getElementById('ctTitle').value = '';
     document.getElementById('ctDesc').value  = '';
-    clearFile();
-    updateStats();
-    renderDash();
-
+    clearFile(); updateStats(); renderDash();
   } catch(e) {
     console.error('PDF upload error:', e);
     document.getElementById('uploadProg').style.display = 'none';
-    showToast('❌ ' + e.message, 'error');
+    showToast('❌ '+e.message,'error');
   }
-
   btn.disabled = false;
   btn.innerHTML = '☁️ <span id="uploadBtnTxt">Upload PDF to Drive</span>';
 }
@@ -1157,10 +1604,9 @@ async function doUpload() {
    CHAPTER CONTENT VIEWER
 ════════════════════════════════════════════════════ */
 async function openChapterContent(chapId, chapName) {
-  document.getElementById('ccmTitle').textContent = '📂 ' + chapName;
-  document.getElementById('ccmBody').innerHTML = '<div class="skel" style="height:52px;margin-bottom:8px"></div><div class="skel" style="height:52px;margin-bottom:8px"></div><div class="skel" style="height:52px"></div>';
+  document.getElementById('ccmTitle').textContent = '📂 '+chapName;
+  document.getElementById('ccmBody').innerHTML = '<div class="skel" style="height:52px;margin-bottom:8px"></div>'.repeat(3);
   openModal('chapContentModal');
-
   try {
     const snap = await db.collection('courseContent').where('chapterId','==',chapId).get();
     if (snap.empty) {
@@ -1190,26 +1636,22 @@ async function loadLibrary() {
   const cls     = document.getElementById('libClass').value;
   const subject = document.getElementById('libSubject').value;
   const el      = document.getElementById('libraryList');
-
-  el.innerHTML = '<div class="skel" style="height:64px;margin-bottom:8px;border-radius:12px"></div>'.repeat(4);
-
+  el.innerHTML  = '<div class="skel" style="height:64px;margin-bottom:8px;border-radius:12px"></div>'.repeat(4);
   let filtered = [...allContent];
   if (libFilter !== 'all') filtered = filtered.filter(c => c.type === libFilter);
   if (cls)     filtered = filtered.filter(c => String(c.class) === String(cls));
   if (subject) filtered = filtered.filter(c => c.subjectId === subject || c.subjectName === subject);
-
   if (!filtered.length) {
     el.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-title">No content found</div><div class="empty-sub">Try changing the filters</div></div>`;
     return;
   }
-
   el.innerHTML = filtered.map(c => contentRow(c, false, false, true)).join('');
 }
 
 /* ═══════════════════════════════════════════════════
-   CONTENT ROW RENDERER (shared)
+   CONTENT ROW RENDERER
 ════════════════════════════════════════════════════ */
-function contentRow(c, compact = false, deletable = false, withDelete = false) {
+function contentRow(c, compact=false, deletable=false, withDelete=false) {
   const typeConfig = {
     video: { icon:'🎬', bg:'var(--red-bg)',   label:'Video',  badge:'badge-video' },
     notes: { icon:'📄', bg:'var(--blue-bg)',  label:'Notes',  badge:'badge-notes' },
@@ -1217,24 +1659,23 @@ function contentRow(c, compact = false, deletable = false, withDelete = false) {
     note:  { icon:'📝', bg:'var(--blue-bg)',  label:'Notes',  badge:'badge-notes' },
   };
   const tc   = typeConfig[c.type] || typeConfig.notes;
-  const link = c.type === 'video' ? (c.youtubeUrl || c.driveUrl || '') : (c.directUrl || c.driveUrl || '');
+  const link = c.type === 'video' ? (c.youtubeUrl||c.driveUrl||'') : (c.directUrl||c.driveUrl||'');
   const date = c.uploadedAt?.toDate?.() ? c.uploadedAt.toDate().toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
   const canDel = deletable || withDelete;
-
   return `<div class="cl-item">
     <div class="cl-icon" style="background:${tc.bg}">${tc.icon}</div>
     <div style="flex:1;min-width:0">
       <div style="font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">${esc(c.title||'Untitled')}</div>
       <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
         <span class="badge ${tc.badge}">${tc.label}</span>
-        ${c.chapterName ? `<span style="font-size:0.62rem;color:var(--text3)">${esc(c.chapterName)}</span>` : ''}
-        ${c.class ? `<span class="cls-tag">Cls ${c.class}</span>` : ''}
-        ${date ? `<span style="font-size:0.62rem;color:var(--text3)">${date}</span>` : ''}
+        ${c.chapterName?`<span style="font-size:0.62rem;color:var(--text3)">${esc(c.chapterName)}</span>`:''}
+        ${c.class?`<span class="cls-tag">Cls ${c.class}</span>`:''}
+        ${date?`<span style="font-size:0.62rem;color:var(--text3)">${date}</span>`:''}
       </div>
     </div>
     <div style="display:flex;gap:6px;align-items:center;flex-shrink:0">
-      ${link ? `<a href="${link}" target="_blank" style="font-size:0.72rem;color:var(--primary);font-weight:700;text-decoration:none;background:var(--primary-bg);padding:5px 10px;border-radius:7px;border:1px solid var(--primary3);white-space:nowrap">Open ↗</a>` : ''}
-      ${canDel ? `<button onclick="deleteContent('${c.id}','${c.fileId||''}')" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--red-bg);color:var(--red);cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif">🗑</button>` : ''}
+      ${link?`<a href="${link}" target="_blank" style="font-size:0.72rem;color:var(--primary);font-weight:700;text-decoration:none;background:var(--primary-bg);padding:5px 10px;border-radius:7px;border:1px solid var(--primary3);white-space:nowrap">Open ↗</a>`:''}
+      ${canDel?`<button onclick="deleteContent('${c.id}','${c.fileId||''}')" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--red-bg);color:var(--red);cursor:pointer;font-size:0.8rem;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif">🗑</button>`:''}
     </div>
   </div>`;
 }
@@ -1243,13 +1684,8 @@ async function deleteContent(docId, fileId) {
   if (!confirm('Delete this content item?')) return;
   try {
     await db.collection('courseContent').doc(docId).delete();
-    if (fileId && !fileId.startsWith('http')) {
-      storage.ref(fileId).delete().catch(() => {});
-    }
     allContent = allContent.filter(c => c.id !== docId);
-    updateStats();
-    renderDash();
-    loadLibrary();
+    updateStats(); renderDash(); loadLibrary();
     showToast('🗑 Deleted','info');
   } catch(e) { showToast('Error: '+e.message,'error'); }
 }
@@ -1263,11 +1699,10 @@ function populateClassDrops() {
     const el = document.getElementById(id);
     if (!el) return;
     const first = el.options[0].cloneNode(true);
-    el.innerHTML = '';
-    el.appendChild(first);
+    el.innerHTML = ''; el.appendChild(first);
     classes.forEach(c => {
       const o = document.createElement('option');
-      o.value = c; o.textContent = 'Class ' + c;
+      o.value = c; o.textContent = 'Class '+c;
       el.appendChild(o);
     });
   });
@@ -1323,11 +1758,11 @@ function goTo(page) {
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
   document.getElementById('pg-'+page)?.classList.add('on');
   document.getElementById('nav-'+page)?.classList.add('on');
-  window.scrollTo(0, 0);
-
-  if (page === 'structure') { renderStructure(document.getElementById('structSearch')?.value || ''); }
-  if (page === 'library')   { loadLibrary(); }
-  if (page === 'upload')    { populateSubjectFilter(); }
+  window.scrollTo(0,0);
+  if (page === 'structure') renderStructure(document.getElementById('structSearch')?.value||'');
+  if (page === 'library')   loadLibrary();
+  if (page === 'upload')    populateSubjectFilter();
+  if (page === 'dash')      { loadTodayAttSummary(); updateStats(); }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1335,7 +1770,6 @@ function goTo(page) {
 ════════════════════════════════════════════════════ */
 function openModal(id)  { document.getElementById(id)?.classList.add('open'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
-
 document.querySelectorAll('.modal').forEach(m => {
   m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
 });
@@ -1343,17 +1777,16 @@ document.querySelectorAll('.modal').forEach(m => {
 /* ═══════════════════════════════════════════════════
    TOAST
 ════════════════════════════════════════════════════ */
-function showToast(msg, type = 'success') {
+function showToast(msg, type='success') {
   const t = document.getElementById('toast');
   const c = {
-    success: 'linear-gradient(135deg,#065F46,#059669)',
-    error:   'linear-gradient(135deg,#7F1D1D,#DC2626)',
-    warning: 'linear-gradient(135deg,#78350F,#D97706)',
-    info:    'linear-gradient(135deg,#1E3A5F,#2563EB)'
+    success:'linear-gradient(135deg,#065F46,#059669)',
+    error:'linear-gradient(135deg,#7F1D1D,#DC2626)',
+    warning:'linear-gradient(135deg,#78350F,#D97706)',
+    info:'linear-gradient(135deg,#1E3A5F,#2563EB)'
   };
-  t.style.background = c[type] || c.success;
-  t.textContent = msg;
-  t.classList.add('show');
+  t.style.background = c[type]||c.success;
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3400);
 }
 
@@ -1363,48 +1796,44 @@ function showToast(msg, type = 'success') {
 function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-function clearForm(ids) { ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
+function clearForm(ids) { ids.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; }); }
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function formatDate(str) {
+  if (!str) return '—';
+  try { return new Date(str+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }
+  catch(e) { return str; }
+}
+function cap(s) { return s ? s.charAt(0).toUpperCase()+s.slice(1) : '—'; }
 
-/* ─── File → Base64 ─────────────────────────────── */
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    // result is "data:application/pdf;base64,XXXXXX" — we only want the XXXXXX part
     reader.onload  = () => resolve(reader.result.split(',')[1]);
     reader.onerror = () => reject(new Error('Could not read file'));
     reader.readAsDataURL(file);
   });
 }
 
-/* ─── Apps Script POST ───────────────────────────── */
-// Sends JSON, follows redirects, parses JSON back.
-// Throws a descriptive Error so callers can catch + toast it.
 async function gasPost(payload) {
   let res;
   try {
     res = await fetch(GAS_URL, {
-      method:   'POST',
-      redirect: 'follow',
-      headers:  { 'Content-Type': 'text/plain;charset=utf-8' },
-      body:     JSON.stringify(payload)
+      method: 'POST', redirect: 'follow',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
     });
   } catch(networkErr) {
-    throw new Error('Network error reaching Apps Script: ' + networkErr.message);
+    throw new Error('Network error reaching Apps Script: '+networkErr.message);
   }
-
   const text = await res.text();
   let data;
-  try {
-    data = JSON.parse(text);
-  } catch(e) {
-    // First 300 chars of raw response helps debugging
-    throw new Error('Apps Script returned non-JSON:\n' + text.substring(0, 300));
-  }
-
-  if (data.success === false || data.error) {
-    throw new Error(data.error || 'Apps Script returned a failure response');
-  }
-  return data; // { success:true, url, directUrl, embedUrl, fileId, structure, … }
+  try { data = JSON.parse(text); }
+  catch(e) { throw new Error('Apps Script returned non-JSON:\n'+text.substring(0,300)); }
+  if (data.success === false || data.error) throw new Error(data.error||'Apps Script returned a failure response');
+  return data;
 }
 </script>
 </body>
