@@ -415,69 +415,8 @@
         .att-filter-btn.active-filter { background:rgba(212,175,55,0.15); color:var(--gold); border-color:var(--gold3); }
         #attFilterBar { scrollbar-width:none; }
         #attFilterBar::-webkit-scrollbar { display:none; }
-
-        /* ── AI CHAT ── */
-        .skyra-bubble {
-            background:var(--card);
-            border:1px solid var(--card-border);
-            border-radius:18px 18px 18px 4px;
-            padding:14px 16px;
-            font-size:0.875rem;
-            line-height:1.75;
-            color:var(--text);
-            max-width:min(78vw,360px);
-            word-break:break-word;
-            box-shadow:0 2px 16px rgba(0,0,0,0.3);
-        }
-        .skyra-bubble p { margin:0 0 8px 0; }
-        .skyra-bubble p:last-child { margin-bottom:0; }
-        .skyra-bubble .s-heading { font-size:0.82rem; font-weight:800; color:var(--gold2); text-transform:uppercase; letter-spacing:0.06em; margin:12px 0 6px; display:flex; align-items:center; gap:6px; font-family:'Sora',sans-serif; }
-        .skyra-bubble .s-heading:first-child { margin-top:0; }
-        .skyra-bubble .s-point { display:flex; align-items:flex-start; gap:8px; padding:6px 10px; margin:4px 0; background:rgba(212,175,55,0.07); border-radius:10px; border-left:3px solid var(--gold3); font-size:0.855rem; line-height:1.6; }
-        .skyra-bubble .s-step { display:flex; align-items:flex-start; gap:10px; padding:8px 10px; margin:5px 0; background:rgba(79,158,248,0.08); border-radius:10px; font-size:0.855rem; line-height:1.6; }
-        .skyra-bubble .s-step-num { width:22px; height:22px; border-radius:50%; background:var(--grad-sapphire); color:white; font-size:0.7rem; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
-        .skyra-bubble .s-formula { background:rgba(212,175,55,0.10); border:1px solid rgba(212,175,55,0.22); border-radius:10px; padding:8px 12px; font-family:'Courier New',monospace; font-size:0.85rem; font-weight:700; color:var(--gold2); text-align:center; margin:8px 0; letter-spacing:0.03em; }
-        .skyra-bubble .s-tip { background:rgba(79,158,248,0.08); border:1px solid rgba(79,158,248,0.2); border-radius:10px; padding:8px 12px; font-size:0.83rem; color:var(--sapphire2); margin:8px 0; display:flex; gap:7px; align-items:flex-start; }
-        .skyra-bubble .s-encourage { background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:10px; padding:8px 12px; font-size:0.83rem; color:#34D399; margin-top:10px; display:flex; gap:7px; align-items:center; font-weight:600; }
-        .skyra-bubble strong { color:var(--text); font-weight:700; }
-        .skyra-bubble em { color:var(--gold2); font-style:italic; }
-        .skyra-bubble code { background:rgba(212,175,55,0.12); padding:1px 6px; border-radius:5px; font-family:monospace; font-size:0.82em; color:var(--gold2); }
-        html.light .skyra-bubble { background:#fff; box-shadow:0 2px 12px rgba(0,0,0,0.08); }
-
-        .user-bubble {
-            background:var(--grad-gold);
-            color:#07070F;
-            border-radius:18px 18px 4px 18px;
-            padding:10px 14px;
-            font-size:0.875rem;
-            line-height:1.6;
-            max-width:min(76vw,340px);
-            word-break:break-word;
-            box-shadow:0 2px 16px rgba(212,175,55,0.35);
-            font-weight:600;
-        }
-
-        .ai-ctx-btn {
-            flex-shrink:0; padding:6px 14px; border-radius:20px;
-            font-size:0.72rem; font-weight:700;
-            border:1px solid var(--card-border);
-            background:rgba(255,255,255,0.04);
-            color:var(--text3); cursor:pointer;
-            white-space:nowrap; transition:all 0.18s;
-        }
-        .ai-ctx-btn.active { background:rgba(212,175,55,0.15); color:var(--gold2); border-color:var(--gold3); }
-        html.light .ai-ctx-btn { background:rgba(0,0,0,0.04); color:var(--text3); }
-        html.light .ai-ctx-btn.active { background:rgba(160,120,32,0.15); color:var(--gold); border-color:var(--gold3); }
-
-        #aiChatMessages::-webkit-scrollbar { width:3px; }
-        #aiChatMessages::-webkit-scrollbar-thumb { background:var(--card-border2); border-radius:3px; }
-        #aiSubjectTabs::-webkit-scrollbar { display:none; }
-        #aiChatInput::-webkit-scrollbar { display:none; }
-
-        .typing-dot { width:7px; height:7px; border-radius:50%; background:var(--gold); animation:typingBounce 1.2s infinite; display:inline-block; margin:0 2px; opacity:0.7; }
-        .typing-dot:nth-child(2){animation-delay:.2s}
-        .typing-dot:nth-child(3){animation-delay:.4s}
-        @keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-7px)}}
+        #tsSubjectFilterBar { scrollbar-width:none; }
+        #tsSubjectFilterBar::-webkit-scrollbar { display:none; }
 
         /* ── TAG ── */
         .tag-gold { background:rgba(212,175,55,0.14); color:var(--gold2); border:1px solid rgba(212,175,55,0.28); padding:3px 10px; border-radius:9999px; font-size:0.7rem; font-weight:700; }
@@ -623,7 +562,45 @@
         </div>
     </div>
 
-    <!-- AI settings modal hidden -->
+    <!-- ═══ TEST VIEWER MODAL ═══ -->
+    <div id="testViewModal" class="modal">
+        <div class="modal-content" style="max-width:640px;">
+            <div class="flex items-center justify-between mb-4 pb-4" style="border-bottom:1px solid var(--card-border)">
+                <div class="flex-1 min-w-0 pr-4">
+                    <h3 class="text-lg font-bold truncate" style="color:var(--text);font-family:'Sora',sans-serif" id="testViewTitle">Test</h3>
+                    <p class="text-xs mt-0.5" style="color:var(--text2)" id="testViewSubtitle"></p>
+                </div>
+                <button onclick="closeModal('testViewModal')" class="p-2 btn-ghost rounded-xl flex-shrink-0" style="color:var(--text2)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <!-- Marks card -->
+            <div id="testViewMarksCard" class="rounded-xl p-4 mb-4 lux-card" style="display:none">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div style="font-size:0.7rem;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em">Your Score</div>
+                        <div style="font-size:1.6rem;font-weight:800;font-family:'Sora',sans-serif;margin-top:2px" id="testViewMarksValue">—</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:0.7rem;color:var(--text2)">Percentage</div>
+                        <div style="font-weight:800;font-family:'DM Mono',monospace;font-size:1.1rem" id="testViewMarksPct">—</div>
+                    </div>
+                </div>
+                <div class="progress-bar mt-3" style="height:7px">
+                    <div class="progress-fill" id="testViewMarksBar" style="width:0%"></div>
+                </div>
+                <div id="testViewRemarks" style="display:none;margin-top:10px;font-size:0.8rem;color:var(--text2);font-style:italic;padding:8px 10px;background:rgba(212,175,55,0.06);border-radius:0.6rem;border-left:3px solid var(--gold3)"></div>
+            </div>
+            <div id="testViewMarksPending" class="rounded-xl p-4 mb-4" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);display:none">
+                <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#fbbf24;font-weight:600">⏳ Marks not yet added by teacher</div>
+            </div>
+
+            <div id="testViewBody"></div>
+        </div>
+    </div>
+
+    <!-- AI settings modal hidden (legacy, kept hidden/no-op) -->
     <div id="aiSettingsModal" class="modal" style="display:none!important"></div>
 
     <!-- ═══════════════════════════════════════════
@@ -639,8 +616,8 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                <button onclick="navigateTo('aiteacher')" class="relative p-2 rounded-xl transition" style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2)" title="Skyra AI Teacher">
-                    <svg class="w-5 h-5" style="color:var(--gold2)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                <button onclick="navigateTo('testseries')" class="relative p-2 rounded-xl transition" style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2)" title="Test Series">
+                    <svg class="w-5 h-5" style="color:var(--gold2)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </button>
                 <div class="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm" style="background:var(--grad-gold);color:#07070F;font-family:'Sora',sans-serif;box-shadow:0 0 12px rgba(212,175,55,0.3)" id="avatarInitial">S</div>
             </div>
@@ -706,11 +683,11 @@
                     </div>
                     <span class="qa-label">Attendance</span>
                 </button>
-                <button onclick="navigateTo('aiteacher')" class="qa-card">
+                <button onclick="navigateTo('testseries')" class="qa-card">
                     <div class="qa-icon qa-icon-rose">
-                        <svg class="w-5 h-5" style="color:#F472B6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        <svg class="w-5 h-5" style="color:#F472B6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
-                    <span class="qa-label">AI Teacher</span>
+                    <span class="qa-label">Test Series</span>
                 </button>
             </div>
 
@@ -969,58 +946,54 @@
             </div>
         </div>
 
-        <!-- ══ AI TEACHER — SKYRA MAM ══ -->
-        <div id="page-aiteacher" class="page" style="padding:0;margin:-1.25rem -1rem 0;position:relative;">
-            <!-- Skyra header -->
-            <div style="background:linear-gradient(135deg,#07070F 0%,#100F28 100%);padding:14px 16px;display:flex;align-items:center;gap:12px;position:sticky;top:64px;z-index:20;border-bottom:1px solid rgba(212,175,55,0.15)">
-                <div style="width:44px;height:44px;border-radius:50%;background:var(--grad-gold);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;box-shadow:0 0 20px rgba(212,175,55,0.4)">🤖</div>
-                <div class="flex-1">
-                    <div style="font-weight:800;font-size:1rem;color:var(--text);font-family:'Sora',sans-serif">Skyra Mam</div>
-                    <div style="font-size:0.72rem;color:var(--gold2);display:flex;align-items:center;gap:5px">
-                        <span style="width:7px;height:7px;border-radius:50%;background:#34D399;display:inline-block;box-shadow:0 0 6px rgba(52,211,153,0.6)"></span>
-                        AI Teacher · Always available
-                    </div>
-                </div>
-                <button onclick="clearAiChat()" title="Clear chat" style="background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.2);padding:8px;border-radius:10px;cursor:pointer;color:var(--gold2)">
-                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </button>
+        <!-- ══ TEST SERIES ══ -->
+        <div id="page-testseries" class="page space-y-4">
+            <div>
+                <h2 class="page-title">Test Series</h2>
+                <p class="page-sub mt-1">Question papers, your marks & progress</p>
             </div>
 
-            <!-- Subject context pills -->
-            <div style="background:var(--bg2);padding:10px 12px;border-bottom:1px solid var(--card-border)">
-                <div style="font-size:0.65rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px;font-family:'Sora',sans-serif">Ask about</div>
-                <div id="aiSubjectTabs" style="display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px">
-                    <button onclick="setAiContext('general')" class="ai-ctx-btn active" id="aiCtx-general">🌐 General</button>
-                </div>
-            </div>
-
-            <!-- Messages -->
-            <div id="aiChatMessages" style="padding:16px 12px 100px;min-height:50vh;background:var(--bg)">
-                <div id="skyraWelcome" style="display:flex;align-items:flex-end;gap:8px;margin-bottom:16px">
-                    <div style="width:32px;height:32px;border-radius:50%;background:var(--grad-gold);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;box-shadow:0 0 10px rgba(212,175,55,0.3)">🤖</div>
-                    <div>
-                        <div style="font-size:0.7rem;font-weight:700;color:var(--gold2);margin-bottom:4px;font-family:'Sora',sans-serif">Skyra Mam</div>
-                        <div class="skyra-bubble">
-                            Namaste! 🙏 I'm <strong>Skyra Mam</strong>, your AI teacher.<br><br>
-                            You can ask me <strong>any doubt</strong> — Maths, Science, Physics, Chemistry, Biology, History, English… anything!<br><br>
-                            I'll explain it simply. Let's learn together! 📚✨
+            <!-- Overall Progress Summary -->
+            <div class="lux-card overflow-hidden" style="border-color:var(--card-border2)">
+                <div style="background:linear-gradient(135deg,#0A0820 0%,#141030 45%,#1E1A44 100%);padding:1.25rem">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                        <div style="font-size:0.65rem;font-weight:700;color:var(--gold2);text-transform:uppercase;letter-spacing:0.1em;font-family:'Sora',sans-serif">📈 Score Progression</div>
+                        <div style="text-align:right">
+                            <div style="font-size:0.6rem;color:var(--text3)">Average</div>
+                            <div style="font-weight:800;color:var(--gold2);font-family:'DM Mono',monospace;font-size:0.9rem" id="tsAvgLabel">—%</div>
                         </div>
-                        <div style="font-size:0.65rem;color:var(--text3);margin-top:3px;padding-left:4px">Just now</div>
+                    </div>
+                    <div class="flex gap-2 overflow-x-auto pb-1" id="tsSubjectFilterBar">
+                        <button onclick="setTsSubjectFilter('all')" class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold att-filter-btn active-filter" id="tsfilter-all">All Subjects</button>
+                    </div>
+                    <div class="nebula-wrap" style="margin-top:10px;border:none;box-shadow:none;background:transparent">
+                        <canvas id="tsProgressCanvas"></canvas>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-3 p-4">
+                    <div style="background:rgba(212,175,55,0.08);border:1px solid rgba(212,175,55,0.12);border-radius:0.875rem;padding:0.75rem;text-align:center">
+                        <div style="font-size:0.65rem;color:var(--text2)">Tests Taken</div>
+                        <div style="font-weight:800;color:var(--gold2);font-family:'DM Mono',monospace;margin-top:2px" id="tsTotalTests">—</div>
+                    </div>
+                    <div style="background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.12);border-radius:0.875rem;padding:0.75rem;text-align:center">
+                        <div style="font-size:0.65rem;color:var(--text2)">Best Score</div>
+                        <div style="font-weight:800;color:#34D399;font-family:'DM Mono',monospace;margin-top:2px" id="tsBestScore">—</div>
+                    </div>
+                    <div style="background:rgba(79,158,248,0.08);border:1px solid rgba(79,158,248,0.12);border-radius:0.875rem;padding:0.75rem;text-align:center">
+                        <div style="font-size:0.65rem;color:var(--text2)">Pending</div>
+                        <div style="font-weight:800;color:var(--sapphire2);font-family:'DM Mono',monospace;margin-top:2px" id="tsPendingCount">—</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Input bar -->
-            <div id="aiInputBar" style="position:fixed;bottom:64px;left:0;right:0;max-width:512px;margin:0 auto;background:var(--bg2);border-top:1px solid var(--card-border);padding:10px 12px;z-index:25">
-                <div style="display:flex;gap:8px;align-items:flex-end">
-                    <textarea id="aiChatInput" rows="1" placeholder="Koi bhi doubt puchho Skyra Mam se… 💬" onkeydown="handleAiKeydown(event)" oninput="autoResizeAi(this)"
-                        style="flex:1;background:var(--card)!important;color:var(--text)!important;border:1.5px solid var(--card-border)!important;border-radius:22px;padding:10px 16px;font-size:0.875rem;resize:none;outline:none;max-height:110px;line-height:1.5;transition:border-color 0.2s;scrollbar-width:none"
-                        onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--card-border)'"></textarea>
-                    <button onclick="sendAiMessage()" id="aiSendBtn"
-                        style="width:44px;height:44px;border-radius:50%;background:var(--grad-gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 20px rgba(212,175,55,0.4);transition:all 0.2s"
-                        onmousedown="this.style.transform='scale(0.92)'" onmouseup="this.style.transform='scale(1)'">
-                        <svg width="18" height="18" fill="none" stroke="#07070F" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-                    </button>
+            <!-- Test List -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="sec-head" style="font-size:0.95rem">📝 All Tests</h3>
+                </div>
+                <div id="testSeriesList" class="space-y-3">
+                    <div class="skeleton h-24"></div>
+                    <div class="skeleton h-24"></div>
                 </div>
             </div>
         </div>
@@ -1120,7 +1093,6 @@
 // CONFIG
 // ═══════════════════════════════════════════════════════════════
 const DRIVE_UPLOAD_URL = 'https://script.google.com/macros/s/AKfycbzY5dUqfwAdHk1iSav4kIowOgVNk6KCkfIzH2KTf4-FSChUX6hQvruQwyVCbHl_hUk2/exec';
-const GEMINI_API_KEY   = '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';
 
 const firebaseConfig = {
     apiKey: "AIzaSyB5TTCXCD74IUeLmM7bynlgCUvcmcM6rTw",
@@ -1197,7 +1169,7 @@ self.addEventListener('install',  e => { e.waitUntil(caches.open(CACHE).then(c =
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); self.clients.claim(); });
 self.addEventListener('fetch',    e => {
     if (!e.request.url.startsWith('http')) return;
-    if (e.request.url.includes('firestore') || e.request.url.includes('openrouter') || e.request.url.includes('googleapis')) return;
+    if (e.request.url.includes('firestore') || e.request.url.includes('googleapis')) return;
     e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
 });`;
         try {
@@ -1246,7 +1218,6 @@ auth.onAuthStateChanged(async (user) => {
                     loadProfile();
                     loadStudyData();
                     startPaymentsListener(user.uid);
-                    initAiTeacher();
                 } else {
                     loadProfile();
                 }
@@ -1349,28 +1320,41 @@ async function loadDashboard() {
 async function loadDashAttendanceSummary() {
     const el = document.getElementById('dashAttendanceSummary');
     try {
-        const snap = await db.collection('attendance').where('studentId','==',currentUser.uid).orderBy('date','desc').limit(5).get();
-        if (snap.empty) { el.innerHTML = '<p style="font-size:0.875rem;text-align:center;padding:8px;color:var(--text3)">No attendance records yet</p>'; return; }
-        let p = 0, a = 0, l = 0, total = 0;
-        snap.forEach(doc => { const s = doc.data().status; total++; if (s==='present') p++; else if (s==='absent') a++; else if (s==='late') l++; });
-        const pct = total > 0 ? Math.round((p / total) * 100) : 0;
-        const pctColor = pct >= 75 ? '#34D399' : '#f87171';
-        el.innerHTML = `<div class="flex items-center gap-4">
-            <div class="flex-1">
-                <div class="flex justify-between text-xs mb-1" style="color:var(--text2)">
-                    <span>Last ${total} classes</span><span style="font-weight:800;color:${pctColor};font-family:'Sora',sans-serif">${pct}%</span>
-                </div>
-                <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct >= 75 ? 'linear-gradient(90deg,#34D399,#22c55e)' : 'linear-gradient(90deg,#f87171,#ef4444)'}"></div></div>
-            </div>
-            <div class="flex gap-3 text-xs flex-shrink-0" style="font-weight:800">
-                <span style="color:#34D399">✅${p}</span>
-                <span style="color:#f87171">❌${a}</span>
-                <span style="color:#fbbf24">⏰${l}</span>
-            </div>
-        </div>`;
+        let snap;
+        try {
+            snap = await db.collection('attendance').where('studentId','==',currentUser.uid).orderBy('date','desc').limit(5).get();
+        } catch(idxErr) {
+            const snap2 = await db.collection('attendance').where('studentId','==',currentUser.uid).get();
+            const sorted = snap2.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,5);
+            renderDashAttSummary(sorted);
+            return;
+        }
+        renderDashAttSummary(snap.docs.map(d=>({id:d.id,...d.data()})));
     } catch (e) {
         el.innerHTML = '<p style="font-size:0.875rem;text-align:center;color:var(--text3)">Attendance data not available</p>';
     }
+}
+
+function renderDashAttSummary(records) {
+    const el = document.getElementById('dashAttendanceSummary');
+    if (!records || records.length === 0) { el.innerHTML = '<p style="font-size:0.875rem;text-align:center;padding:8px;color:var(--text3)">No attendance records yet</p>'; return; }
+    let p = 0, a = 0, l = 0, total = 0;
+    records.forEach(d => { const s = d.status; total++; if (s==='present') p++; else if (s==='absent') a++; else if (s==='late') l++; });
+    const pct = total > 0 ? Math.round((p / total) * 100) : 0;
+    const pctColor = pct >= 75 ? '#34D399' : '#f87171';
+    el.innerHTML = `<div class="flex items-center gap-4">
+        <div class="flex-1">
+            <div class="flex justify-between text-xs mb-1" style="color:var(--text2)">
+                <span>Last ${total} classes</span><span style="font-weight:800;color:${pctColor};font-family:'Sora',sans-serif">${pct}%</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct >= 75 ? 'linear-gradient(90deg,#34D399,#22c55e)' : 'linear-gradient(90deg,#f87171,#ef4444)'}"></div></div>
+        </div>
+        <div class="flex gap-3 text-xs flex-shrink-0" style="font-weight:800">
+            <span style="color:#34D399">✅${p}</span>
+            <span style="color:#f87171">❌${a}</span>
+            <span style="color:#fbbf24">⏰${l}</span>
+        </div>
+    </div>`;
 }
 
 async function loadDashPayments() {
@@ -1396,6 +1380,22 @@ async function loadAttendance() {
         renderAttendanceList('all');
     } catch(e) {
         console.error('Attendance load error:', e);
+
+        // Fallback for missing composite index: fetch without orderBy, sort client-side
+        if (e.code === 'failed-precondition' || /index/i.test(e.message || '')) {
+            try {
+                const snap2 = await db.collection('attendance').where('studentId','==',currentUser.uid).get();
+                allAttendanceRecords = snap2.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+                renderAttendanceSummary();
+                renderAttendanceList('all');
+                return;
+            } catch(e2) {
+                console.error('Fallback attendance load also failed:', e2);
+            }
+        }
+
         allAttendanceRecords = [];
         document.getElementById('attendanceList').innerHTML = `
             <div class="card p-8 text-center">
@@ -1882,6 +1882,7 @@ function navigateTo(page) {
         document.getElementById('subjectDetailPanel').style.display = 'none';
     }
     if (page === 'attendance') loadAttendance();
+    if (page === 'testseries') loadTestSeries();
 }
 
 function openModal(id)  { document.getElementById(id).classList.add('show'); }
@@ -1908,463 +1909,308 @@ async function logout() {
 }
 
 // ══════════════════════════════════════════════════════════════
-// AI TEACHER — SKYRA MAM
+// TEST SERIES
 // ══════════════════════════════════════════════════════════════
-let aiContext     = 'general';
-let aiChatHistory = [];
+let allTests        = [];   // raw test docs for this student's class
+let allTestMarks    = {};   // testId -> marks doc
+let _testsUnsub      = null;
+let _marksUnsub       = null;
+let tsSubjectFilter  = 'all';
 
-function initAiTeacher() {
-    buildAiSubjectTabs();
-    setTimeout(async () => {
-        const key = getActiveKey();
-        if (!key || key === 'YOUR_OPENROUTER_KEY_HERE') {
-            showApiKeySetup('');
-            return;
-        }
-        // Verify key AND pre-fetch live model list in one shot
-        _modelsFetched = false; // reset so fresh fetch happens
-        _liveModels    = [];
-        await fetchLiveModels(key);
+async function loadTestSeries() {
+    const cls = String(studentData.class || studentData.roleData?.class || '');
+    const listEl = document.getElementById('testSeriesList');
+    if (!cls) { listEl.innerHTML = `<div class="card p-8 text-center"><div style="font-size:3rem;margin-bottom:12px">📝</div><h3 class="sec-head">Class not set</h3><p style="font-size:0.875rem;margin-top:6px;color:var(--text2)">Contact your admin.</p></div>`; return; }
 
-        if (!_modelsFetched || _liveModels.length === 0) {
-            // fetchLiveModels failed — check if key is actually bad
-            const valid = await verifyApiKey(key);
-            if (valid === false) {
-                try { localStorage.removeItem('ms_or_key'); } catch(_) {}
-                showApiKeySetup('API key is invalid or expired. Please enter a new one.');
-            } else if (valid === null) {
-                // Network issue — just warn in console, don't bother user
-                console.warn('Skyra: network issue pre-fetching models. Will retry on first message.');
-            }
-        } else {
-            console.log(`Skyra ready — ${_liveModels.length} free models available`);
-        }
-    }, 600);
-}
+    listEl.innerHTML = '<div class="skeleton h-24"></div><div class="skeleton h-24"></div>';
 
-function buildAiSubjectTabs() {
-    const tabsEl = document.getElementById('aiSubjectTabs');
-    if (!tabsEl) return;
-    const extras = allSubjects.map(s =>
-        `<button onclick="setAiContext('${s.name}')" class="ai-ctx-btn" id="aiCtx-${s.name.replace(/\s/g,'_')}">📖 ${s.name}</button>`
-    ).join('');
-    tabsEl.innerHTML = `<button onclick="setAiContext('general')" class="ai-ctx-btn active" id="aiCtx-general">🌐 General</button>${extras}`;
-}
+    if (_testsUnsub) _testsUnsub();
+    if (_marksUnsub) _marksUnsub();
 
-function setAiContext(ctx) {
-    aiContext = ctx;
-    document.querySelectorAll('.ai-ctx-btn').forEach(b => b.classList.remove('active'));
-    const id = 'aiCtx-' + ctx.replace(/\s/g,'_');
-    const btn = document.getElementById(id) || document.getElementById('aiCtx-general');
-    if (btn) btn.classList.add('active');
-}
-
-function autoResizeAi(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 110) + 'px';
-}
-
-function clearAiChat() {
-    aiChatHistory = [];
-    const el = document.getElementById('aiChatMessages');
-    if (!el) return;
-    el.innerHTML = `<div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:16px">
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--grad-gold);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🤖</div>
-        <div>
-            <div style="font-size:0.7rem;font-weight:700;color:var(--gold2);margin-bottom:4px;font-family:'Sora',sans-serif">Skyra Mam</div>
-            <div class="skyra-bubble">Chat cleared! 🧹 Ask me anything new. 📚</div>
-            <div style="font-size:0.65rem;color:var(--text3);margin-top:3px;padding-left:4px">Just now</div>
-        </div>
-    </div>`;
-    // Re-show key setup if no key
-    const key = getActiveKey();
-    if (!key || key === 'YOUR_OPENROUTER_KEY_HERE') setTimeout(() => showApiKeySetup(''), 100);
-}
-
-async function verifyApiKey(key) {
-    try {
-        const r = await fetch('https://openrouter.ai/api/v1/auth/key', {
-            headers: { 'Authorization': `Bearer ${key}` }
+    let testsQuery = db.collection('tests').where('class','==',cls).orderBy('testDate','desc');
+    _testsUnsub = testsQuery.onSnapshot((snap) => {
+        allTests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        buildTsSubjectFilterBar();
+        renderTestSeriesList();
+        renderTsProgressStats();
+        drawTsProgressChart();
+    }, (err) => {
+        console.error('Tests load error (trying fallback):', err);
+        // Fallback for missing composite index: query without orderBy, sort client-side
+        db.collection('tests').where('class','==',cls).onSnapshot((snap2) => {
+            allTests = snap2.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a,b) => testSortDate(b) - testSortDate(a));
+            buildTsSubjectFilterBar();
+            renderTestSeriesList();
+            renderTsProgressStats();
+            drawTsProgressChart();
+        }, (err2) => {
+            console.error('Tests fallback also failed:', err2);
+            listEl.innerHTML = `<div class="card p-8 text-center"><div style="font-size:3rem;margin-bottom:12px">📝</div><h3 class="sec-head">No tests yet</h3><p style="font-size:0.875rem;margin-top:6px;color:var(--text2)">Your teacher will add test papers here.</p></div>`;
         });
-        if (!r.ok) return false;
-        const d = await r.json();
-        return !!d.data;
-    } catch(e) { return null; }
-}
-
-function handleAiKeydown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAiMessage(); } }
-
-function fmtTime() {
-    const d = new Date();
-    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
-}
-
-function appendUserBubble(text) {
-    const el = document.getElementById('aiChatMessages');
-    const div = document.createElement('div');
-    div.style.cssText = 'display:flex;justify-content:flex-end;margin-bottom:12px;align-items:flex-end;gap:0';
-    div.innerHTML = `<div>
-        <div class="user-bubble">${escHtml(text)}</div>
-        <div style="font-size:0.65rem;color:var(--text3);margin-top:3px;text-align:right;padding-right:4px">${fmtTime()}</div>
-    </div>`;
-    el.appendChild(div);
-    el.scrollTop = el.scrollHeight;
-}
-
-function appendSkyraTyping() {
-    const el = document.getElementById('aiChatMessages');
-    const div = document.createElement('div');
-    div.id = 'skyra-typing';
-    div.style.cssText = 'display:flex;align-items:flex-end;gap:8px;margin-bottom:12px';
-    div.innerHTML = `
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--grad-gold);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">🤖</div>
-        <div>
-            <div style="font-size:0.7rem;font-weight:700;color:var(--gold2);margin-bottom:4px;font-family:'Sora',sans-serif">Skyra Mam</div>
-            <div class="skyra-bubble" style="padding:12px 16px">
-                <span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>
-            </div>
-        </div>`;
-    el.appendChild(div);
-    el.scrollTop = el.scrollHeight;
-}
-
-function removeSkyraTyping() { const el = document.getElementById('skyra-typing'); if (el) el.remove(); }
-
-function appendSkyraReply(text, model) {
-    const el = document.getElementById('aiChatMessages');
-    const div = document.createElement('div');
-    div.style.cssText = 'display:flex;align-items:flex-end;gap:8px;margin-bottom:12px';
-    const modelBadge = model ? `<span style="font-size:0.58rem;opacity:0.5;margin-left:6px">${model.split('/').pop().replace(':free','')}</span>` : '';
-    div.innerHTML = `
-        <div style="width:32px;height:32px;border-radius:50%;background:var(--grad-gold);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;box-shadow:0 0 10px rgba(212,175,55,0.3)">🤖</div>
-        <div>
-            <div style="font-size:0.7rem;font-weight:700;color:var(--gold2);margin-bottom:4px;font-family:'Sora',sans-serif">Skyra Mam${modelBadge}</div>
-            <div class="skyra-bubble">${formatAiText(text)}</div>
-            <div style="font-size:0.65rem;color:var(--text3);margin-top:3px;padding-left:4px">${fmtTime()}</div>
-        </div>`;
-    el.appendChild(div);
-    el.scrollTop = el.scrollHeight;
-}
-
-function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
-
-function formatAiText(raw) {
-    const bulletIcons = ['📌','✅','💡','🔹','📎','⭐','🎯','🔸'];
-    let iconIdx = 0;
-    const lines = raw.split('\n');
-    let html = '';
-    let stepCounter = 0;
-
-    for (let i = 0; i < lines.length; i++) {
-        let line = lines[i].trim();
-        if (!line) { html += '<div style="height:6px"></div>'; continue; }
-
-        if (/^#{1,3}\s+/.test(line)) {
-            stepCounter = 0;
-            const text = line.replace(/^#{1,3}\s+/, '').replace(/\*\*/g,'');
-            const hIcons = ['📚','🔬','🧮','📖','💫','🎓'];
-            html += `<div class="s-heading">${hIcons[Math.floor(Math.random()*hIcons.length)]} ${text}</div>`;
-            continue;
-        }
-        if (/^\*\*[^*]+\*\*\s*:?\s*$/.test(line)) {
-            stepCounter = 0;
-            html += `<div class="s-heading">📌 ${line.replace(/\*\*/g,'')}</div>`;
-            continue;
-        }
-        if (/^(step\s*\d+|(\d+)\.\s)/i.test(line)) {
-            stepCounter++;
-            const text = line.replace(/^step\s*\d+[:\-]?\s*/i,'').replace(/^\d+\.\s*/,'');
-            html += `<div class="s-step"><div class="s-step-num">${stepCounter}</div><div>${inlineFormat(text)}</div></div>`;
-            continue;
-        }
-        if (/^`[^`]+`$/.test(line) || /[=÷×±√∫∑π]/u.test(line) && line.length < 80) {
-            html += `<div class="s-formula">🔢 ${line.replace(/`/g,'')}</div>`;
-            continue;
-        }
-        if (/^(note|tip|remember|important|trick|shortcut|warning)[:\-!]?\s*/i.test(line)) {
-            const text = line.replace(/^(note|tip|remember|important|trick|shortcut|warning)[:\-!]?\s*/i,'');
-            html += `<div class="s-tip"><span>💡</span><span>${inlineFormat(text)}</span></div>`;
-            continue;
-        }
-        if (/^(great|excellent|well done|you got it|keep it up|amazing|bravo|shabash|bahut acha)/i.test(line) || /[🎉🥳🙌👏🌟⭐🏆]/.test(line)) {
-            html += `<div class="s-encourage"><span>🌟</span><span>${inlineFormat(line)}</span></div>`;
-            continue;
-        }
-        if (/^[-*•]\s+/.test(line)) {
-            const text = line.replace(/^[-*•]\s+/,'');
-            html += `<div class="s-point"><span class="s-icon">${bulletIcons[iconIdx++ % bulletIcons.length]}</span><span>${inlineFormat(text)}</span></div>`;
-            continue;
-        }
-        html += `<p>${inlineFormat(line)}</p>`;
-    }
-    return html;
-}
-
-function inlineFormat(text) {
-    return text
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>')
-        .replace(/\[([^\]]+)\]/g, '<span style="background:rgba(212,175,55,0.15);padding:1px 6px;border-radius:5px;font-size:0.82em;color:var(--gold2)">$1</span>');
-}
-
-// ── Active API key (can be overridden by user in chat) ────────
-let _activeApiKey = GEMINI_API_KEY;
-
-// Ordered fallback model list — tries each until one works
-// ── Live free-model cache (refreshed each time AI page opens) ─
-let _liveModels      = [];   // populated from OpenRouter /v1/models
-let _modelsFetched   = false;
-
-// Preferred model keywords in priority order
-const MODEL_PREFS = ['deepseek','llama','gemma','qwen','mistral','phi','hermes','nous'];
-
-async function fetchLiveModels(key) {
-    try {
-        const r = await fetch('https://openrouter.ai/api/v1/models', {
-            headers: { 'Authorization': `Bearer ${key}` }
-        });
-        if (!r.ok) return;
-        const d = await r.json();
-        // Only free models (prompt AND completion cost = 0)
-        const free = (d.data || []).filter(m =>
-            m.pricing &&
-            (parseFloat(m.pricing.prompt)     === 0) &&
-            (parseFloat(m.pricing.completion) === 0) &&
-            m.id.endsWith(':free')
-        );
-        if (free.length === 0) return;
-
-        // Sort: preferred keywords first, then by context window desc
-        free.sort((a, b) => {
-            const ai = MODEL_PREFS.findIndex(p => a.id.includes(p));
-            const bi = MODEL_PREFS.findIndex(p => b.id.includes(p));
-            const as = ai === -1 ? 99 : ai;
-            const bs = bi === -1 ? 99 : bi;
-            if (as !== bs) return as - bs;
-            return (b.context_length || 0) - (a.context_length || 0);
-        });
-
-        _liveModels    = free.map(m => m.id);
-        _modelsFetched = true;
-        console.log(`Skyra: ${_liveModels.length} free models loaded. Top: ${_liveModels[0]}`);
-    } catch(e) {
-        console.warn('Could not fetch model list:', e.message);
-    }
-}
-
-function getActiveKey() {
-    try { return localStorage.getItem('ms_or_key') || _activeApiKey; } catch(e) { return _activeApiKey; }
-}
-
-function saveUserKey(key) {
-    _activeApiKey = key;
-    try { localStorage.setItem('ms_or_key', key); } catch(e) {}
-}
-
-// Show inline API key setup card inside chat
-function showApiKeySetup(errorMsg) {
-    const el = document.getElementById('aiChatMessages');
-    const cardId = 'skyra-apikey-card';
-    if (document.getElementById(cardId)) return; // already shown
-
-    const div = document.createElement('div');
-    div.id = cardId;
-    div.style.cssText = 'margin-bottom:16px';
-    div.innerHTML = `
-        <div style="background:linear-gradient(135deg,rgba(212,175,55,0.08),rgba(79,158,248,0.06));border:1px solid rgba(212,175,55,0.25);border-radius:16px;padding:16px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-                <span style="font-size:1.2rem">🔑</span>
-                <div style="font-weight:800;color:var(--gold2);font-family:'Sora',sans-serif;font-size:0.9rem">Skyra Mam needs an API Key</div>
-            </div>
-            <div style="font-size:0.8rem;color:var(--text2);margin-bottom:4px;line-height:1.6">
-                ${errorMsg ? `<span style="color:#f87171;font-size:0.75rem">⚠️ ${errorMsg}</span><br><br>` : ''}
-                Get a <strong style="color:var(--gold2)">free</strong> OpenRouter key:<br>
-                1️⃣ Go to <a href="https://openrouter.ai" target="_blank" style="color:var(--sapphire2);text-decoration:underline">openrouter.ai</a><br>
-                2️⃣ Sign up → Keys → Create key<br>
-                3️⃣ Paste it below 👇
-            </div>
-            <div style="display:flex;gap:8px;margin-top:12px">
-                <input id="skyraKeyInput" type="password" placeholder="sk-or-v1-..." 
-                    style="flex:1;padding:8px 12px;border-radius:10px;font-size:0.8rem;border:1.5px solid var(--card-border);background:var(--card)!important;color:var(--text)!important;outline:none;font-family:monospace">
-                <button onclick="applyUserApiKey()" 
-                    style="padding:8px 16px;border-radius:10px;background:var(--grad-gold);border:none;color:#07070F;font-weight:800;cursor:pointer;font-family:'Sora',sans-serif;font-size:0.8rem;white-space:nowrap">
-                    Save & Use
-                </button>
-            </div>
-        </div>`;
-    el.appendChild(div);
-    el.scrollTop = el.scrollHeight;
-}
-
-function applyUserApiKey() {
-    const input = document.getElementById('skyraKeyInput');
-    const key = (input?.value || '').trim();
-    if (!key || !key.startsWith('sk-')) {
-        showToast('Please enter a valid OpenRouter key (starts with sk-)', 'error');
-        return;
-    }
-    saveUserKey(key);
-    const card = document.getElementById('skyra-apikey-card');
-    if (card) card.remove();
-    appendSkyraReply('✅ **API key saved!** I\'m ready now. Ask me your first doubt! 📚\n\nGreat setup! You\'re all set to learn. 🌟');
-    showToast('Skyra Mam is now active! ✨', 'success');
-}
-
-// Models that don't support 'system' role — convert to user message
-const NO_SYSTEM_ROLE = ['gemma','claude-haiku','command-r','phi-3'];
-
-function prepMessages(model, messages) {
-    const needsConvert = NO_SYSTEM_ROLE.some(s => model.includes(s));
-    if (!needsConvert) return messages;
-    // Merge system prompt into the first user message
-    const sys  = messages.find(m => m.role === 'system');
-    const rest = messages.filter(m => m.role !== 'system');
-    if (!sys) return rest;
-    if (rest.length === 0) return [{ role: 'user', content: sys.content }];
-    return [
-        { role: 'user', content: `[Instructions: ${sys.content}]\n\n${rest[0].content}` },
-        ...rest.slice(1)
-    ];
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function tryOneModel(model, messages, key) {
-    const payload = prepMessages(model, messages);
-    const resp = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type':  'application/json',
-            'Authorization': `Bearer ${key}`,
-            'HTTP-Referer':  window.location.origin || 'https://mindskyra.com',
-            'X-Title':       'MINDSKYRA Skyra Mam'
-        },
-        body: JSON.stringify({ model, messages: payload, max_tokens: 1024, temperature: 0.7 })
     });
 
-    const data = await resp.json();
-
-    if (!resp.ok) {
-        const errMsg = String(data?.error?.message || data?.error || `HTTP \${resp.status}`);
-        const code   = data?.error?.code || resp.status;
-        if (code === 401 || /user not found|invalid api key|no auth|unauthorized/i.test(errMsg)) {
-            throw { type: 'auth', message: errMsg };
-        }
-        throw { type: 'model_err', code, is429: code === 429, message: errMsg };
-    }
-
-    const reply = data.choices?.[0]?.message?.content || '';
-    if (!reply.trim()) throw { type: 'model_err', message: 'Empty response' };
-    return reply;
+    _marksUnsub = db.collection('testMarks').where('studentId','==',currentUser.uid)
+        .onSnapshot((snap) => {
+            const marks = {};
+            snap.forEach(doc => { const d = doc.data(); marks[d.testId] = { id: doc.id, ...d }; });
+            allTestMarks = marks;
+            renderTestSeriesList();
+            renderTsProgressStats();
+            drawTsProgressChart();
+        }, (err) => console.error('Marks load error:', err));
 }
 
-async function callOpenRouter(messages, key) {
-    if (!_modelsFetched) await fetchLiveModels(key);
-
-    if (_liveModels.length === 0) {
-        throw { type: 'no_models', message: 'Could not load model list. Check your API key.' };
-    }
-
-    let lastError = 'No models available';
-    let consecutive429 = 0;
-    // Try up to 15 models for resilience
-    const toTry = _liveModels.slice(0, 15);
-
-    for (const model of toTry) {
-        try {
-            // Brief delay after rate-limit hits to let provider recover
-            if (consecutive429 > 0) await sleep(Math.min(600 * consecutive429, 2000));
-
-            const reply = await tryOneModel(model, messages, key);
-            console.log(`Skyra ✓ ${model}`);
-            return { reply, model };
-        } catch(e) {
-            if (e.type === 'auth') throw e;
-            lastError = e.message || String(e);
-            if (e.is429) { consecutive429++; } else { consecutive429 = 0; }
-            console.warn(`⚠ ${model}: ${lastError}`);
-        }
-    }
-
-    throw { type: 'model', message: lastError };
+function buildTsSubjectFilterBar() {
+    const bar = document.getElementById('tsSubjectFilterBar');
+    if (!bar) return;
+    const subjects = [...new Set(allTests.map(t => t.subjectName).filter(Boolean))];
+    const extras = subjects.map(s => `<button onclick="setTsSubjectFilter('${s.replace(/'/g,"\\'")}')" class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold att-filter-btn" id="tsfilter-${s.replace(/\s/g,'_')}">${s}</button>`).join('');
+    bar.innerHTML = `<button onclick="setTsSubjectFilter('all')" class="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold att-filter-btn ${tsSubjectFilter==='all'?'active-filter':''}" id="tsfilter-all">All Subjects</button>${extras}`;
+    // restore active state
+    document.querySelectorAll('#tsSubjectFilterBar .att-filter-btn').forEach(b => b.classList.remove('active-filter'));
+    const activeId = tsSubjectFilter === 'all' ? 'tsfilter-all' : 'tsfilter-' + tsSubjectFilter.replace(/\s/g,'_');
+    const activeBtn = document.getElementById(activeId);
+    if (activeBtn) activeBtn.classList.add('active-filter');
 }
 
-async function sendAiMessage() {
-    const inputEl = document.getElementById('aiChatInput');
-    const question = (inputEl?.value || '').trim();
-    if (!question) return;
+function setTsSubjectFilter(subject) {
+    tsSubjectFilter = subject;
+    document.querySelectorAll('#tsSubjectFilterBar .att-filter-btn').forEach(b => b.classList.remove('active-filter'));
+    const id = subject === 'all' ? 'tsfilter-all' : 'tsfilter-' + subject.replace(/\s/g,'_');
+    const btn = document.getElementById(id);
+    if (btn) btn.classList.add('active-filter');
+    renderTsProgressStats();
+    drawTsProgressChart();
+}
 
-    const key = getActiveKey();
+function getFilteredTests() {
+    return tsSubjectFilter === 'all' ? allTests : allTests.filter(t => t.subjectName === tsSubjectFilter);
+}
 
-    // No key configured at all
-    if (!key || key === 'YOUR_OPENROUTER_KEY_HERE') {
-        showApiKeySetup('No API key configured yet.');
+function renderTestSeriesList() {
+    const el = document.getElementById('testSeriesList');
+    if (!el) return;
+    if (allTests.length === 0) {
+        el.innerHTML = `<div class="card p-8 text-center"><div style="font-size:3rem;margin-bottom:12px">📝</div><h3 class="sec-head">No tests yet</h3><p style="font-size:0.875rem;margin-top:6px;color:var(--text2)">Your teacher will add test papers here.</p></div>`;
+        return;
+    }
+    el.innerHTML = allTests.map(test => {
+        const mark = allTestMarks[test.id];
+        const dateStr = fmtTestDate(test.testDate);
+        const typeIcon = test.paperType === 'pdf' ? '📄' : '🖼️';
+        let statusHtml;
+        if (mark && typeof mark.marksObtained === 'number') {
+            const pct = test.maxMarks ? Math.round((mark.marksObtained / test.maxMarks) * 100) : 0;
+            const color = pct >= 75 ? '#34D399' : pct >= 40 ? '#fbbf24' : '#f87171';
+            statusHtml = `<span style="font-size:0.8rem;font-weight:800;padding:5px 12px;border-radius:9999px;background:rgba(0,0,0,0.2);color:${color};font-family:'DM Mono',monospace">${mark.marksObtained}/${test.maxMarks||'—'} · ${pct}%</span>`;
+        } else {
+            statusHtml = `<span style="font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:9999px;background:rgba(251,191,36,0.12);color:#fbbf24">⏳ Pending</span>`;
+        }
+        return `<div class="card p-4 cursor-pointer" onclick="openTestViewer('${test.id}')">
+            <div style="display:flex;align-items:flex-start;gap:12px">
+                <div style="width:44px;height:44px;border-radius:0.75rem;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;background:rgba(212,175,55,0.1)">${typeIcon}</div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-weight:700;font-size:0.9rem;color:var(--text);font-family:'Sora',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${test.title||'Untitled Test'}</div>
+                    <div style="font-size:0.75rem;margin-top:3px;color:var(--text2);display:flex;gap:8px;flex-wrap:wrap">
+                        ${test.subjectName ? `<span class="tag-gold" style="padding:1px 8px">${test.subjectName}</span>` : ''}
+                        <span>${dateStr}</span>
+                        ${test.maxMarks ? `<span>Max: ${test.maxMarks}</span>` : ''}
+                    </div>
+                </div>
+                <div style="flex-shrink:0">${statusHtml}</div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function fmtTestDate(dateVal) {
+    try {
+        if (!dateVal) return '—';
+        let d;
+        if (typeof dateVal === 'string') d = new Date(dateVal + 'T00:00:00');
+        else if (dateVal.toDate) d = dateVal.toDate();
+        else return '—';
+        return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+    } catch(e) { return '—'; }
+}
+
+function renderTsProgressStats() {
+    const tests = getFilteredTests();
+    const graded = tests.filter(t => allTestMarks[t.id] && typeof allTestMarks[t.id].marksObtained === 'number');
+    const pending = tests.length - graded.length;
+
+    document.getElementById('tsTotalTests').textContent = tests.length;
+    document.getElementById('tsPendingCount').textContent = pending;
+
+    if (graded.length === 0) {
+        document.getElementById('tsAvgLabel').textContent = '—%';
+        document.getElementById('tsBestScore').textContent = '—';
+        return;
+    }
+    let sumPct = 0, bestPct = -1, bestLabel = '';
+    graded.forEach(t => {
+        const m = allTestMarks[t.id];
+        const pct = t.maxMarks ? (m.marksObtained / t.maxMarks) * 100 : 0;
+        sumPct += pct;
+        if (pct > bestPct) { bestPct = pct; bestLabel = `${m.marksObtained}/${t.maxMarks}`; }
+    });
+    const avgPct = Math.round(sumPct / graded.length);
+    document.getElementById('tsAvgLabel').textContent = avgPct + '%';
+    document.getElementById('tsBestScore').textContent = bestLabel + ' (' + Math.round(bestPct) + '%)';
+}
+
+// ── Progression Chart (canvas line chart, oldest → newest) ─────
+function drawTsProgressChart() {
+    const canvas = document.getElementById('tsProgressCanvas');
+    if (!canvas) return;
+
+    const tests = getFilteredTests()
+        .filter(t => allTestMarks[t.id] && typeof allTestMarks[t.id].marksObtained === 'number' && t.maxMarks)
+        .slice() // clone
+        .sort((a,b) => {
+            const da = testSortDate(a), db_ = testSortDate(b);
+            return da - db_;
+        });
+
+    const wrap = canvas.parentElement;
+    const W = (wrap ? wrap.clientWidth : 320) || 320;
+    const H = 160;
+    canvas.width = W; canvas.height = H;
+    canvas.style.width = '100%'; canvas.style.display = 'block';
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,W,H);
+
+    if (tests.length === 0) {
+        ctx.font = '12px Plus Jakarta Sans, sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.textAlign = 'center';
+        ctx.fillText('No graded tests yet for this filter', W/2, H/2);
         return;
     }
 
-    inputEl.value = '';
-    inputEl.style.height = 'auto';
-    appendUserBubble(question);
-    aiChatHistory.push({ role: 'user', text: question });
+    const points = tests.map(t => {
+        const m = allTestMarks[t.id];
+        return { pct: Math.max(0, Math.min(100, (m.marksObtained / t.maxMarks) * 100)), label: t.title || '', date: fmtTestDate(t.testDate) };
+    });
 
-    const sendBtn = document.getElementById('aiSendBtn');
-    if (sendBtn) sendBtn.disabled = true;
-    appendSkyraTyping();
+    const pad = { top: 16, right: 14, bottom: 24, left: 32 };
+    const gW = W - pad.left - pad.right;
+    const gH = H - pad.top - pad.bottom;
 
-    try {
-        const studentName = studentData?.fullName || studentData?.firstName || 'Student';
-        const cls         = studentData?.class || '—';
-        const subjectCtx  = aiContext !== 'general'
-            ? `The student is asking about: ${aiContext}.`
-            : 'The student can ask about any school subject.';
+    // Grid lines at 0/25/50/75/100
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textAlign = 'right';
+    [0,25,50,75,100].forEach(v => {
+        const y = pad.top + gH - (v/100)*gH;
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.setLineDash([3,4]); ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(W-pad.right, y); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(0,212,255,0.4)';
+        ctx.fillText(v+'%', pad.left-4, y+3);
+    });
 
-        const systemPrompt = `You are Skyra Mam, a warm, friendly and brilliant AI teacher at MINDSKYRA Institute.
-Student name: ${studentName}, Class: ${cls}.
-${subjectCtx}
+    const n = points.length;
+    const stepX = n > 1 ? gW / (n-1) : 0;
+    const coords = points.map((p,i) => ({
+        x: pad.left + (n > 1 ? i*stepX : gW/2),
+        y: pad.top + gH - (p.pct/100)*gH,
+        pct: p.pct
+    }));
 
-FORMATTING RULES — always follow these:
-- Use ## for section headings (e.g. ## What is Photosynthesis?)
-- Use bullet points with - for lists of facts or features
-- Use "Step 1: ... Step 2: ..." format for solving problems
-- Put formulas or equations on their own line inside backticks e.g. \`F = ma\`
-- Start with "Note:" or "Tip:" for important reminders
-- End every answer with an encouraging line like "Great question! You're doing amazing 🌟"
-- Keep each point SHORT and CLEAR — one idea per line
-- If student writes in Hindi or Hinglish, reply in same language mix
-- NEVER write long paragraphs — always break into points
-- Use simple words a school student can understand easily`;
+    // Line
+    ctx.save();
+    ctx.shadowBlur = 10; ctx.shadowColor = 'rgba(212,175,55,0.5)';
+    ctx.strokeStyle = '#D4AF37'; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    coords.forEach((c,i) => { if (i===0) ctx.moveTo(c.x,c.y); else ctx.lineTo(c.x,c.y); });
+    ctx.stroke();
+    ctx.restore();
 
-        const messages = [
-            { role: 'system', content: systemPrompt },
-            ...aiChatHistory.slice(0, -1).map(m => ({
-                role: m.role === 'user' ? 'user' : 'assistant',
-                content: m.text
-            })),
-            { role: 'user', content: question }
-        ];
+    // Fill under line
+    const grad = ctx.createLinearGradient(0,pad.top,0,pad.top+gH);
+    grad.addColorStop(0,'rgba(212,175,55,0.25)'); grad.addColorStop(1,'rgba(212,175,55,0)');
+    ctx.beginPath();
+    coords.forEach((c,i) => { if (i===0) ctx.moveTo(c.x,c.y); else ctx.lineTo(c.x,c.y); });
+    ctx.lineTo(coords[coords.length-1].x, pad.top+gH);
+    ctx.lineTo(coords[0].x, pad.top+gH);
+    ctx.closePath();
+    ctx.fillStyle = grad; ctx.fill();
 
-        const { reply, model } = await callOpenRouter(messages, key);
-        aiChatHistory.push({ role: 'model', text: reply });
-        removeSkyraTyping();
-        appendSkyraReply(reply, model);
-
-    } catch(e) {
-        removeSkyraTyping();
-        console.error('Skyra AI error:', e);
-
-        if (e.type === 'auth') {
-            // Clear saved key so user re-enters
-            try { localStorage.removeItem('ms_or_key'); } catch(_) {}
-            _activeApiKey = GEMINI_API_KEY; // reset to default
-            appendSkyraReply('🔑 **API key issue detected.**\n\nThe key was rejected by OpenRouter. This usually means:\n- The key has expired or was deleted\n- The account has no credits\n\nPlease enter a new key below 👇');
-            showApiKeySetup('Key rejected: ' + (e.message || 'User not found / Invalid key'));
-        } else {
-            appendSkyraReply('⚠️ **Could not connect right now.**\n\n- Check your internet connection\n- All free models might be busy\n\nPlease try again in a moment. 🙏\n\nYou\'re doing great, don\'t give up! 🌟');
+    // Points
+    coords.forEach((c,i) => {
+        const color = c.pct >= 75 ? '#34D399' : c.pct >= 40 ? '#F0D060' : '#f87171';
+        ctx.save();
+        ctx.shadowBlur = 8; ctx.shadowColor = color;
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(c.x, c.y, 4, 0, Math.PI*2); ctx.fill();
+        ctx.restore();
+        // show only first/last/every-nth label if crowded
+        if (n <= 6 || i === 0 || i === n-1 || i % Math.ceil(n/5) === 0) {
+            ctx.font = '8px Plus Jakarta Sans, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.35)';
+            ctx.textAlign = 'center';
+            ctx.fillText(points[i].date.split(' ').slice(0,2).join(' '), c.x, H-8);
         }
-    } finally {
-        if (sendBtn) sendBtn.disabled = false;
+    });
+}
+
+function testSortDate(t) {
+    try {
+        if (typeof t.testDate === 'string') return new Date(t.testDate+'T00:00:00').getTime();
+        if (t.testDate?.toDate) return t.testDate.toDate().getTime();
+    } catch(e) {}
+    return 0;
+}
+
+// ── Test Viewer Modal ────────────────────────────────────────────
+function openTestViewer(testId) {
+    const test = allTests.find(t => t.id === testId);
+    if (!test) return;
+    const mark = allTestMarks[testId];
+
+    document.getElementById('testViewTitle').textContent = test.title || 'Test';
+    document.getElementById('testViewSubtitle').textContent = `${test.subjectName || ''} · ${fmtTestDate(test.testDate)}`;
+
+    const marksCard = document.getElementById('testViewMarksCard');
+    const pendingCard = document.getElementById('testViewMarksPending');
+    const remarksEl = document.getElementById('testViewRemarks');
+
+    if (mark && typeof mark.marksObtained === 'number' && test.maxMarks) {
+        const pct = Math.round((mark.marksObtained / test.maxMarks) * 100);
+        const color = pct >= 75 ? '#34D399' : pct >= 40 ? '#fbbf24' : '#f87171';
+        document.getElementById('testViewMarksValue').textContent = `${mark.marksObtained} / ${test.maxMarks}`;
+        document.getElementById('testViewMarksValue').style.color = color;
+        document.getElementById('testViewMarksPct').textContent = pct + '%';
+        document.getElementById('testViewMarksPct').style.color = color;
+        document.getElementById('testViewMarksBar').style.width = pct + '%';
+        document.getElementById('testViewMarksBar').style.background = pct >= 75 ? 'linear-gradient(90deg,#34D399,#22c55e)' : pct >= 40 ? 'linear-gradient(90deg,#fbbf24,#f59e0b)' : 'linear-gradient(90deg,#f87171,#ef4444)';
+        if (mark.remarks) { remarksEl.style.display = 'block'; remarksEl.textContent = '💬 ' + mark.remarks; }
+        else { remarksEl.style.display = 'none'; }
+        marksCard.style.display = 'block';
+        pendingCard.style.display = 'none';
+    } else {
+        marksCard.style.display = 'none';
+        pendingCard.style.display = 'block';
     }
+
+    // Paper viewer body
+    const body = document.getElementById('testViewBody');
+    if (test.paperType === 'pdf') {
+        body.innerHTML = `
+            <div style="display:flex;gap:8px;margin-bottom:16px">
+                <a href="${test.paperUrl}" target="_blank" style="flex:1;padding:10px;border-radius:0.875rem;background:var(--grad-gold);color:#07070F;font-weight:700;text-align:center;text-decoration:none;font-size:0.875rem;font-family:'Sora',sans-serif">📖 Open PDF</a>
+            </div>
+            <div style="border-radius:0.875rem;padding:1.5rem;text-align:center;font-size:0.875rem;background:rgba(255,255,255,0.03);color:var(--text2)"><p style="font-size:2.5rem;margin-bottom:8px">📄</p><p>Tap <strong style="color:var(--gold2)">Open PDF</strong> to view the question paper.</p></div>`;
+    } else if (test.paperType === 'image') {
+        body.innerHTML = `<img src="${test.paperUrl}" alt="${test.title||'Test paper'}" style="width:100%;border-radius:1rem;border:1px solid var(--card-border)">
+            <a href="${test.paperUrl}" target="_blank" style="display:block;margin-top:10px;text-align:center;font-size:0.8rem;color:var(--gold2);font-weight:600">View full size ↗</a>`;
+    } else {
+        body.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text3)">No paper attached to this test.</div>`;
+    }
+
+    openModal('testViewModal');
 }
 
 // ══════════════════════════════════════════════════════════════
