@@ -68,13 +68,14 @@ h1,h2,h3,.brand,.val,.title{font-family:'Outfit',sans-serif;}
 .hdr-right{display:flex;align-items:center;gap:8px;}
 
 /* ── NAV ── */
-#nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);display:flex;align-items:center;justify-content:space-around;padding:0 6px 6px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);}
-.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;cursor:pointer;border-radius:12px;position:relative;user-select:none;transition:all 0.2s;}
-.ni-icon{font-size:1.2rem;transition:transform 0.2s;}
-.ni-lbl{font-size:0.57rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.04em;transition:color 0.2s;}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--nav-h);display:flex;align-items:center;justify-content:space-around;padding:0 4px 6px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);border-top:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+#nav::-webkit-scrollbar{display:none;}
+.ni{flex:1;min-width:56px;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 3px;cursor:pointer;border-radius:12px;position:relative;user-select:none;transition:all 0.2s;}
+.ni-icon{font-size:1.15rem;transition:transform 0.2s;}
+.ni-lbl{font-size:0.55rem;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.03em;transition:color 0.2s;white-space:nowrap;}
 .ni.on .ni-lbl{color:var(--primary);}
 .ni.on .ni-icon{transform:scale(1.15);}
-.ni-bar{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:30px;height:3px;border-radius:2px;background:var(--primary);opacity:0;transition:opacity 0.2s;}
+.ni-bar{position:absolute;top:4px;left:50%;transform:translateX(-50%);width:26px;height:3px;border-radius:2px;background:var(--primary);opacity:0;transition:opacity 0.2s;}
 .ni.on .ni-bar{opacity:1;}
 
 /* ── WRAP ── */
@@ -134,6 +135,9 @@ textarea.fi{resize:vertical;min-height:80px;}
 .type-btn{padding:9px 4px;border:none;border-radius:9px;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;background:transparent;color:var(--text2);}
 .type-btn.on{background:var(--primary);color:white;box-shadow:0 2px 8px rgba(91,94,244,0.3);}
 
+/* ── TYPE SWITCHER 2-col (for test paper type) ── */
+.type-sw2{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--bg3);border-radius:11px;padding:3px;margin-bottom:16px;}
+
 /* ── SUBJECT ACCORDION ── */
 .subj-item{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius2);margin-bottom:8px;overflow:hidden;}
 .subj-hd{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none;transition:background 0.15s;}
@@ -174,6 +178,9 @@ textarea.fi{resize:vertical;min-height:80px;}
 .badge-p{background:var(--green-bg);color:var(--green);}
 .badge-a{background:var(--red-bg);color:var(--red);}
 .badge-l{background:var(--amber-bg);color:var(--amber);}
+.badge-test{background:var(--pink-bg);color:var(--pink);}
+.badge-pending{background:var(--amber-bg);color:var(--amber);}
+.badge-graded{background:var(--green-bg);color:var(--green);}
 
 /* ── MODAL ── */
 .modal{display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.45);backdrop-filter:blur(8px);padding:16px;align-items:flex-end;justify-content:center;}
@@ -283,6 +290,20 @@ tbody td:first-child{color:var(--text);font-weight:600;}
 .logout-modal-sub{font-size:0.78rem;color:var(--text2);text-align:center;padding:0 24px;margin-bottom:24px;line-height:1.5;}
 .logout-modal-actions{display:flex;gap:10px;padding:0 18px 22px;}
 
+/* ══════════════════════════════════
+   TEST SERIES STYLES
+══════════════════════════════════ */
+.test-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius2);padding:14px;margin-bottom:10px;transition:all 0.18s;cursor:pointer;}
+.test-card:hover{border-color:var(--border2);box-shadow:var(--shadow2);}
+.test-card-hd{display:flex;align-items:flex-start;gap:10px;}
+.test-icon{width:42px;height:42px;border-radius:10px;background:var(--pink-bg);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;}
+.marks-row{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:10px;border:1.5px solid var(--border);background:var(--card);margin:5px 0;transition:all 0.15s;}
+.marks-row.graded{border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.04);}
+.marks-input{width:64px;flex-shrink:0;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;padding:6px 8px;font-size:0.8rem;font-weight:700;text-align:center;font-family:'DM Sans',sans-serif;outline:none;}
+.marks-input:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(91,94,244,0.1);}
+.test-file-prev{display:none;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:8px;background:var(--bg3);}
+.test-file-prev img{width:100%;max-height:160px;object-fit:contain;display:block;background:#000;}
+.subj-score-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius2);padding:14px;margin-bottom:10px;}
 @media(max-width:380px){.stats-grid{grid-template-columns:1fr 1fr;}.mini-grid{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
@@ -373,8 +394,8 @@ tbody td:first-child{color:var(--text);font-weight:600;}
             <div class="mini-card" onclick="goTo('upload');setContentType('video')">
               <div class="mini-icon">🎬</div><div class="mini-lbl">Upload Video</div>
             </div>
-            <div class="mini-card" onclick="goTo('upload');setContentType('notes')">
-              <div class="mini-icon">📄</div><div class="mini-lbl">Upload PDF</div>
+            <div class="mini-card" onclick="goTo('testseries');openModal('addTestModal')">
+              <div class="mini-icon">📝</div><div class="mini-lbl">Add Test</div>
             </div>
           </div>
         </div>
@@ -606,6 +627,79 @@ tbody td:first-child{color:var(--text);font-weight:600;}
     </div>
   </div>
 
+  <!-- ══ PAGE: TEST SERIES ══ -->
+  <div id="pg-testseries" class="pg">
+    <div class="pg-hd">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div class="pg-title">📝 Test Series</div><div class="pg-sub">Create tests · Enter marks · Track scores</div></div>
+        <button class="btn btn-primary btn-sm" onclick="openAddTestModal()">+ Test</button>
+      </div>
+    </div>
+
+    <div class="tab-row" id="tsTabRow">
+      <div class="tab-pill on" id="tstab-tests"  onclick="switchTsTab('tests')">📝 All Tests</div>
+      <div class="tab-pill"   id="tstab-marks"   onclick="switchTsTab('marks')">✍️ Enter Marks</div>
+      <div class="tab-pill"   id="tstab-scores"  onclick="switchTsTab('scores')">🏆 Scoreboard</div>
+    </div>
+
+    <!-- ─── ALL TESTS ─── -->
+    <div id="tssec-tests">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <select class="fi" id="tsListClass" style="flex:1;min-width:100px;padding:8px 12px" onchange="renderTestList()"><option value="">All Classes</option></select>
+        <select class="fi" id="tsListSubject" style="flex:1;min-width:120px;padding:8px 12px" onchange="renderTestList()"><option value="">All Subjects</option></select>
+      </div>
+      <div id="testListWrap">
+        <div class="skel" style="height:74px;margin-bottom:8px;border-radius:12px"></div>
+        <div class="skel" style="height:74px;margin-bottom:8px;border-radius:12px"></div>
+      </div>
+    </div><!-- end tssec-tests -->
+
+    <!-- ─── ENTER MARKS ─── -->
+    <div id="tssec-marks" style="display:none">
+      <div class="card">
+        <div class="card-hd"><div class="card-title">🎯 Select Test</div></div>
+        <div class="card-body">
+          <div class="fg"><label class="fl">Class</label>
+            <select class="fi" id="mkClass" onchange="populateMarksTestDrop()"><option value="">— Select Class —</option></select>
+          </div>
+          <div class="fg"><label class="fl">Test</label>
+            <select class="fi" id="mkTest" onchange="loadMarksStudents()"><option value="">— Select Test —</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="mkCard" style="display:none">
+        <div class="bulk-bar">
+          <span class="bulk-lbl" id="mkTestLabel">—</span>
+          <div style="flex:1"></div>
+          <span id="mkFilledCnt" style="font-size:0.72rem;color:var(--text3);font-weight:600">0 graded</span>
+        </div>
+        <div id="marksStudentList" style="padding:8px 8px 4px">
+          <div class="empty"><div class="empty-icon">🎯</div><div class="empty-title">Select a test to enter marks</div></div>
+        </div>
+        <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px">
+          <button class="btn btn-primary" id="mkSaveBtn" onclick="saveAllMarks()">💾 Save All Marks</button>
+        </div>
+      </div>
+    </div><!-- end tssec-marks -->
+
+    <!-- ─── SCOREBOARD ─── -->
+    <div id="tssec-scores" style="display:none">
+      <div class="card">
+        <div class="card-hd">
+          <div class="card-title">🏆 Subject-wise Scoreboard</div>
+          <select id="scClass" class="fi" style="padding:7px 10px;font-size:0.78rem;width:130px" onchange="loadScoreboard()"><option value="">All Classes</option></select>
+        </div>
+        <div class="card-body" id="scBody">
+          <div class="skel" style="height:60px;margin-bottom:8px"></div>
+          <div class="skel" style="height:60px;margin-bottom:8px"></div>
+          <div class="skel" style="height:60px"></div>
+        </div>
+      </div>
+    </div><!-- end tssec-scores -->
+
+  </div><!-- end pg-testseries -->
+
   <!-- ══ PAGE: PROFILE ══ -->
   <div id="pg-profile" class="pg">
     <div class="pg-hd">
@@ -664,7 +758,6 @@ tbody td:first-child{color:var(--text);font-weight:600;}
           <span style="font-size:0.75rem;color:var(--text2);font-weight:600">Mode</span>
           <span style="font-size:0.75rem;color:var(--primary);font-weight:700">Admin (No Auth)</span>
         </div>
-        <!-- ✅ FIXED: Now calls doLogout() which is properly defined -->
         <button class="btn btn-danger" style="width:100%;justify-content:center;padding:13px" onclick="doLogout()">
           🚪 Logout / Sign Out
         </button>
@@ -672,7 +765,7 @@ tbody td:first-child{color:var(--text);font-weight:600;}
       </div>
     </div>
 
-    <div style="text-align:center;padding:10px 0 4px;font-size:0.68rem;color:var(--text3)">MINDSKYRA Course Manager · v2.0</div>
+    <div style="text-align:center;padding:10px 0 4px;font-size:0.68rem;color:var(--text3)">MINDSKYRA Course Manager · v2.1</div>
   </div>
 
   <!-- BOTTOM NAV -->
@@ -688,6 +781,9 @@ tbody td:first-child{color:var(--text);font-weight:600;}
     </div>
     <div class="ni" onclick="goTo('library')" id="nav-library">
       <div class="ni-bar"></div><div class="ni-icon">📚</div><div class="ni-lbl">Library</div>
+    </div>
+    <div class="ni" onclick="goTo('testseries')" id="nav-testseries">
+      <div class="ni-bar"></div><div class="ni-icon">📝</div><div class="ni-lbl">Tests</div>
     </div>
     <div class="ni" onclick="goTo('profile')" id="nav-profile">
       <div class="ni-bar"></div><div class="ni-icon">👤</div><div class="ni-lbl">Profile</div>
@@ -800,6 +896,78 @@ tbody td:first-child{color:var(--text);font-weight:600;}
   </div>
 </div>
 
+<!-- ══ MODAL: Add Test ══ -->
+<div class="modal" id="addTestModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title">📝 Add New Test</div>
+      <button class="modal-close" onclick="closeModal('addTestModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Class</label>
+        <select class="fi" id="testClass" onchange="populateTestSubjectDrop()">
+          <option value="">— Select Class —</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Subject</label>
+        <select class="fi" id="testSubject"><option value="">— Select Subject —</option></select>
+      </div>
+      <div class="fg"><label class="fl">Test Title</label><input class="fi" id="testTitle" placeholder="e.g. Unit Test 1 — Kinematics"></div>
+      <div class="fg"><label class="fl">Test Date</label><input class="fi" type="date" id="testDate"></div>
+      <div class="fg"><label class="fl">Maximum Marks</label><input class="fi" type="number" id="testMaxMarks" placeholder="e.g. 50" min="1"></div>
+
+      <div class="fg">
+        <label class="fl">Question Paper Type</label>
+        <div class="type-sw2">
+          <button class="type-btn on" id="tt-pdf"   onclick="setTestPaperType('pdf')">📄 PDF</button>
+          <button class="type-btn"    id="tt-image" onclick="setTestPaperType('image')">🖼️ Image</button>
+        </div>
+      </div>
+
+      <div class="drop-zone" id="testDropZone"
+        ondrop="onTestDrop(event)" ondragover="onTestDragOver(event)" ondragleave="onTestDragLeave(event)"
+        onclick="document.getElementById('testFile').click()">
+        <div style="font-size:2.2rem;margin-bottom:8px" id="testDropIcon">📄</div>
+        <div style="font-weight:700;font-size:0.85rem;color:var(--text);margin-bottom:3px">Tap to browse or drag & drop</div>
+        <div style="font-size:0.72rem;color:var(--text2)" id="testDropHint">PDF only · max 100 MB</div>
+      </div>
+      <input type="file" id="testFile" accept="application/pdf,.pdf" style="display:none" onchange="onTestFileSelect(event)">
+      <div id="testFilePrev" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-top:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:1.8rem" id="testFileIcon">📄</div>
+          <div style="flex:1;min-width:0">
+            <div id="testFName" style="font-weight:700;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)"></div>
+            <div id="testFSize" style="font-size:0.7rem;color:var(--text2);margin-top:2px"></div>
+          </div>
+          <button onclick="clearTestFile()" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--red-bg);color:var(--red);cursor:pointer;font-size:0.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">✕</button>
+        </div>
+      </div>
+      <div class="test-file-prev" id="testImgPrevWrap"><img id="testImgPrev" src="" alt=""></div>
+      <div id="testUploadProg" style="display:none;margin-top:10px">
+        <div class="prog-wrap">
+          <div class="prog-row"><span id="testUpStatus">Uploading…</span><span id="testUpPct">0%</span></div>
+          <div class="prog-bar"><div id="testUpFill" class="prog-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="testSaveBtn" style="width:100%;justify-content:center;padding:14px;margin-top:14px" onclick="saveTest()">
+        ☁️ Publish Test
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL: View Test (admin) ══ -->
+<div class="modal" id="viewTestModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <div class="modal-title" id="vtTitle">Test Details</div>
+      <button class="modal-close" onclick="closeModal('viewTestModal')">✕</button>
+    </div>
+    <div class="modal-body" id="vtBody"></div>
+  </div>
+</div>
+
 <script>
 /* ═══════════════════════════════════════════════════
    FIREBASE INIT
@@ -831,6 +999,16 @@ let attMarked   = {};
 let attStudents = [];
 let allClasses  = [];
 
+/* ── Test Series state ── */
+let allTests       = [];   // tests collection cache
+let allTestMarks   = [];   // testMarks collection cache (all, admin-wide)
+let currentTsTab   = 'tests';
+let testPaperType  = 'pdf';
+let pickedTestFile = null;
+let mkStudents     = [];   // students loaded for marks entry
+let mkMarksDraft   = {};   // studentId -> {marksObtained, remarks}
+let allStudentsCache = []; // cache of all students docs for name lookups
+
 /* ═══════════════════════════════════════════════════
    BOOT
 ════════════════════════════════════════════════════ */
@@ -842,8 +1020,9 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('attDateLabel').textContent =
     now.toLocaleDateString('en-IN',{weekday:'short',day:'2-digit',month:'short'});
   document.getElementById('attDate').value = todayStr();
+  document.getElementById('testDate').value = todayStr();
 
-  await Promise.all([loadSubjects(), loadChapters(), loadContent()]);
+  await Promise.all([loadSubjects(), loadChapters(), loadContent(), loadTests()]);
   await loadClasses();
   hideSplash();
   renderDash();
@@ -893,21 +1072,49 @@ async function loadContent() {
   }
 }
 
+/* ── Tests loader (fast, cached, class/subject drops kept fresh) ── */
+async function loadTests() {
+  try {
+    const snap = await db.collection('tests').orderBy('testDate','desc').get();
+    allTests = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) {
+    try {
+      const snap = await db.collection('tests').get();
+      allTests = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+        .sort((a,b) => testSortDate(b) - testSortDate(a));
+    } catch(e2) { console.error('loadTests:', e2); allTests = []; }
+  }
+  updateStats();
+}
+
+function testSortDate(t) {
+  try {
+    if (typeof t.testDate === 'string') return new Date(t.testDate+'T00:00:00').getTime();
+    if (t.testDate?.toDate) return t.testDate.toDate().getTime();
+  } catch(e) {}
+  return 0;
+}
+
 async function loadClasses() {
   try {
     const snap = await db.collection('students').get();
     const set  = new Set();
     subjects.forEach(s => { if (s.class) set.add(String(s.class)); });
+    allStudentsCache = [];
     snap.forEach(d => {
-      const c = d.data().class || d.data().roleData?.class;
+      const dd = d.data();
+      allStudentsCache.push({ id: d.id, ...dd });
+      const c = dd.class || dd.roleData?.class;
       if (c) set.add(String(c));
     });
     allClasses = [...set].sort((a,b) => Number(a)-Number(b) || a.localeCompare(b));
     populateAttClassDrops();
+    populateTestClassDrops();
   } catch(e) {
     const set = new Set(subjects.map(s => String(s.class)).filter(Boolean));
     allClasses = [...set].sort((a,b) => Number(a)-Number(b));
     populateAttClassDrops();
+    populateTestClassDrops();
   }
 }
 
@@ -927,13 +1134,14 @@ function populateAttClassDrops() {
 
 async function refreshAll() {
   showToast('Syncing…','info');
-  await Promise.all([loadSubjects(), loadChapters(), loadContent()]);
+  await Promise.all([loadSubjects(), loadChapters(), loadContent(), loadTests()]);
   await loadClasses();
   renderDash();
   loadTodayAttSummary();
   if (currentPage === 'structure') renderStructure();
   if (currentPage === 'library')  loadLibrary();
   if (currentPage === 'upload')   populateSubjectFilter();
+  if (currentPage === 'testseries') refreshTsView();
   showToast('✅ Synced!','success');
 }
 
@@ -1012,18 +1220,7 @@ async function loadAttStudents() {
   el.innerHTML = '<div style="padding:10px"><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px"></div></div>';
   attMarked = {};
   try {
-    const snap1 = await db.collection('students').where('class','==',cls).get();
-    const snap2 = await db.collection('students').get();
-    const seen  = new Set();
-    const students = [];
-    snap1.forEach(d => { seen.add(d.id); students.push({ id: d.id, ...d.data() }); });
-    snap2.forEach(d => {
-      if (seen.has(d.id)) return;
-      const dd = d.data();
-      if (dd.roleData?.class === cls || String(dd.class) === String(cls)) {
-        students.push({ id: d.id, ...dd });
-      }
-    });
+    const students = getStudentsForClass(cls);
     attStudents = students;
     if (date) {
       const subject = document.getElementById('attSubject').value.trim();
@@ -1040,6 +1237,21 @@ async function loadAttStudents() {
   } catch(e) {
     el.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title" style="color:var(--red)">Error: ${e.message}</div></div>`;
   }
+}
+
+/* Shared helper: get students for a class from cache, refetch if cache empty */
+function getStudentsForClass(cls) {
+  if (allStudentsCache.length) {
+    return allStudentsCache.filter(dd => String(dd.class) === String(cls) || String(dd.roleData?.class) === String(cls));
+  }
+  return [];
+}
+async function ensureStudentsCache() {
+  if (allStudentsCache.length) return;
+  try {
+    const snap = await db.collection('students').get();
+    allStudentsCache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) { console.error('ensureStudentsCache:', e); }
 }
 
 function renderAttStudents() {
@@ -1763,6 +1975,55 @@ function populateChapterFilter() {
 }
 
 /* ═══════════════════════════════════════════════════
+   TEST SERIES — dropdown populators
+════════════════════════════════════════════════════ */
+function populateTestClassDrops() {
+  ['testClass','tsListClass','mkClass','scClass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const first = el.options[0].cloneNode(true);
+    el.innerHTML = ''; el.appendChild(first);
+    allClasses.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c; o.textContent = 'Class ' + c;
+      el.appendChild(o);
+    });
+  });
+}
+
+function populateTestSubjectDrop() {
+  const cls = document.getElementById('testClass').value;
+  const el  = document.getElementById('testSubject');
+  const first = el.options[0].cloneNode(true);
+  el.innerHTML = ''; el.appendChild(first);
+  const filtered = cls ? subjects.filter(s => String(s.class) === String(cls)) : subjects;
+  filtered.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.id; o.dataset.name = s.name; o.textContent = s.name;
+    el.appendChild(o);
+  });
+}
+
+function populateTsListSubjectDrop() {
+  const cls = document.getElementById('tsListClass').value;
+  const el  = document.getElementById('tsListSubject');
+  const first = el.options[0].cloneNode(true);
+  el.innerHTML = ''; el.appendChild(first);
+  const names = [...new Set(
+    (cls ? subjects.filter(s => String(s.class) === String(cls)) : subjects).map(s => s.name)
+  )];
+  names.forEach(n => {
+    const o = document.createElement('option');
+    o.value = n; o.textContent = n;
+    el.appendChild(o);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('tsListClass');
+  if (el) el.addEventListener('change', () => { populateTsListSubjectDrop(); renderTestList(); });
+});
+
+/* ═══════════════════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════════════════════ */
 function goTo(page) {
@@ -1776,6 +2037,7 @@ function goTo(page) {
   if (page === 'library')   loadLibrary();
   if (page === 'upload')    populateSubjectFilter();
   if (page === 'dash')      { loadTodayAttSummary(); updateStats(); }
+  if (page === 'testseries') refreshTsView();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -1887,6 +2149,466 @@ async function gasPost(payload) {
   catch(e) { throw new Error('Apps Script returned non-JSON:\n'+text.substring(0,300)); }
   if (data.success === false || data.error) throw new Error(data.error||'Apps Script returned a failure response');
   return data;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ══════════════════  TEST SERIES MODULE  ═══════════════════════
+   Collections used (must match student dashboard exactly):
+     tests:      { class, subjectName, title, testDate, maxMarks,
+                   paperType('pdf'|'image'), paperUrl, createdAt }
+     testMarks:  { testId, studentId, studentName, class, subjectName,
+                   marksObtained, remarks, gradedAt }
+════════════════════════════════════════════════════════════════ */
+
+function switchTsTab(tab) {
+  currentTsTab = tab;
+  ['tests','marks','scores'].forEach(t => {
+    document.getElementById('tstab-'+t)?.classList.toggle('on', t === tab);
+    const sec = document.getElementById('tssec-'+t);
+    if (sec) sec.style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'tests')  renderTestList();
+  if (tab === 'marks')  { /* waits for class/test selection */ }
+  if (tab === 'scores') loadScoreboard();
+}
+
+async function refreshTsView() {
+  await ensureStudentsCache();
+  populateTestClassDrops();
+  populateTestSubjectDrop();
+  populateTsListSubjectDrop();
+  if (currentTsTab === 'tests')  renderTestList();
+  if (currentTsTab === 'scores') loadScoreboard();
+}
+
+/* ── Add Test modal open (fresh state) ── */
+function openAddTestModal() {
+  clearForm(['testTitle','testMaxMarks']);
+  document.getElementById('testClass').value = '';
+  document.getElementById('testSubject').innerHTML = '<option value="">— Select Subject —</option>';
+  document.getElementById('testDate').value = todayStr();
+  setTestPaperType('pdf');
+  clearTestFile();
+  openModal('addTestModal');
+}
+
+/* ── Paper type switch (pdf / image) ── */
+function setTestPaperType(type) {
+  testPaperType = type;
+  document.getElementById('tt-pdf')?.classList.toggle('on', type === 'pdf');
+  document.getElementById('tt-image')?.classList.toggle('on', type === 'image');
+  const fileInput = document.getElementById('testFile');
+  fileInput.accept = type === 'pdf' ? 'application/pdf,.pdf' : 'image/*';
+  document.getElementById('testDropIcon').textContent = type === 'pdf' ? '📄' : '🖼️';
+  document.getElementById('testDropHint').textContent = type === 'pdf' ? 'PDF only · max 100 MB' : 'JPG / PNG · max 20 MB';
+  clearTestFile();
+}
+
+/* ── File pick / drag-drop for test paper ── */
+function onTestFileSelect(e) { if (e.target.files[0]) setTestFilePrev(e.target.files[0]); }
+function onTestDrop(e) {
+  e.preventDefault();
+  document.getElementById('testDropZone').classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f) setTestFilePrev(f);
+}
+function onTestDragOver(e) { e.preventDefault(); document.getElementById('testDropZone').classList.add('drag-over'); }
+function onTestDragLeave()  { document.getElementById('testDropZone').classList.remove('drag-over'); }
+
+function setTestFilePrev(file) {
+  if (testPaperType === 'pdf') {
+    if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) { showToast('Please select a PDF file','error'); return; }
+    if (file.size > 100*1024*1024) { showToast('File too large (max 100 MB)','error'); return; }
+    document.getElementById('testImgPrevWrap').style.display = 'none';
+  } else {
+    if (!file.type.startsWith('image/')) { showToast('Please select an image file','error'); return; }
+    if (file.size > 20*1024*1024) { showToast('Image too large (max 20 MB)','error'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById('testImgPrev').src = ev.target.result;
+      document.getElementById('testImgPrevWrap').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+  pickedTestFile = file;
+  document.getElementById('testFileIcon').textContent = testPaperType === 'pdf' ? '📄' : '🖼️';
+  document.getElementById('testFName').textContent = file.name;
+  document.getElementById('testFSize').textContent = (file.size/(1024*1024)).toFixed(2)+' MB';
+  document.getElementById('testFilePrev').style.display = 'block';
+  document.getElementById('testDropZone').classList.add('has-file');
+}
+function clearTestFile() {
+  pickedTestFile = null;
+  document.getElementById('testFile').value = '';
+  document.getElementById('testFilePrev').style.display = 'none';
+  document.getElementById('testImgPrevWrap').style.display = 'none';
+  document.getElementById('testDropZone').classList.remove('has-file');
+}
+function setTestUpProg(pct, status) {
+  document.getElementById('testUpFill').style.width   = pct+'%';
+  document.getElementById('testUpPct').textContent    = pct+'%';
+  document.getElementById('testUpStatus').textContent = status;
+}
+
+/* ── Save/publish a test: upload paper to Drive via existing GAS, write Firestore doc ── */
+async function saveTest() {
+  const cls      = document.getElementById('testClass').value;
+  const subjSel  = document.getElementById('testSubject');
+  const subjId   = subjSel.value;
+  const subjName = subjSel.selectedOptions[0]?.dataset?.name || subjSel.selectedOptions[0]?.textContent || '';
+  const title    = document.getElementById('testTitle').value.trim();
+  const date     = document.getElementById('testDate').value;
+  const maxMarks = parseInt(document.getElementById('testMaxMarks').value, 10);
+
+  if (!cls)      { showToast('Select a class','error'); return; }
+  if (!subjId)   { showToast('Select a subject','error'); return; }
+  if (!title)    { showToast('Enter a test title','error'); return; }
+  if (!date)     { showToast('Select a test date','error'); return; }
+  if (!maxMarks || maxMarks <= 0) { showToast('Enter valid maximum marks','error'); return; }
+  if (!pickedTestFile) { showToast(`Select a ${testPaperType === 'pdf' ? 'PDF' : 'image'} file`,'error'); return; }
+
+  const btn = document.getElementById('testSaveBtn');
+  btn.disabled = true; btn.innerHTML = '⏳ Publishing…';
+  document.getElementById('testUploadProg').style.display = 'block';
+  setTestUpProg(5, 'Reading file…');
+
+  try {
+    setTestUpProg(15, 'Converting to base64…');
+    const base64Data = await fileToBase64(pickedTestFile);
+
+    setTestUpProg(30, 'Creating Drive folders…');
+    const sub = subjects.find(s => s.id === subjId);
+    const structRes = await gasPost({
+      action: 'createCourseStructure',
+      className:   String(cls),
+      subjectName: subjName || sub?.name || 'Subject',
+      chapterName: 'TestSeries'
+    });
+    const folderId = structRes?.structure?.dpp || structRes?.structure?.notes || structRes?.structure?.videos || '';
+    if (!folderId) throw new Error('Could not get Drive folder ID from Apps Script.');
+
+    setTestUpProg(55, `Uploading ${testPaperType === 'pdf' ? 'PDF' : 'image'} to Google Drive…`);
+    const upRes = await gasPost({
+      action: 'uploadContent', folderId,
+      file: base64Data, fileName: pickedTestFile.name,
+      mimeType: pickedTestFile.type || (testPaperType === 'pdf' ? 'application/pdf' : 'image/jpeg'),
+      contentType: 'test',
+      metadata: { title, class: String(cls), subjectId: subjId }
+    });
+    const driveUrl  = upRes?.url || upRes?.driveUrl || '';
+    const directUrl = upRes?.directUrl || driveUrl;
+    if (!driveUrl) throw new Error('Apps Script did not return a Drive URL.');
+
+    setTestUpProg(85, 'Saving test…');
+    const ref = await db.collection('tests').add({
+      class: String(cls),
+      subjectId: subjId,
+      subjectName: subjName || sub?.name || '',
+      title,
+      testDate: date,
+      maxMarks,
+      paperType: testPaperType,
+      paperUrl: directUrl || driveUrl,
+      driveUrl,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    allTests.unshift({ id: ref.id, class: String(cls), subjectId: subjId, subjectName: subjName || sub?.name || '', title, testDate: date, maxMarks, paperType: testPaperType, paperUrl: directUrl || driveUrl });
+
+    setTestUpProg(100, '✅ Done!');
+    setTimeout(() => { document.getElementById('testUploadProg').style.display = 'none'; }, 1200);
+    showToast('✅ Test published! Students can now view it.', 'success');
+    closeModal('addTestModal');
+    updateStats();
+    if (currentPage === 'testseries') renderTestList();
+  } catch(e) {
+    console.error('Test publish error:', e);
+    document.getElementById('testUploadProg').style.display = 'none';
+    showToast('❌ '+e.message, 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '☁️ Publish Test';
+}
+
+/* ── All Tests list (filterable by class/subject, fast client-side) ── */
+function renderTestList() {
+  const el  = document.getElementById('testListWrap');
+  if (!el) return;
+  const cls  = document.getElementById('tsListClass')?.value || '';
+  const subj = document.getElementById('tsListSubject')?.value || '';
+
+  let list = [...allTests];
+  if (cls)  list = list.filter(t => String(t.class) === String(cls));
+  if (subj) list = list.filter(t => t.subjectName === subj);
+  list.sort((a,b) => testSortDate(b) - testSortDate(a));
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📝</div><div class="empty-title">No tests found</div><div class="empty-sub">Tap + Test to publish one</div></div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(t => {
+    const gradedCount = allTestMarks.filter(m => m.testId === t.id && typeof m.marksObtained === 'number').length;
+    const icon = t.paperType === 'image' ? '🖼️' : '📄';
+    return `<div class="test-card" onclick="viewTestAdmin('${t.id}')">
+      <div class="test-card-hd">
+        <div class="test-icon">${icon}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:700;font-size:0.86rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(t.title||'Untitled Test')}</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:5px">
+            ${t.subjectName ? `<span class="cls-tag">${esc(t.subjectName)}</span>` : ''}
+            <span class="cls-tag">Cls ${esc(t.class||'—')}</span>
+            <span class="badge badge-test">Max ${t.maxMarks||'—'}</span>
+          </div>
+          <div style="font-size:0.68rem;color:var(--text2);margin-top:5px">📅 ${formatDate(t.testDate)} &nbsp;·&nbsp; ✅ ${gradedCount} graded</div>
+        </div>
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();deleteTest('${t.id}')" style="flex-shrink:0">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function viewTestAdmin(testId) {
+  const t = allTests.find(x => x.id === testId);
+  if (!t) return;
+  document.getElementById('vtTitle').textContent = t.title || 'Test';
+  document.getElementById('vtBody').innerHTML = '<div class="skel" style="height:52px"></div>';
+  openModal('viewTestModal');
+
+  try {
+    let snap;
+    try { snap = await db.collection('testMarks').where('testId','==',testId).get(); }
+    catch(e) { snap = await db.collection('testMarks').where('testId','==',testId).get(); }
+    const marks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const graded = marks.filter(m => typeof m.marksObtained === 'number');
+    const avgPct = graded.length ? Math.round(graded.reduce((s,m) => s + (m.marksObtained/t.maxMarks*100), 0) / graded.length) : 0;
+
+    document.getElementById('vtBody').innerHTML = `
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        ${t.subjectName ? `<span class="cls-tag">${esc(t.subjectName)}</span>` : ''}
+        <span class="cls-tag">Cls ${esc(t.class||'—')}</span>
+        <span class="badge badge-test">Max ${t.maxMarks}</span>
+        <span style="font-size:0.72rem;color:var(--text2)">📅 ${formatDate(t.testDate)}</span>
+      </div>
+      <div class="stats-grid" style="margin-bottom:10px">
+        <div class="stat-box"><div class="stat-val" style="color:var(--primary);font-size:1.3rem">${graded.length}</div><div class="stat-lbl">Graded</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--green);font-size:1.3rem">${avgPct}%</div><div class="stat-lbl">Class Avg</div></div>
+      </div>
+      <a href="${t.paperUrl||t.driveUrl}" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;margin-bottom:10px">📖 Open Question Paper</a>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center;padding:12px" onclick="closeModal('viewTestModal');switchTsTab('marks');document.getElementById('mkClass').value='${t.class}';populateMarksTestDrop();setTimeout(()=>{document.getElementById('mkTest').value='${t.id}';loadMarksStudents();},150)">✍️ Enter / Edit Marks</button>
+    `;
+  } catch(e) {
+    document.getElementById('vtBody').innerHTML = `<div style="color:var(--red);font-size:0.8rem">Error: ${e.message}</div>`;
+  }
+}
+
+async function deleteTest(testId) {
+  if (!confirm('Delete this test and all its marks? This cannot be undone.')) return;
+  try {
+    const marksSnap = await db.collection('testMarks').where('testId','==',testId).get();
+    const batch = db.batch();
+    batch.delete(db.collection('tests').doc(testId));
+    marksSnap.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    allTests = allTests.filter(t => t.id !== testId);
+    allTestMarks = allTestMarks.filter(m => m.testId !== testId);
+    renderTestList();
+    updateStats();
+    showToast('🗑 Test deleted','info');
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+}
+
+/* ── Enter Marks tab ── */
+function populateMarksTestDrop() {
+  const cls = document.getElementById('mkClass').value;
+  const el  = document.getElementById('mkTest');
+  el.innerHTML = '<option value="">— Select Test —</option>';
+  document.getElementById('mkCard').style.display = 'none';
+  if (!cls) return;
+  const filtered = allTests.filter(t => String(t.class) === String(cls)).sort((a,b) => testSortDate(b)-testSortDate(a));
+  filtered.forEach(t => {
+    const o = document.createElement('option');
+    o.value = t.id; o.textContent = `${t.title} — ${t.subjectName||''} (${formatDate(t.testDate)})`;
+    el.appendChild(o);
+  });
+}
+
+async function loadMarksStudents() {
+  const testId = document.getElementById('mkTest').value;
+  const listEl = document.getElementById('marksStudentList');
+  const card   = document.getElementById('mkCard');
+  if (!testId) { card.style.display = 'none'; return; }
+
+  const t = allTests.find(x => x.id === testId);
+  if (!t) return;
+  card.style.display = 'block';
+  document.getElementById('mkTestLabel').textContent = `${t.title} · Max ${t.maxMarks}`;
+  listEl.innerHTML = '<div style="padding:10px"><div class="skel" style="height:50px;margin-bottom:8px"></div><div class="skel" style="height:50px"></div></div>';
+
+  await ensureStudentsCache();
+  mkStudents = getStudentsForClass(t.class);
+  mkMarksDraft = {};
+
+  try {
+    const snap = await db.collection('testMarks').where('testId','==',testId).get();
+    snap.forEach(d => {
+      const dd = d.data();
+      mkMarksDraft[dd.studentId] = { marksObtained: dd.marksObtained, remarks: dd.remarks || '', docId: d.id };
+    });
+  } catch(e) { console.error('loadMarksStudents marks fetch:', e); }
+
+  renderMarksStudents(t.maxMarks);
+  updateMkCount();
+}
+
+function renderMarksStudents(maxMarks) {
+  const el = document.getElementById('marksStudentList');
+  if (!mkStudents.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No students in this class</div></div>`;
+    return;
+  }
+  el.innerHTML = mkStudents.map(s => {
+    const name = s.fullName || ((s.firstName||'') + ' ' + (s.lastName||'')).trim() || 'Student';
+    const draft = mkMarksDraft[s.id];
+    const val = draft?.marksObtained ?? '';
+    const graded = typeof draft?.marksObtained === 'number';
+    return `<div class="marks-row ${graded?'graded':''}" id="mkrow-${s.id}">
+      <div class="s-ava" style="width:30px;height:30px;font-size:0.7rem">${name.charAt(0).toUpperCase()}</div>
+      <div class="s-info">
+        <div class="s-name">${esc(name)}</div>
+        <div class="s-meta">Roll ${s.rollNumber || s.id.slice(-4).toUpperCase()}</div>
+      </div>
+      <input type="number" class="marks-input" id="mkval-${s.id}" placeholder="—" min="0" max="${maxMarks}" value="${val}"
+        oninput="onMarkInput('${s.id}', this.value, ${maxMarks})">
+    </div>`;
+  }).join('');
+}
+
+function onMarkInput(studentId, val, maxMarks) {
+  const row = document.getElementById('mkrow-'+studentId);
+  const num = val === '' ? null : Math.max(0, Math.min(maxMarks, parseFloat(val)));
+  if (!mkMarksDraft[studentId]) mkMarksDraft[studentId] = {};
+  mkMarksDraft[studentId].marksObtained = num;
+  if (row) row.classList.toggle('graded', typeof num === 'number' && !isNaN(num));
+  updateMkCount();
+}
+
+function updateMkCount() {
+  const cnt = Object.values(mkMarksDraft).filter(v => typeof v.marksObtained === 'number' && !isNaN(v.marksObtained)).length;
+  const el = document.getElementById('mkFilledCnt');
+  if (el) el.textContent = `${cnt} / ${mkStudents.length} graded`;
+}
+
+async function saveAllMarks() {
+  const testId = document.getElementById('mkTest').value;
+  if (!testId) { showToast('Select a test first','error'); return; }
+  const t = allTests.find(x => x.id === testId);
+  if (!t) return;
+
+  const btn = document.getElementById('mkSaveBtn');
+  btn.disabled = true; btn.textContent = '⏳ Saving…';
+  try {
+    const batch = db.batch();
+    let count = 0;
+    for (const s of mkStudents) {
+      const draft = mkMarksDraft[s.id];
+      if (!draft || typeof draft.marksObtained !== 'number' || isNaN(draft.marksObtained)) continue;
+      const name = s.fullName || ((s.firstName||'') + ' ' + (s.lastName||'')).trim();
+      const data = {
+        testId, studentId: s.id, studentName: name,
+        class: String(t.class), subjectName: t.subjectName || '',
+        marksObtained: draft.marksObtained,
+        remarks: draft.remarks || '',
+        gradedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+      if (draft.docId) batch.update(db.collection('testMarks').doc(draft.docId), data);
+      else batch.set(db.collection('testMarks').doc(), data);
+      count++;
+    }
+    if (count === 0) { showToast('Enter at least one mark first','error'); btn.disabled=false; btn.textContent='💾 Save All Marks'; return; }
+    await batch.commit();
+    showToast(`✅ Saved marks for ${count} students!`, 'success');
+    await loadMarksStudents(); // refresh docIds
+    renderTestList();
+  } catch(e) { showToast('Error: '+e.message,'error'); }
+  finally { btn.disabled = false; btn.textContent = '💾 Save All Marks'; }
+}
+
+/* ── Scoreboard tab: subject-wise average score per student ── */
+async function loadScoreboard() {
+  const cls = document.getElementById('scClass')?.value || '';
+  const el  = document.getElementById('scBody');
+  if (!el) return;
+  el.innerHTML = '<div class="skel" style="height:60px;margin-bottom:8px"></div>'.repeat(3);
+
+  try {
+    let testsInScope = cls ? allTests.filter(t => String(t.class) === String(cls)) : allTests;
+    if (!testsInScope.length) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div><div class="empty-title">No tests yet</div><div class="empty-sub">Publish a test to see scores here</div></div>`;
+      return;
+    }
+    const testIds = new Set(testsInScope.map(t => t.id));
+    const testById = {}; testsInScope.forEach(t => testById[t.id] = t);
+
+    let snap;
+    if (cls) snap = await db.collection('testMarks').where('class','==',String(cls)).get();
+    else     snap = await db.collection('testMarks').get();
+
+    const marks = snap.docs.map(d => d.data()).filter(m => testIds.has(m.testId) && typeof m.marksObtained === 'number');
+
+    if (!marks.length) {
+      el.innerHTML = `<div class="empty"><div class="empty-icon">🏆</div><div class="empty-title">No graded tests yet</div><div class="empty-sub">Enter marks to populate the scoreboard</div></div>`;
+      return;
+    }
+
+    // Group: studentId -> subjectName -> { sumPct, count, best }
+    const byStudent = {};
+    marks.forEach(m => {
+      const t = testById[m.testId];
+      if (!t || !t.maxMarks) return;
+      const pct = (m.marksObtained / t.maxMarks) * 100;
+      const key = m.studentId;
+      if (!byStudent[key]) byStudent[key] = { name: m.studentName || '?', class: m.class || cls || '—', subjects: {}, overallSum: 0, overallCnt: 0 };
+      const sd = byStudent[key];
+      const subj = m.subjectName || 'General';
+      if (!sd.subjects[subj]) sd.subjects[subj] = { sum: 0, cnt: 0, best: 0 };
+      sd.subjects[subj].sum += pct;
+      sd.subjects[subj].cnt += 1;
+      sd.subjects[subj].best = Math.max(sd.subjects[subj].best, pct);
+      sd.overallSum += pct;
+      sd.overallCnt += 1;
+    });
+
+    const entries = Object.values(byStudent).sort((a,b) => (b.overallSum/b.overallCnt) - (a.overallSum/a.overallCnt));
+
+    el.innerHTML = entries.map(s => {
+      const overallPct = Math.round(s.overallSum / s.overallCnt);
+      const overallCol = overallPct >= 75 ? 'var(--green)' : overallPct >= 40 ? 'var(--amber)' : 'var(--red)';
+      const subjRows = Object.entries(s.subjects).map(([subj, d]) => {
+        const avg = Math.round(d.sum / d.cnt);
+        const col = avg >= 75 ? 'var(--green)' : avg >= 40 ? 'var(--amber)' : 'var(--red)';
+        return `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-top:1px solid var(--border)">
+          <div style="font-size:0.76rem;color:var(--text2)">${esc(subj)} <span style="color:var(--text3)">(${d.cnt} test${d.cnt!==1?'s':''})</span></div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="prog-bar" style="width:60px"><div class="prog-fill" style="width:${avg}%;background:${col}"></div></div>
+            <span style="font-weight:800;font-size:0.78rem;color:${col};min-width:34px;text-align:right">${avg}%</span>
+          </div>
+        </div>`;
+      }).join('');
+      return `<div class="subj-score-card">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#5B5EF4,#818CF8);display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:0.85rem;flex-shrink:0">${s.name.charAt(0).toUpperCase()}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:800;font-size:0.86rem;color:var(--text)">${esc(s.name)} <span class="cls-tag">Cls ${s.class}</span></div>
+            <div style="font-size:0.68rem;color:var(--text2);margin-top:1px">Overall average across ${s.overallCnt} test${s.overallCnt!==1?'s':''}</div>
+          </div>
+          <div style="font-weight:800;color:${overallCol};font-size:1.15rem;flex-shrink:0">${overallPct}%</div>
+        </div>
+        ${subjRows}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--red);padding:12px;font-size:0.8rem">Error: ${e.message}</div>`;
+  }
 }
 </script>
 </body>
