@@ -77,6 +77,8 @@
         .badge-pending  { background:#FEF3C7; color:#92400E; }
         .badge-approved { background:#D1FAE5; color:#065F46; }
         .badge-rejected { background:#FEE2E2; color:#991B1B; }
+        .badge-locked   { background:#FEE2E2; color:#991B1B; }
+        .badge-active   { background:#D1FAE5; color:#065F46; }
 
         /* FEE PILLS */
         .fee-pill { display:inline-flex; align-items:center; padding:0.2rem 0.55rem; border-radius:9999px; font-size:0.68rem; font-weight:600; white-space:nowrap; }
@@ -85,12 +87,16 @@
         .fee-pill-net    { background:#DBEAFE; color:#1E40AF; }
         .fee-pill-paid   { background:#D1FAE5; color:#065F46; }
         .fee-pill-due    { background:#FEE2E2; color:#991B1B; }
+        .fee-pill-locked { background:#991B1B; color:#FFFFFF; }
+        .fee-pill-warn   { background:#FDE68A; color:#78350F; }
 
         /* BUTTONS */
         .btn-primary { background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%); transition:all 0.25s; }
         .btn-primary:hover { transform:translateY(-1px); box-shadow:0 10px 20px -5px rgba(79,70,229,0.4); }
         .table-row { transition:background 0.15s; }
         .table-row:hover { background:#F9FAFB; }
+        .table-row.row-locked { background:#FEF2F2; }
+        .table-row.row-locked:hover { background:#FEE2E2; }
 
         .fee-card-collected { background:linear-gradient(135deg,#10B981,#059669); }
         .fee-card-pending   { background:linear-gradient(135deg,#F59E0B,#D97706); }
@@ -159,6 +165,11 @@
             #courseModal .col-span-2, #courseModal .col-span-3 { width:100% !important; max-width:100% !important; border-right:none !important; padding-right:0 !important; border-top:1px solid #E5E7EB; padding-top:1rem; }
             #courseModal .col-span-2 { max-height:200px !important; }
         }
+
+        /* LOCK SYSTEM */
+        .lock-toggle-btn { display:inline-flex; align-items:center; gap:4px; padding:2px 5px; border-radius:4px; font-size:0.72rem; cursor:pointer; transition:background 0.15s; }
+        .lock-toggle-btn:hover { background:rgba(0,0,0,0.08); }
+        .skeleton-row td { padding:1rem 1.5rem; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800">
@@ -241,6 +252,9 @@
         <div class="bg-gray-50 rounded-xl p-4 mb-5 flex items-center gap-4">
             <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg" id="offerStudentAvatar">S</div>
             <div><div class="font-bold text-gray-900 text-base" id="offerStudentName">Student Name</div><div class="text-sm text-gray-500" id="offerStudentClass">Class 10 • Online</div></div>
+        </div>
+        <div id="offerFeeWarning" class="hidden mb-4 p-3 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-800">
+            ⚠️ No base fee is configured for this student's class/board combination. Set it in <strong>Fee Management → Base Fee Settings</strong> first, otherwise the base fee shown here will be ₹0.
         </div>
         <div class="mb-5">
             <div class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Fee Breakdown</div>
@@ -415,6 +429,9 @@
                     <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold" id="feeStudentAvatar">S</div>
                     <div><div class="font-bold text-gray-800" id="feeStudentName">—</div><div class="text-sm text-gray-600" id="feeStudentClass">—</div></div>
                 </div>
+                <div id="feeCollectWarning" class="hidden mb-2 p-2 bg-amber-50 border border-amber-300 rounded-lg text-xs text-amber-800">
+                    ⚠️ No base fee configured for this student's class/board. Set it in Fee Management → Base Fee Settings.
+                </div>
                 <div class="grid grid-cols-3 gap-2 text-center mt-2">
                     <div class="bg-white rounded-lg p-2"><div class="text-xs text-purple-600 font-semibold">Base Fee</div><div class="text-sm font-bold text-purple-900" id="collectBaseFee">₹0</div></div>
                     <div class="bg-white rounded-lg p-2"><div class="text-xs text-orange-600 font-semibold">Offer</div><div class="text-sm font-bold text-orange-900" id="collectOfferAmt">₹0</div></div>
@@ -439,6 +456,27 @@
                 <button type="submit" class="flex-1 py-2 bg-green-600 text-white rounded-lg font-semibold">✅ Confirm Collection</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- ══════════════════ LOCK / UNLOCK MODAL ══════════════════ -->
+<div id="lockModal" class="modal">
+    <div class="modal-content" style="max-width:420px;">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4" id="lockModalIconWrap">
+                <svg class="w-8 h-8 text-red-600" id="lockModalIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2" id="lockModalTitle">Lock Access</h3>
+            <p class="text-gray-600 text-sm" id="lockModalMessage">This will freeze the student's dashboard — they won't be able to view notes, videos, or DPPs until fees are cleared and access is restored.</p>
+        </div>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1" id="lockReasonLabel">Reason (visible to student)</label>
+            <textarea id="lockReasonText" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" placeholder="e.g. Fee payment overdue for 2025-26"></textarea>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeModal('lockModal')" class="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg">Cancel</button>
+            <button id="confirmLockBtn" class="flex-1 py-2 bg-red-600 text-white rounded-lg font-semibold">Lock Student</button>
+        </div>
     </div>
 </div>
 
@@ -544,10 +582,23 @@
                 </div>
             </div>
         </header>
-
+                        
         <main>
             <!-- ═══ OVERVIEW ═══ -->
             <div id="page-overview" class="page active">
+                <div id="orphanedPaymentsBanner" class="hidden mb-6 p-4 bg-amber-50 border-2 border-amber-300 rounded-xl">
+                    <div class="flex items-start justify-between gap-3 flex-wrap mb-3">
+                        <div class="flex items-start gap-3">
+                            <span class="text-2xl flex-shrink-0">💸</span>
+                            <div>
+                                <div class="font-bold text-amber-900">Unlinked payment records found</div>
+                                <div class="text-sm text-amber-800 mt-0.5" id="orphanedPaymentsSummary">Checking...</div>
+                            </div>
+                        </div>
+                        <button onclick="cleanAllOrphanedPayments()" class="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 flex-shrink-0">Remove All</button>
+                    </div>
+                    <div id="orphanedPaymentsList" class="space-y-2 max-h-64 overflow-y-auto"></div>
+                </div>
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div class="card p-6 border-l-4 border-primary"><div class="text-sm text-gray-600 font-medium mb-2">Total Students</div><div class="text-3xl font-bold text-gray-800" id="totalStudents">0</div><div class="text-sm text-green-600 mt-1">Active</div></div>
                     <div class="card p-6 border-l-4 border-secondary"><div class="text-sm text-gray-600 font-medium mb-2">Total Teachers</div><div class="text-3xl font-bold text-gray-800" id="totalTeachers">0</div><div class="text-sm text-gray-500 mt-1">Registered</div></div>
@@ -619,11 +670,26 @@
 
             <!-- ═══ FEES ═══ -->
             <div id="page-fees" class="page">
-                <h2 class="text-2xl font-bold mb-6">Fee Management</h2>
+                <div class="flex items-center justify-between mb-6 flex-wrap gap-3">
+                    <h2 class="text-2xl font-bold">Fee Management</h2>
+                    <button onclick="runReconcileWithConfirm()" id="reconcileBtn" class="px-4 py-2 bg-indigo-50 border-2 border-indigo-200 text-indigo-700 rounded-lg font-medium text-sm hover:bg-indigo-100 transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        Reconcile Fee Data
+                    </button>
+                </div>
+                <p class="text-xs text-gray-400 -mt-4 mb-6 max-w-2xl">If a student's payment was approved but "Paid" still shows ₹0, click Reconcile — it re-sums every approved payment from the payments collection and corrects any student record that's out of sync.</p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                     <div class="card p-6 fee-card-collected text-white"><div class="text-sm opacity-90 mb-2">Total Collected</div><div class="text-3xl font-bold" id="totalCollected">₹0</div><div class="text-sm mt-1 opacity-90">All time</div></div>
                     <div class="card p-6 fee-card-pending text-white"><div class="text-sm opacity-90 mb-2">Pending Amount</div><div class="text-3xl font-bold" id="totalPending">₹0</div><div class="text-sm mt-1 opacity-90">Awaiting payment</div></div>
                     <div class="card p-6 fee-card-overdue text-white"><div class="text-sm opacity-90 mb-2">Total Discounts Given</div><div class="text-3xl font-bold" id="totalDiscounts">₹0</div><div class="text-sm mt-1 opacity-90">Offer/bargain reductions</div></div>
+                </div>
+
+                <div id="feeConfigWarningBanner" class="hidden mb-6 p-4 bg-amber-50 border-2 border-amber-300 rounded-xl flex items-start gap-3">
+                    <span class="text-2xl flex-shrink-0">⚠️</span>
+                    <div class="text-sm">
+                        <div class="font-bold text-amber-900">Some students have no base fee configured</div>
+                        <div class="text-amber-800 mt-1" id="feeConfigWarningText">Open DevTools console for the full list, or go to Base Fee Settings to configure missing classes/boards.</div>
+                    </div>
                 </div>
 
                 <!-- Fee Tabs -->
@@ -661,7 +727,10 @@
 
                 <!-- History -->
                 <div id="fee-section-history" class="hidden card p-6">
-                    <h3 class="font-bold mb-4">Recent Transactions</h3>
+                    <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                        <h3 class="font-bold">Recent Transactions</h3>
+                        <input type="text" id="feeHistorySearch" placeholder="Search by student, mode, or collected by..." class="px-4 py-2 border border-gray-300 rounded-lg w-full sm:w-72 text-sm" onkeyup="searchFeeHistory()">
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="w-full">
                             <thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th><th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Student</th><th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Amount</th><th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Mode</th><th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Collected By</th></tr></thead>
@@ -832,6 +901,47 @@
 
 <script>
 // ═══════════════════════════════════════════════════════
+// STATE — declared FIRST, before any function, listener, or config that
+// could reference them. Using `var` (function-scoped, hoisted AND
+// initialized to undefined immediately) instead of `let`/`const` here
+// specifically avoids the "Cannot access '_studentsCacheAt' before
+// initialization" TDZ error: with `let`, the variable exists but is
+// uninitialized until its declaration line runs, so any inline HTML
+// handler, early listener callback, or out-of-order call that touches it
+// beforehand throws. `var` has no such dead zone — worst case it reads as
+// undefined (harmless: Date.now()-undefined = NaN, NaN < TTL = false, so
+// the cache is just treated as stale) instead of crashing.
+// ═══════════════════════════════════════════════════════
+var currentAdmin      = null;
+var selectedPaymentId = null;
+var selectedStudentId = null;
+var deleteCallback    = null;
+var lockCallback      = null;
+var classFeeSettings  = {};
+var cbseFeeSettings   = {};
+var offerStudentData  = null;
+
+// Cache of the last-loaded students snapshot so multiple views (Students
+// table, Fee Collection grid, Fee stats) can reuse one read instead of
+// each firing its own db.collection('students').get().
+var _studentsCache      = [];
+var _studentsCacheAt    = 0;
+var STUDENTS_CACHE_TTL  = 15000; // 15s — short enough to stay fresh, long enough to dedupe bursts of calls
+
+// Course Manager State
+var selectedSubjectId   = null;
+var selectedChapterId   = null;
+var selectedChapterName = '';
+var currentContentType  = 'video';
+var contentFile         = null;
+var _subjMap = {};
+var _chapMap = {};
+
+// Dedupe set for repeat fee-config console warnings (used by
+// getStudentBaseFee / checkForMissingFeeConfig further down).
+var _missingFeeConfigWarnings = new Set();
+
+// ═══════════════════════════════════════════════════════
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzY5dUqfwAdHk1iSav4kIowOgVNk6KCkfIzH2KTf4-FSChUX6hQvruQwyVCbHl_hUk2/exec';
@@ -849,22 +959,13 @@ const auth   = firebase.auth();
 const db     = firebase.firestore();
 const storage = firebase.storage();
 
-let currentAdmin      = null;
-let selectedPaymentId = null;
-let selectedStudentId = null;
-let deleteCallback    = null;
-let classFeeSettings  = {};
-let cbseFeeSettings   = {};
-let offerStudentData  = null;
-
-// Course Manager State
-let selectedSubjectId   = null;
-let selectedChapterId   = null;
-let selectedChapterName = '';
-let currentContentType  = 'video';
-let contentFile         = null;
-const _subjMap = {};
-const _chapMap = {};
+// Enable offline persistence + multi-tab support — meaningfully reduces
+// redundant reads on repeat visits and makes the UI feel faster.
+db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+    // Non-fatal: multiple tabs open without multi-tab support, or browser
+    // doesn't support it (Safari private mode, etc). App still works.
+    console.warn('Firestore persistence not enabled:', err.code);
+});
 
 // ═══════════════════════════════════════════════════════
 // AUTH
@@ -886,16 +987,165 @@ auth.onAuthStateChanged(async (user) => {
         document.getElementById('sidebarAvatar').textContent     = _init;
 
         await loadClassFeeSettings();
-        loadDashboardData();
-        loadAdmissions();
-        loadStudents();
-        loadTeachers();
-        loadPayments();
-        loadFeeStats();
-        loadCourseStats();
-        loadAnnouncements();
+        // Fire independent reads in parallel instead of sequentially —
+        // this alone noticeably cuts first-paint time on the dashboard.
+        await Promise.all([
+            loadDashboardData(),
+            loadAdmissions(),
+            loadStudents(),
+            loadTeachers(),
+            loadPayments(),
+            loadFeeStats(),
+            loadCourseStats(),
+            loadAnnouncements()
+        ]);
+
+        // ═══════════════════════════════════════════════════════
+        // RECONCILING payment listener (replaces the old passive one).
+        //
+        // Root cause this fixes: some payments (confirmed via Riddhi's and
+        // Nihal's payment docs — they have driveFileId/proofUrl/
+        // proofDirectUrl fields this file never writes) are being marked
+        // status:'approved' by a system OUTSIDE this admin panel — a Google
+        // Apps Script trigger, a Cloud Function, or a different tool. That
+        // system flips the payment's status but never touches the
+        // student's fees.paid field, so the student permanently shows
+        // Paid ₹0 even though their payment is fully approved.
+        //
+        // The OLD listener here only re-ran loadStudents()/loadFeeStats()
+        // when it saw a new approval — which does nothing if fees.paid was
+        // never written in the first place; it just re-displays the same
+        // wrong ₹0.
+        //
+        // This version instead: on every approved-payment change, re-sums
+        // ALL approved payments for the affected student directly from the
+        // payments collection (the source of truth), compares that sum to
+        // what's currently on the student doc, and corrects fees.paid /
+        // fees.pending if they don't match — regardless of which system
+        // performed the approval. This is what actually closes the gap.
+        // ═══════════════════════════════════════════════════════
+        db.collection('payments')
+          .where('status', '==', 'approved')
+          .orderBy('approvedAt', 'desc')
+          .limit(5)
+          .onSnapshot(async (snap) => {
+              if (snap.empty || snap.metadata.hasPendingWrites) return;
+              try {
+                  // Reconcile each recently-approved payment's student, not
+                  // just the single most-recent one, so a burst of external
+                  // approvals (e.g. a batch job) doesn't get missed.
+                  const studentIds = [...new Set(snap.docs.map(d => d.data().studentId).filter(Boolean))];
+                  await Promise.all(studentIds.map(sid => reconcileStudentFees(sid)));
+
+                  invalidateStudentsCache();
+                  loadFeeStats();
+                  if (document.getElementById('page-students').classList.contains('active')) loadStudents();
+                  if (!document.getElementById('fee-section-collect').classList.contains('hidden')) loadFeeCollectionData();
+                  if (!document.getElementById('fee-section-history').classList.contains('hidden')) loadFeeHistory();
+              } catch (reconcileErr) {
+                  console.error('Reconciliation error:', reconcileErr);
+              }
+          }, (err) => console.warn('Payment listener error (index likely missing):', err.message));
+
     } catch (err) { console.error(err); showToast('Error loading admin data','error'); }
 });
+
+// ═══════════════════════════════════════════════════════
+// FEE RECONCILIATION
+// ═══════════════════════════════════════════════════════
+// Sums every approved payment for one student directly from the
+// `payments` collection (the source of truth for money actually
+// received) and corrects that student's fees.paid/fees.pending if they've
+// drifted out of sync — which happens whenever a payment gets approved by
+// something other than this file's own collectFee()/approvePayment()
+// (confirmed cause: an external Drive-upload approval flow that writes
+// driveFileId/proofUrl but never calls back into this admin panel).
+//
+// Safe to call repeatedly and on students who are already correct — it's
+// a no-op (skips the Firestore write) when the sums already match.
+async function reconcileStudentFees(studentId) {
+    if (!studentId) return { skipped: true, reason: 'no studentId' };
+    try {
+        const [paySnap, sDoc] = await Promise.all([
+            db.collection('payments').where('studentId','==',studentId).where('status','==','approved').get(),
+            db.collection('students').doc(studentId).get()
+        ]);
+        if (!sDoc.exists) return { skipped: true, reason: 'student not found' };
+
+        const trueSum = paySnap.docs.reduce((s, d) => s + (d.data().amount || 0), 0);
+        const sd = sDoc.data();
+        const currentPaid = sd.fees?.paid || 0;
+
+        if (trueSum === currentPaid) return { skipped: true, reason: 'already correct', trueSum };
+
+        const base = getStudentBaseFee(sd, {silent:true});
+        const disc = sd.offer?.discount || 0;
+        const net  = Math.max(0, base - disc);
+        const newPending = Math.max(0, net - trueSum);
+
+        const studentUpdate = {
+            'fees.paid': trueSum,
+            'fees.pending': newPending,
+            'fees.lastReconciledAt': firebase.firestore.FieldValue.serverTimestamp()
+        };
+        // Same auto-unlock behavior as collectFee()/approvePayment() — if
+        // this correction brings the student to fully paid and they were
+        // locked, restore access.
+        if (newPending <= 0 && sd.access?.locked === true) {
+            studentUpdate['access.locked'] = false;
+            studentUpdate['access.unlockedAt'] = firebase.firestore.FieldValue.serverTimestamp();
+            studentUpdate['access.unlockedBy'] = currentAdmin?.uid || 'system-reconcile';
+            studentUpdate['access.reason'] = '';
+        }
+        await db.collection('students').doc(studentId).update(studentUpdate);
+        console.log(`[Reconcile] Corrected fees.paid for ${sd.fullName || sd.email || studentId}: ₹${currentPaid.toLocaleString()} → ₹${trueSum.toLocaleString()}`);
+        return { corrected: true, from: currentPaid, to: trueSum, student: sd.fullName || sd.email };
+    } catch (e) {
+        console.error(`[Reconcile] Failed for student ${studentId}:`, e);
+        return { error: e.message };
+    }
+}
+
+// One-time bulk backfill: reconciles EVERY student against their approved
+// payments in one pass. Run this once from the browser console
+// (reconcileAllStudentFees()) to fix all existing drift (Riddhi, Nihal,
+// and anyone else affected before the live listener above was in place),
+// then the reconciling listener keeps things correct going forward.
+async function reconcileAllStudentFees() {
+    console.log('[Reconcile] Starting full backfill...');
+    showToast('Reconciling all student fees — check console for progress','info');
+    const students = await getStudentsSnapshot(true);
+    let corrected = 0, checked = 0, errors = 0;
+    for (const {id} of students) {
+        const result = await reconcileStudentFees(id);
+        checked++;
+        if (result.corrected) corrected++;
+        if (result.error) errors++;
+    }
+    console.log(`[Reconcile] Done. Checked ${checked}, corrected ${corrected}, errors ${errors}.`);
+    showToast(`Reconciliation done: ${corrected} student(s) corrected out of ${checked} checked${errors?`, ${errors} error(s)`:''}`, corrected>0?'success':'info');
+    invalidateStudentsCache();
+    loadStudents(); loadFeeStats(); loadFeeCollectionData();
+    return { checked, corrected, errors };
+}
+
+// Wired to the visible "Reconcile Fee Data" button in the Fee Management
+// header, so this can be run without opening DevTools. Guards against
+// double-clicks while a run is already in progress.
+let _reconcileRunning = false;
+async function runReconcileWithConfirm() {
+    if (_reconcileRunning) return;
+    if (!confirm('This will re-check every student\'s paid amount against their approved payments and correct any that are out of sync. This is safe to run — it only fixes mismatches, it never changes already-correct records. Continue?')) return;
+    const btn = document.getElementById('reconcileBtn');
+    _reconcileRunning = true;
+    if (btn) { btn.disabled = true; btn.style.opacity = '0.6'; btn.querySelector('svg')?.classList.add('animate-spin'); }
+    try {
+        await reconcileAllStudentFees();
+    } finally {
+        _reconcileRunning = false;
+        if (btn) { btn.disabled = false; btn.style.opacity = ''; btn.querySelector('svg')?.classList.remove('animate-spin'); }
+    }
+}
 
 // ═══════════════════════════════════════════════════════
 // NAV & UI
@@ -915,6 +1165,13 @@ function navigateTo(page) {
     const titles = { overview:'Dashboard Overview', admissions:'Admission Requests', students:'Student Management', teachers:'Teacher Management', fees:'Fee Management', courses:'Course & Content', announcements:'Announcements' };
     document.getElementById('pageTitle').textContent = titles[page] || 'Dashboard';
     if (window.innerWidth < 1024) closeSidebar();
+
+    // Refresh the page's own data on nav-in — cheap due to the students
+    // cache, but guarantees the view is never stale after a background
+    // payment update landed while the admin was on a different tab.
+    if (page === 'students')    loadStudents();
+    if (page === 'admissions')  loadAdmissions();
+    if (page === 'fees')        loadFeeStats();
 }
 
 function showToast(msg, type='success') {
@@ -926,18 +1183,33 @@ function showToast(msg, type='success') {
 }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 function openModal(id)  { document.getElementById(id).classList.add('show'); }
+function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ═══════════════════════════════════════════════════════
+// STUDENTS CACHE (perf + single source of truth for fee state)
+// ═══════════════════════════════════════════════════════
+function invalidateStudentsCache() { _studentsCacheAt = 0; }
+
+async function getStudentsSnapshot(force = false) {
+    const fresh = (Date.now() - _studentsCacheAt) < STUDENTS_CACHE_TTL;
+    if (!force && fresh && _studentsCache.length) return _studentsCache;
+    const snap = await db.collection('students').orderBy('createdAt','desc').get();
+    _studentsCache = snap.docs.map(d => ({ id: d.id, ref: d.ref, data: d.data() }));
+    _studentsCacheAt = Date.now();
+    return _studentsCache;
+}
 
 // ═══════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════
 async function loadDashboardData() {
     try {
-        const [studSnap, techSnap, pendSnap] = await Promise.all([
-            db.collection('students').get(),
+        const [students, techSnap, pendSnap] = await Promise.all([
+            getStudentsSnapshot(),
             db.collection('teachers').get(),
-            db.collection('admissions').where('status','==','pending').get()
+            db.collection('admissions').where('status','==','pending').get().catch(() => ({ size: 0 }))
         ]);
-        document.getElementById('totalStudents').textContent    = studSnap.size;
+        document.getElementById('totalStudents').textContent    = students.length;
         document.getElementById('totalTeachers').textContent    = techSnap.size;
         document.getElementById('pendingApprovals').textContent = pendSnap.size;
         const badge = document.getElementById('admissionBadge');
@@ -945,11 +1217,28 @@ async function loadDashboardData() {
 
         const now = new Date();
         const ayStart = now.getMonth()>=3 ? new Date(now.getFullYear(),3,1) : new Date(now.getFullYear()-1,3,1);
-        const paySnap = await db.collection('payments').where('status','==','approved').orderBy('createdAt','desc').limit(200).get();
-        const revenue = paySnap.docs.filter(d => d.data().createdAt?.toDate() >= ayStart).reduce((s,d) => s+(d.data().amount||0), 0);
+        // Query without orderBy so this never depends on a composite index
+        // existing; sort client-side instead.
+        const paySnap = await db.collection('payments').where('status','==','approved').get();
+        const validStudentIds = new Set(students.map(s => s.id));
+        const revenue = paySnap.docs
+            .map(d => d.data())
+            .filter(p => {
+                // Exclude "unknown money" — payments with no studentId or
+                // one that no longer matches any current student (leftover
+                // from deletions before the delete-cascade fix, or bad
+                // external writes). These shouldn't count toward revenue
+                // for students that don't exist.
+                if (!p.studentId || !validStudentIds.has(p.studentId)) return false;
+                const ts = p.approvedAt?.toDate?.() || p.createdAt?.toDate?.();
+                return ts && ts >= ayStart;
+            })
+            .reduce((s,p) => s+(p.amount||0), 0);
         document.getElementById('monthlyRevenue').textContent = '₹'+revenue.toLocaleString();
 
-        const actSnap = await db.collection('activityLogs').orderBy('timestamp','desc').limit(5).get();
+        loadOrphanedPaymentsPanel();
+
+        const actSnap = await db.collection('activityLogs').orderBy('timestamp','desc').limit(5).get().catch(() => ({ docs: [] }));
         const iconMap = {
             admission: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
             payment:   'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
@@ -963,40 +1252,91 @@ async function loadDashboardData() {
                 <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${ico}"/></svg>
                 </div>
-                <div class="flex-1 min-w-0"><p class="font-medium text-sm text-gray-900 truncate">${data.title||'Activity'}</p><p class="text-xs text-gray-500">${data.message||''}</p><p class="text-xs text-gray-400 mt-0.5">${time}</p></div>
+                <div class="flex-1 min-w-0"><p class="font-medium text-sm text-gray-900 truncate">${esc(data.title)||'Activity'}</p><p class="text-xs text-gray-500">${esc(data.message)||''}</p><p class="text-xs text-gray-400 mt-0.5">${time}</p></div>
             </div>`;
         }).join('') : '<p class="text-gray-400 text-center py-4">No recent activity</p>';
-    } catch(err) { console.error(err); }
+    } catch(err) { console.error(err); showToast('Error loading dashboard stats','error'); }
 }
 
 // ═══════════════════════════════════════════════════════
-// ADMISSIONS
+// ADMISSIONS  (fixed: no longer silently returns empty when
+// documents lack an `appliedAt` field or when the composite
+// index for status+appliedAt doesn't exist)
 // ═══════════════════════════════════════════════════════
 async function loadAdmissions() {
     const filter = document.getElementById('admissionFilter')?.value || 'all';
+    const tbody = document.getElementById('admissionsTable');
+    tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">Loading...</td></tr>`;
     try {
+        // Pull the whole collection (or filtered by status only, no orderBy)
+        // and sort client-side. This guarantees documents show up even if:
+        //  - appliedAt is missing/named differently on some docs
+        //  - the appliedAt+status composite index hasn't been created
+        //  - appliedAt was written as a plain JS Date instead of a Timestamp
         let q = db.collection('admissions');
-        if (filter!=='all') q = q.where('status','==',filter);
-        const snap = await q.orderBy('appliedAt','desc').get();
-        const tbody = document.getElementById('admissionsTable');
-        if (snap.empty) { tbody.innerHTML=`<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No ${filter!=='all'?filter:''} admissions</td></tr>`; return; }
-        const rows = await Promise.all(snap.docs.map(async doc => {
-            const d=doc.data(), st=d.status||'pending';
-            let name=d.studentName||'Unknown', email=d.email||'';
-            if(d.studentId){ const sd=await db.collection('students').doc(d.studentId).get(); if(sd.exists){ const s=sd.data(); name=s.fullName||(s.firstName+' '+s.lastName); email=s.email; } }
+        if (filter !== 'all') q = q.where('status','==',filter);
+        const snap = await q.get();
+
+        if (snap.empty) {
+            tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                No ${filter!=='all'?esc(filter):''} admissions found.
+                ${filter==='all' ? '<br><span class="text-xs text-gray-400">If you expect requests here, confirm students are writing to the <code>admissions</code> collection on signup.</span>' : ''}
+            </td></tr>`;
+            return;
+        }
+
+        const toMillis = (v) => {
+            if (!v) return 0;
+            if (typeof v.toDate === 'function') return v.toDate().getTime();
+            if (v instanceof Date) return v.getTime();
+            if (typeof v === 'number') return v;
+            const parsed = Date.parse(v);
+            return isNaN(parsed) ? 0 : parsed;
+        };
+
+        const docs = snap.docs
+            .map(d => ({ id: d.id, data: d.data() }))
+            .sort((a,b) => toMillis(b.data.appliedAt ?? b.data.createdAt) - toMillis(a.data.appliedAt ?? a.data.createdAt));
+
+        // Batch-fetch linked student docs in parallel instead of one
+        // await per row (previous version awaited inside .map sequentially
+        // via Promise.all but still issued N reads — kept as parallel
+        // reads here since Firestore has no cheap "IN" join, but at least
+        // none of them block each other now).
+        const rows = await Promise.all(docs.map(async ({id, data: d}) => {
+            const st = d.status || 'pending';
+            let name = d.studentName || d.fullName || 'Unknown', email = d.email || '';
+            if (d.studentId) {
+                try {
+                    const sd = await db.collection('students').doc(d.studentId).get();
+                    if (sd.exists) {
+                        const s = sd.data();
+                        name = s.fullName || `${s.firstName||''} ${s.lastName||''}`.trim() || name;
+                        email = s.email || email;
+                    }
+                } catch(_) { /* keep fallback name/email */ }
+            }
+            const appliedRaw = d.appliedAt ?? d.createdAt;
+            const appliedDate = appliedRaw?.toDate ? appliedRaw.toDate() : (appliedRaw instanceof Date ? appliedRaw : null);
+            const dateLabel = appliedDate ? appliedDate.toLocaleDateString() : 'N/A';
+            const initial = (name && name[0]) ? name[0].toUpperCase() : '?';
             return `<tr class="table-row">
-            <td class="px-6 py-4" data-label="Student"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">${name[0].toUpperCase()}</div><div><div class="font-medium">${name}</div><div class="text-sm text-gray-500">${email}</div></div></div></td>
-            <td class="px-6 py-4" data-label="Class">Class ${d.class||'N/A'}</td>
-            <td class="px-6 py-4" data-label="Mode"><span class="capitalize px-2 py-1 rounded-full text-xs font-medium ${d.mode==='online'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${d.mode||'N/A'}</span></td>
-            <td class="px-6 py-4 text-gray-600" data-label="Date">${d.appliedAt?.toDate().toLocaleDateString()||'N/A'}</td>
-            <td class="px-6 py-4" data-label="Status"><span class="badge badge-${st}">${st}</span></td>
+            <td class="px-6 py-4" data-label="Student"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">${initial}</div><div><div class="font-medium">${esc(name)}</div><div class="text-sm text-gray-500">${esc(email)}</div></div></div></td>
+            <td class="px-6 py-4" data-label="Class">Class ${esc(d.class)||'N/A'}</td>
+            <td class="px-6 py-4" data-label="Mode"><span class="capitalize px-2 py-1 rounded-full text-xs font-medium ${d.mode==='online'?'bg-blue-100 text-blue-800':'bg-green-100 text-green-800'}">${esc(d.mode)||'N/A'}</span></td>
+            <td class="px-6 py-4 text-gray-600" data-label="Date">${dateLabel}</td>
+            <td class="px-6 py-4" data-label="Status"><span class="badge badge-${st}">${esc(st)}</span></td>
             <td class="px-6 py-4" data-label="Actions">${st==='pending'?`<div class="flex gap-2">
-                <button onclick="approveAdmission('${doc.id}','${d.studentId||''}')" class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm">Approve</button>
-                <button onclick="rejectAdmission('${doc.id}')" class="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm">Reject</button>
+                <button onclick="approveAdmission('${id}','${d.studentId||''}')" class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm">Approve</button>
+                <button onclick="rejectAdmission('${id}')" class="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm">Reject</button>
             </div>`:'<span class="text-gray-400 text-sm">Processed</span>'}</td></tr>`;
         }));
         tbody.innerHTML = rows.join('');
-    } catch(err) { console.error(err); showToast('Error loading admissions','error'); }
+    } catch(err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-red-500">⚠️ ${esc(err.message)}<br><button onclick="loadAdmissions()" class="mt-2 text-white bg-red-500 px-3 py-1 rounded text-xs">Retry</button></td></tr>`;
+        showToast('Error loading admissions','error');
+    }
 }
 async function approveAdmission(admId, studentId) {
     try {
@@ -1005,13 +1345,15 @@ async function approveAdmission(admId, studentId) {
         if(studentId){ batch.update(db.collection('students').doc(studentId),{'admission.status':'approved',isActive:true,status:'active'}); batch.update(db.collection('users').doc(studentId),{'roleData.admission.status':'approved',isApproved:true}); }
         await batch.commit();
         if(studentId){ await db.collection('notifications').add({userId:studentId,title:'Admission Approved!',message:'Your admission has been approved. Welcome to MINDSKYRA!',type:'admission',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}); }
-        showToast('Admission approved'); loadAdmissions(); loadDashboardData();
+        showToast('Admission approved'); invalidateStudentsCache(); loadAdmissions(); loadDashboardData();
     } catch(e) { console.error(e); showToast('Error','error'); }
 }
 async function rejectAdmission(admId) {
     if(!confirm('Reject this admission?')) return;
-    await db.collection('admissions').doc(admId).update({status:'rejected',rejectedAt:firebase.firestore.FieldValue.serverTimestamp()});
-    showToast('Rejected'); loadAdmissions();
+    try {
+        await db.collection('admissions').doc(admId).update({status:'rejected',rejectedAt:firebase.firestore.FieldValue.serverTimestamp()});
+        showToast('Rejected'); loadAdmissions();
+    } catch(e) { console.error(e); showToast('Error rejecting admission','error'); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1024,15 +1366,114 @@ async function loadClassFeeSettings() {
         cbseFeeSettings  = cs.exists ? (cs.data().classes||{}) : {};
     } catch(e) { classFeeSettings={}; cbseFeeSettings={}; }
 }
-function getStudentBaseFee(data) {
-    const cls  = data.class  || data.roleData?.class;
-    const mode = data.mode   || data.roleData?.mode  || 'online';
-    const board= (data.board || data.roleData?.board || 'regular').toLowerCase();
-    const s    = board==='cbse' ? (cbseFeeSettings[cls]||classFeeSettings[cls]) : classFeeSettings[cls];
-    if(!s) return 0;
-    if(mode==='online')  return s.online  || s.base || 0;
-    if(mode==='offline') return s.offline || s.base || 0;
-    return s.base || 0;
+
+// ═══════════════════════════════════════════════════════
+// THE CORE FIX (getStudentBaseFee)
+// ═══════════════════════════════════════════════════════
+// Root cause of "fee not showing for all students": classFeeSettings and
+// cbseFeeSettings are keyed by class number (3..12), written via
+// saveSingleClassFee/saveAllClassFees using a numeric `cls` from
+// Array.from({length:10},(_,i)=>i+3). But a student's `class` field can
+// arrive as a STRING ("10") from the <select> dropdown in the Student
+// modal, as a NUMBER if written by a script/import, as undefined if the
+// field was never set, or nested under roleData.class instead of class.
+// The original function did a single direct lookup — classFeeSettings[cls]
+// — with no normalization and no fallback, so any student whose class
+// value didn't exactly match a configured key silently got base fee = 0.
+// That zero then propagates into net fee, due amount, and every fee pill
+// in the Students table, the Collect Fee tab, and the Fee stats cards —
+// which is exactly the "shows for a few students but not all" symptom.
+//
+// Fix: normalize the class to a string AND try both string/number key
+// forms against both possible settings objects, and log a specific,
+// actionable warning (with the student's identity) whenever a lookup
+// still comes up empty, instead of failing silently.
+// ═══════════════════════════════════════════════════════
+// (declared once, at the top of the script, alongside the other state vars)
+
+function getStudentBaseFee(data, opts = {}) {
+    const silent = opts.silent === true; // pass {silent:true} to suppress console.warn (used for CSV export bulk loops)
+
+    // Normalize class to a string key — student docs may have class saved
+    // as a string ("10") from the <select> form, a number (from a script
+    // or import), or nested under roleData.class. Coerce to a trimmed
+    // string so we have one canonical form to test.
+    const rawCls = data.class ?? data.roleData?.class;
+    const cls    = (rawCls !== undefined && rawCls !== null && rawCls !== '') ? String(rawCls).trim() : null;
+    const mode   = data.mode  || data.roleData?.mode  || 'online';
+    const board  = (data.board || data.roleData?.board || 'regular').toLowerCase();
+
+    const who = data.fullName || `${data.firstName||''} ${data.lastName||''}`.trim() || data.email || '(unknown student)';
+
+    if (!cls) {
+        const key = 'noclass:'+who;
+        if (!silent && !_missingFeeConfigWarnings.has(key)) {
+            _missingFeeConfigWarnings.add(key);
+            console.warn(`[Fee] "${who}" has no class value set on their student record (checked both .class and .roleData.class) — base fee defaulting to ₹0. Edit the student and set a Class.`);
+        }
+        return 0;
+    }
+
+    // classFeeSettings / cbseFeeSettings keys were written as NUMBERS by
+    // saveSingleClassFee/saveAllClassFees (sObj[cls] = {...} where cls
+    // comes from Array.from({length:10},(_,i)=>i+3), a number). Try the
+    // string key first (covers cases where Firestore round-tripped it, or
+    // it was set some other way), then fall back to the numeric key so
+    // this matches regardless of how either side was written.
+    const clsNum = Number(cls);
+    const lookupSet = board === 'cbse'
+        ? [cbseFeeSettings[cls], cbseFeeSettings[clsNum], classFeeSettings[cls], classFeeSettings[clsNum]]
+        : [classFeeSettings[cls], classFeeSettings[clsNum]];
+    const settingsObj = lookupSet.find(s => s != null);
+
+    if (!settingsObj) {
+        const key = 'nofee:'+board+':'+cls;
+        if (!silent && !_missingFeeConfigWarnings.has(key)) {
+            _missingFeeConfigWarnings.add(key);
+            console.warn(`[Fee] No base fee configured for Class ${cls} (board: ${board}) — "${who}" and any other student in this class/board will show ₹0 base fee. Go to Fee Management → Base Fee Settings → ${board==='cbse'?'CBSE Students':'Regular Students'} tab and set a fee for Class ${cls}.`);
+        }
+        return 0;
+    }
+
+    if (mode === 'online')  return settingsObj.online  || settingsObj.base || 0;
+    if (mode === 'offline') return settingsObj.offline || settingsObj.base || 0;
+    return settingsObj.base || 0;
+}
+
+// Scans the current students cache against the loaded fee settings and
+// surfaces a banner + toast if any student would resolve to a ₹0 base fee
+// due to missing class or missing fee configuration. Called after
+// students + fee settings are both loaded, and again whenever fee
+// settings are saved, so the admin doesn't have to dig through the
+// console to notice this is happening.
+function checkForMissingFeeConfig(students) {
+    const missingClass = [];
+    const missingConfig = new Set(); // "board:class" combos
+    students.forEach(({data: d}) => {
+        const rawCls = d.class ?? d.roleData?.class;
+        const cls = (rawCls !== undefined && rawCls !== null && rawCls !== '') ? String(rawCls).trim() : null;
+        const board = (d.board || d.roleData?.board || 'regular').toLowerCase();
+        const who = d.fullName || `${d.firstName||''} ${d.lastName||''}`.trim() || d.email || '(unknown)';
+        if (!cls) { missingClass.push(who); return; }
+        const fee = getStudentBaseFee(d, {silent:true});
+        if (fee === 0) missingConfig.add(`${board==='cbse'?'CBSE':'Regular'} Class ${cls}`);
+    });
+
+    const banner = document.getElementById('feeConfigWarningBanner');
+    const bannerText = document.getElementById('feeConfigWarningText');
+    if (!banner) return { missingClass, missingConfig };
+
+    const parts = [];
+    if (missingConfig.size) parts.push(`No fee set for: ${Array.from(missingConfig).join(', ')}.`);
+    if (missingClass.length) parts.push(`${missingClass.length} student(s) have no Class assigned.`);
+
+    if (parts.length) {
+        bannerText.textContent = parts.join(' ') + ' Open the browser console for full detail, or go to Base Fee Settings to fix.';
+        banner.classList.remove('hidden');
+    } else {
+        banner.classList.add('hidden');
+    }
+    return { missingClass, missingConfig };
 }
 
 function switchBoardTab(board) {
@@ -1052,7 +1493,10 @@ function renderClassFeeGrid(board) {
     if (!grid) return;
     const classes  = Array.from({length:10},(_,i)=>i+3);
     grid.innerHTML = classes.map(cls => {
-        const saved   = settings[cls] || {};
+        // Read with both key forms so a previously-saved string-keyed
+        // entry (from an older version of this code, or a manual Firestore
+        // edit) still shows as "saved" in the UI instead of looking empty.
+        const saved   = settings[cls] || settings[String(cls)] || {};
         const isSaved = !!saved.base;
         const bdr     = isSaved ? (board==='cbse'?'border-orange-400':'border-green-400') : 'border-gray-200';
         const savedBadge = isSaved
@@ -1102,13 +1546,22 @@ async function saveSingleClassFee(board, cls) {
     const isCbse   = board==='cbse';
     const sObj     = isCbse ? cbseFeeSettings : classFeeSettings;
     const docId    = isCbse ? 'cbseClassFees' : 'classFees';
+    // Store under the numeric key consistently (cls arrives here as a
+    // number from the inline onclick handler's ${cls} template literal
+    // being unquoted — see renderClassFeeGrid's button markup). Also clear
+    // any stray string-keyed duplicate of the same class so we don't end
+    // up with both "10" and 10 as separate, inconsistent entries.
+    delete sObj[String(cls)];
     sObj[cls]      = { base, online, offline };
     try {
         await db.collection('feeSettings').doc(docId).set({classes:sObj,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentAdmin.uid},{merge:true});
         const card = document.getElementById(`${board}-fee-card-${cls}`);
         if(card) card.classList.add('saved');
         showToast(`${isCbse?'CBSE ':''}Class ${cls} fee saved: ₹${base.toLocaleString()}/year`);
+        invalidateStudentsCache();
+        _missingFeeConfigWarnings.clear(); // let the next check re-warn if still relevant
         loadFeeSummaryTable(board);
+        getStudentsSnapshot(true).then(checkForMissingFeeConfig);
     } catch(e) { showToast('Error saving fee settings','error'); }
 }
 
@@ -1120,13 +1573,16 @@ async function saveAllClassFees(board) {
     let updated  = 0;
     classes.forEach(cls => {
         const base = parseFloat(document.getElementById(`${board}-basefee-${cls}`)?.value)||0;
-        if(base>0){ const online=parseFloat(document.getElementById(`${board}-onlinefee-${cls}`)?.value)||base; const offline=parseFloat(document.getElementById(`${board}-offlinefee-${cls}`)?.value)||base; sObj[cls]={base,online,offline}; updated++; }
+        if(base>0){ const online=parseFloat(document.getElementById(`${board}-onlinefee-${cls}`)?.value)||base; const offline=parseFloat(document.getElementById(`${board}-offlinefee-${cls}`)?.value)||base; delete sObj[String(cls)]; sObj[cls]={base,online,offline}; updated++; }
     });
     if(!updated){ showToast('No fees entered','warning'); return; }
     try {
         await db.collection('feeSettings').doc(docId).set({classes:sObj,updatedAt:firebase.firestore.FieldValue.serverTimestamp(),updatedBy:currentAdmin.uid});
         showToast(`${updated} ${isCbse?'CBSE ':''}class fees saved`);
+        invalidateStudentsCache();
+        _missingFeeConfigWarnings.clear();
         renderClassFeeGrid(board); loadFeeSummaryTable(board);
+        getStudentsSnapshot(true).then(checkForMissingFeeConfig);
     } catch(e) { showToast('Error saving fee settings','error'); }
 }
 
@@ -1136,19 +1592,19 @@ async function loadFeeSummaryTable(board) {
     const tbody   = document.getElementById(tbodyId);
     if(!tbody) return;
     try {
-        const snap = await db.collection('students').get();
+        const students = await getStudentsSnapshot();
         const classCount = {};
-        snap.forEach(doc => {
-            const d = doc.data();
+        students.forEach(({data: d}) => {
             const b = (d.board||d.roleData?.board||'regular').toLowerCase();
             if(isCbse !== (b==='cbse')) return;
-            const c = d.class||d.roleData?.class;
+            const rawC = d.class ?? d.roleData?.class;
+            const c = (rawC !== undefined && rawC !== null && rawC !== '') ? String(rawC).trim() : null;
             if(c) classCount[c] = (classCount[c]||0)+1;
         });
         const settings = isCbse ? cbseFeeSettings : classFeeSettings;
         tbody.innerHTML = Array.from({length:10},(_,i)=>i+3).map(cls => {
-            const fee = settings[cls];
-            const cnt = classCount[cls]||0;
+            const fee = settings[cls] || settings[String(cls)];
+            const cnt = classCount[String(cls)]||0;
             const exp = fee ? fee.base*cnt : 0;
             return `<tr class="table-row">
             <td class="px-4 py-3 font-medium">Class ${cls}${isCbse?` <span class="text-xs bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded font-bold ml-1">CBSE</span>`:''}</td>
@@ -1162,38 +1618,51 @@ async function loadFeeSummaryTable(board) {
 // ═══════════════════════════════════════════════════════
 // STUDENTS
 // ═══════════════════════════════════════════════════════
-async function loadStudents() {
+async function loadStudents(force = false) {
     try {
-        const snap = await db.collection('students').orderBy('createdAt','desc').get();
+        const students = await getStudentsSnapshot(force);
+        checkForMissingFeeConfig(students);
         const tbody = document.getElementById('studentsTable');
-        if(snap.empty){ tbody.innerHTML='<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No students found</td></tr>'; return; }
-        const rows = await Promise.all(snap.docs.map(async doc => {
-            const d=doc.data(), fees=d.fees||{};
+        if(!students.length){ tbody.innerHTML='<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">No students found</td></tr>'; return; }
+        const rows = students.map(({id, data: d}) => {
+            const fees=d.fees||{};
             const baseFee=getStudentBaseFee(d), offer=d.offer?.discount||0, net=Math.max(0,baseFee-offer);
+            // `fees.paid` is the single source of truth for paid amount and is
+            // written atomically alongside every approved payment (both in
+            // collectFee() for admin-recorded cash/UPI, and in
+            // approvePayment() for student-submitted proofs — see fix below).
+            // Reading it straight from the cached student doc means this
+            // table reflects any payment the instant the cache refreshes,
+            // rather than depending on the admin re-navigating.
             const paid=fees.paid||0, rem=Math.max(0,net-paid);
-            const name=d.fullName||(d.firstName+' '+d.lastName), cls=d.class||'N/A', mode=d.mode||'N/A', board=d.board||'regular';
-            return `<tr class="table-row">
+            const noFeeConfigured = baseFee===0; // flags students whose class/board has no fee set, distinct from a genuinely ₹0 fee
+            const name=d.fullName||`${d.firstName||''} ${d.lastName||''}`.trim(), cls=d.class||d.roleData?.class||'N/A', mode=d.mode||'N/A', board=d.board||'regular';
+            const isLocked = d.access?.locked === true;
+            const initial = (d.firstName?.[0]||name?.[0]||'S').toUpperCase();
+            return `<tr class="table-row ${isLocked?'row-locked':''}">
             <td class="px-4 py-4" data-label="Student"><div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">${(d.firstName?.[0]||'S').toUpperCase()}</div>
-                <div><div class="font-medium text-gray-900">${name}</div><div class="text-xs text-gray-500">${d.email}</div></div></div></td>
-            <td class="px-4 py-4" data-label="Class"><div class="font-medium">Class ${cls}</div><div class="flex gap-1 mt-1">
-                <span class="capitalize px-2 py-0.5 rounded-full text-xs font-medium ${mode==='online'?'bg-blue-100 text-blue-800':mode==='offline'?'bg-green-100 text-green-800':'bg-purple-100 text-purple-800'}">${mode}</span>
-                <span class="uppercase px-2 py-0.5 rounded-full text-xs font-medium ${board==='cbse'?'bg-orange-100 text-orange-800':'bg-gray-100 text-gray-600'}">${board}</span></div></td>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">${initial}</div>
+                <div><div class="font-medium text-gray-900">${esc(name)}${isLocked?' 🔒':''}</div><div class="text-xs text-gray-500">${esc(d.email)}</div></div></div></td>
+            <td class="px-4 py-4" data-label="Class"><div class="font-medium">Class ${esc(cls)}</div><div class="flex gap-1 mt-1 flex-wrap">
+                <span class="capitalize px-2 py-0.5 rounded-full text-xs font-medium ${mode==='online'?'bg-blue-100 text-blue-800':mode==='offline'?'bg-green-100 text-green-800':'bg-purple-100 text-purple-800'}">${esc(mode)}</span>
+                <span class="uppercase px-2 py-0.5 rounded-full text-xs font-medium ${board==='cbse'?'bg-orange-100 text-orange-800':'bg-gray-100 text-gray-600'}">${esc(board)}</span></div></td>
             <td class="px-4 py-4" data-label="Fees"><div class="flex flex-wrap gap-1 mb-1">
-                <span class="fee-pill fee-pill-base">Base ₹${baseFee.toLocaleString()}</span>
+                ${noFeeConfigured?`<span class="fee-pill fee-pill-warn" title="No base fee configured for Class ${esc(cls)} (${esc(board)}). Set it in Base Fee Settings.">⚠️ No fee set</span>`:`<span class="fee-pill fee-pill-base">Base ₹${baseFee.toLocaleString()}</span>`}
                 ${offer>0?`<span class="fee-pill fee-pill-offer">🎁-₹${offer.toLocaleString()}</span>`:''}
                 <span class="fee-pill fee-pill-net">Net ₹${net.toLocaleString()}</span></div>
             <div class="flex flex-wrap gap-1">
                 <span class="fee-pill fee-pill-paid">Paid ₹${paid.toLocaleString()}</span>
-                ${rem>0?`<span class="fee-pill fee-pill-due">Due ₹${rem.toLocaleString()}</span>`:'<span class="fee-pill fee-pill-paid">✓ Cleared</span>'}</div>
-            ${d.offer?.reason?`<div class="text-xs text-orange-600 italic mt-1">🔒 ${d.offer.reason}</div>`:''}</td>
-            <td class="px-4 py-4" data-label="Status"><span class="badge ${d.isActive?'badge-approved':'badge-rejected'}">${d.isActive?'Active':'Inactive'}</span></td>
+                ${rem>0?`<span class="fee-pill fee-pill-due">Due ₹${rem.toLocaleString()}</span>`:'<span class="fee-pill fee-pill-paid">✓ Cleared</span>'}
+                ${isLocked?`<span class="fee-pill fee-pill-locked">🔒 Locked</span>`:''}</div>
+            ${d.offer?.reason?`<div class="text-xs text-orange-600 italic mt-1">🔒 ${esc(d.offer.reason)}</div>`:''}</td>
+            <td class="px-4 py-4" data-label="Status"><span class="badge ${isLocked?'badge-locked':(d.isActive?'badge-active':'badge-rejected')}">${isLocked?'Locked':(d.isActive?'Active':'Inactive')}</span></td>
             <td class="px-4 py-4" data-label="Actions"><div class="flex gap-1 flex-wrap">
-                <button onclick="editStudent('${doc.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">✏️</button>
-                <button onclick="openOfferModal('${doc.id}')" class="p-2 text-orange-500 hover:bg-orange-50 rounded-lg" title="Offer">🎁</button>
-                <button onclick="openFeeCollection('${doc.id}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Collect">💳</button>
-                <button onclick="confirmDeleteStudent('${doc.id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">🗑️</button></div></td></tr>`;
-        }));
+                <button onclick="editStudent('${id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg" title="Edit">✏️</button>
+                <button onclick="openOfferModal('${id}')" class="p-2 text-orange-500 hover:bg-orange-50 rounded-lg" title="Offer">🎁</button>
+                <button onclick="openFeeCollection('${id}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg" title="Collect">💳</button>
+                <button onclick="${isLocked?`confirmUnlockStudent('${id}')`:`confirmLockStudent('${id}')`}" class="p-2 ${isLocked?'text-green-600 hover:bg-green-50':'text-gray-500 hover:bg-gray-100'} rounded-lg" title="${isLocked?'Unlock access':'Lock access'}">${isLocked?'🔓':'🔒'}</button>
+                <button onclick="confirmDeleteStudent('${id}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg" title="Delete">🗑️</button></div></td></tr>`;
+        });
         tbody.innerHTML = rows.join('');
     } catch(err) { console.error(err); showToast('Error loading students','error'); }
 }
@@ -1225,18 +1694,146 @@ async function saveStudent(e) {
     try {
         await db.collection('students').doc(id).update(data);
         await db.collection('users').doc(id).update({firstName:data.firstName,lastName:data.lastName,fullName:data.fullName,email:data.email,'roleData.class':data.class,'roleData.board':data.board,'roleData.mode':data.mode,phone:data.phone,updatedAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-        showToast('Student updated'); closeModal('studentModal'); loadStudents();
+        showToast('Student updated'); closeModal('studentModal'); invalidateStudentsCache(); loadStudents();
     } catch(e) { showToast('Error','error'); }
 }
 function confirmDeleteStudent(id) {
     deleteCallback = async () => {
-        await db.collection('students').doc(id).delete();
-        await db.collection('users').doc(id).delete().catch(()=>{});
-        showToast('Deleted'); loadStudents(); loadDashboardData();
+        try {
+            // Delete every payment record tied to this student FIRST. Fee
+            // stats (Annual Revenue on Overview, Total Collected/Pending
+            // on Fee Management) are computed by summing the `payments`
+            // collection — not just reading a cached number — so any
+            // payment left behind after the student doc is gone would
+            // keep counting toward totals for a student who no longer
+            // exists. This is what was missing before: deleting the
+            // student removed them from the Students table, but their
+            // money stayed in every total.
+            const paySnap = await db.collection('payments').where('studentId','==',id).get();
+            if (!paySnap.empty) {
+                // Firestore batches cap at 500 writes; chunk defensively
+                // in case one student has an unusually large payment
+                // history.
+                const chunks = [];
+                for (let i = 0; i < paySnap.docs.length; i += 450) chunks.push(paySnap.docs.slice(i, i+450));
+                for (const chunk of chunks) {
+                    const batch = db.batch();
+                    chunk.forEach(d => batch.delete(d.ref));
+                    await batch.commit();
+                }
+            }
+            await db.collection('students').doc(id).delete();
+            await db.collection('users').doc(id).delete().catch(()=>{});
+            await db.collection('notifications').where('userId','==',id).get().then(ns => {
+                if (ns.empty) return;
+                const batch = db.batch();
+                ns.docs.forEach(d => batch.delete(d.ref));
+                return batch.commit();
+            }).catch(()=>{});
+            showToast(`Deleted — ${paySnap.size} payment record(s) removed, totals updated`);
+            invalidateStudentsCache();
+            loadStudents(); loadDashboardData(); loadFeeStats();
+            if (!document.getElementById('fee-section-history').classList.contains('hidden')) loadFeeHistory();
+        } catch(e) { console.error(e); showToast('Error deleting student','error'); }
     };
-    document.getElementById('deleteMessage').textContent='Delete this student? This cannot be undone.';
+    const cached = _studentsCache.find(s => s.id === id);
+    const paidAmt = cached?.data?.fees?.paid || 0;
+    document.getElementById('deleteMessage').textContent = paidAmt > 0
+        ? `Delete this student? This also permanently removes their ₹${paidAmt.toLocaleString()} in payment records from Annual Revenue and Total Collected. This cannot be undone.`
+        : 'Delete this student? This cannot be undone.';
     openModal('deleteModal');
 }
+
+// ═══════════════════════════════════════════════════════
+// LOCK / FREEZE SYSTEM
+// ═══════════════════════════════════════════════════════
+// Design: writes `access: { locked: bool, lockedAt, lockedBy, reason }`
+// onto the student's Firestore doc. This admin panel is the control
+// surface only — actual enforcement (blocking notes/videos/DPP viewing)
+// must be checked in the STUDENT-FACING app, which is a separate file
+// not included in what was shared. That app's content/video/notes
+// screens need a guard like:
+//
+//     const studentDoc = await db.collection('students').doc(uid).get();
+//     if (studentDoc.data()?.access?.locked === true) {
+//         // show a "Fees overdue — access locked" screen with the
+//         // `access.reason` message, and do not render course content.
+//     }
+//
+// A Firestore security rule is the more robust place to enforce this
+// (client-side checks can be bypassed), e.g. on `courseContent` reads:
+//     allow read: if get(/databases/$(database)/documents/students/$(request.auth.uid)).data.access.locked != true;
+// That rule change has to be made in the Firebase console / rules file,
+// not in this HTML, since rules aren't part of the admin dashboard.
+function confirmLockStudent(id) {
+    const cached = _studentsCache.find(s => s.id === id);
+    const name = cached?.data?.fullName || cached?.data?.firstName || 'this student';
+    document.getElementById('lockModalTitle').textContent = 'Lock Access';
+    document.getElementById('lockModalMessage').textContent = `This freezes ${esc(name)}'s dashboard — they won't be able to view notes, videos, or DPPs until you unlock it.`;
+    document.getElementById('lockReasonLabel').textContent = 'Reason (visible to student)';
+    document.getElementById('lockReasonText').value = '';
+    document.getElementById('lockModalIconWrap').className = 'w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4';
+    document.getElementById('lockModalIcon').setAttribute('class','w-8 h-8 text-red-600');
+    const btn = document.getElementById('confirmLockBtn');
+    btn.textContent = 'Lock Student';
+    btn.className = 'flex-1 py-2 bg-red-600 text-white rounded-lg font-semibold';
+    lockCallback = async () => {
+        const reason = document.getElementById('lockReasonText').value.trim() || 'Fee payment overdue';
+        try {
+            await db.collection('students').doc(id).update({
+                'access.locked': true,
+                'access.lockedAt': firebase.firestore.FieldValue.serverTimestamp(),
+                'access.lockedBy': currentAdmin.uid,
+                'access.lockedByName': currentAdmin.fullName || 'Admin',
+                'access.reason': reason
+            });
+            await db.collection('notifications').add({
+                userId:id, title:'Dashboard Access Locked',
+                message: reason, type:'access_locked', read:false,
+                createdAt:firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(()=>{});
+            showToast('Student locked 🔒'); invalidateStudentsCache(); loadStudents();
+        } catch(e) { console.error(e); showToast('Error locking student','error'); }
+    };
+    openModal('lockModal');
+}
+
+function confirmUnlockStudent(id) {
+    const cached = _studentsCache.find(s => s.id === id);
+    const name = cached?.data?.fullName || cached?.data?.firstName || 'this student';
+    document.getElementById('lockModalTitle').textContent = 'Unlock Access';
+    document.getElementById('lockModalMessage').textContent = `Restore full dashboard access for ${esc(name)}.`;
+    document.getElementById('lockReasonLabel').textContent = 'Note (optional, visible to student)';
+    document.getElementById('lockReasonText').value = '';
+    document.getElementById('lockModalIconWrap').className = 'w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4';
+    document.getElementById('lockModalIcon').setAttribute('class','w-8 h-8 text-green-600');
+    const btn = document.getElementById('confirmLockBtn');
+    btn.textContent = 'Unlock Student';
+    btn.className = 'flex-1 py-2 bg-green-600 text-white rounded-lg font-semibold';
+    lockCallback = async () => {
+        const note = document.getElementById('lockReasonText').value.trim() || 'Access restored';
+        try {
+            await db.collection('students').doc(id).update({
+                'access.locked': false,
+                'access.unlockedAt': firebase.firestore.FieldValue.serverTimestamp(),
+                'access.unlockedBy': currentAdmin.uid,
+                'access.reason': ''
+            });
+            await db.collection('notifications').add({
+                userId:id, title:'Dashboard Access Restored',
+                message: note, type:'access_unlocked', read:false,
+                createdAt:firebase.firestore.FieldValue.serverTimestamp()
+            }).catch(()=>{});
+            showToast('Student unlocked 🔓'); invalidateStudentsCache(); loadStudents();
+        } catch(e) { console.error(e); showToast('Error unlocking student','error'); }
+    };
+    openModal('lockModal');
+}
+
+document.getElementById('confirmLockBtn').addEventListener('click', () => {
+    if (lockCallback) { lockCallback(); lockCallback = null; }
+    closeModal('lockModal');
+});
 
 // ═══════════════════════════════════════════════════════
 // OFFER SYSTEM
@@ -1252,6 +1849,7 @@ async function openOfferModal(id) {
         document.getElementById('offerStudentName').textContent=d.fullName||(d.firstName+' '+d.lastName);
         document.getElementById('offerStudentClass').textContent=`Class ${d.class} • ${d.mode||'N/A'}`;
         document.getElementById('offerBaseFee').textContent='₹'+base.toLocaleString();
+        document.getElementById('offerFeeWarning').classList.toggle('hidden', base>0);
         document.getElementById('offerDiscountAmount').value=disc||'';
         document.getElementById('offerDiscountPercent').value=disc&&base?Math.round((disc/base)*100):'';
         document.getElementById('offerReason').value=d.offer?.reason||'';
@@ -1290,7 +1888,7 @@ async function saveOffer() {
     try {
         await db.collection('students').doc(id).update({'offer.discount':disc,'offer.reason':reason,'offer.appliedBy':currentAdmin.uid,'offer.appliedByName':currentAdmin.fullName||'Admin','offer.appliedAt':firebase.firestore.FieldValue.serverTimestamp(),'fees.pending':pending});
         showToast(`Offer ₹${disc.toLocaleString()} applied! Net: ₹${net.toLocaleString()}`);
-        closeModal('offerModal'); loadStudents(); loadFeeStats();
+        closeModal('offerModal'); invalidateStudentsCache(); loadStudents(); loadFeeStats();
     } catch(e) { showToast('Error','error'); }
 }
 async function removeOffer() {
@@ -1299,7 +1897,7 @@ async function removeOffer() {
     const base=parseFloat(document.getElementById('offerBaseFeeHidden').value)||0;
     const paid=offerStudentData?.fees?.paid||0;
     await db.collection('students').doc(id).update({'offer.discount':0,'offer.reason':'','offer.removedAt':firebase.firestore.FieldValue.serverTimestamp(),'fees.pending':Math.max(0,base-paid)});
-    showToast('Offer removed'); closeModal('offerModal'); loadStudents();
+    showToast('Offer removed'); closeModal('offerModal'); invalidateStudentsCache(); loadStudents();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1313,8 +1911,8 @@ async function loadTeachers() {
         tbody.innerHTML=snap.docs.map(doc=>{
             const d=doc.data(), subs=d.subjects||d.roleData?.subjects||[];
             return `<tr class="table-row">
-            <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold">${(d.firstName?.[0]||'T').toUpperCase()}</div><div><div class="font-medium">${d.fullName||d.firstName+' '+d.lastName}</div><div class="text-sm text-gray-500">${d.email}</div></div></div></td>
-            <td class="px-6 py-4"><div class="flex flex-wrap gap-1">${subs.map(s=>`<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">${s}</span>`).join('')||'<span class="text-gray-400">—</span>'}</div></td>
+            <td class="px-6 py-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center text-white font-bold">${esc((d.firstName?.[0]||'T').toUpperCase())}</div><div><div class="font-medium">${esc(d.fullName||d.firstName+' '+d.lastName)}</div><div class="text-sm text-gray-500">${esc(d.email)}</div></div></div></td>
+            <td class="px-6 py-4"><div class="flex flex-wrap gap-1">${subs.map(s=>`<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">${esc(s)}</span>`).join('')||'<span class="text-gray-400">—</span>'}</div></td>
             <td class="px-6 py-4"><span class="badge ${d.isApproved?'badge-approved':'badge-pending'}">${d.isApproved?'Approved':'Pending'}</span></td>
             <td class="px-6 py-4"><div class="flex gap-2">
                 ${!d.isApproved?`<button onclick="approveTeacher('${doc.id}')" class="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm">Approve</button>`:''}
@@ -1337,13 +1935,82 @@ function confirmDeleteTeacher(id) {
 }
 
 // ═══════════════════════════════════════════════════════
-// FEE MANAGEMENT
+// ORPHANED PAYMENTS
 // ═══════════════════════════════════════════════════════
+// "Unknown money": payment docs whose studentId doesn't match any current
+// student — either because that student was deleted BEFORE today's
+// deletion fix (which now cleans up payments automatically going
+// forward), or because a payment arrived with a missing/bad studentId
+// from an external write. These were silently counted into Annual
+// Revenue and Total Collected even though they can't be attributed to
+// any real student. This function finds them so they can be excluded
+// from totals and reviewed/removed.
+async function findOrphanedPayments() {
+    const [paySnap, students] = await Promise.all([
+        db.collection('payments').get(),
+        getStudentsSnapshot()
+    ]);
+    const validIds = new Set(students.map(s => s.id));
+    const orphans = paySnap.docs
+        .map(d => ({ id: d.id, ref: d.ref, ...d.data() }))
+        .filter(p => !p.studentId || !validIds.has(p.studentId));
+    return orphans;
+}
+
+async function loadOrphanedPaymentsPanel() {
+    const el = document.getElementById('orphanedPaymentsList');
+    const banner = document.getElementById('orphanedPaymentsBanner');
+    if (!el || !banner) return;
+    try {
+        const orphans = await findOrphanedPayments();
+        if (!orphans.length) { banner.classList.add('hidden'); return; }
+        const approvedOrphans = orphans.filter(o => o.status === 'approved');
+        const orphanTotal = approvedOrphans.reduce((s,o) => s+(o.amount||0), 0);
+        banner.classList.remove('hidden');
+        document.getElementById('orphanedPaymentsSummary').textContent =
+            `${orphans.length} payment record(s) aren't linked to any current student` +
+            (orphanTotal > 0 ? ` — ₹${orphanTotal.toLocaleString()} of this was being counted in your totals.` : '.');
+        el.innerHTML = orphans.map(o => `
+            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-200 text-sm">
+                <div class="min-w-0">
+                    <div class="font-medium text-gray-800">₹${(o.amount||0).toLocaleString()} <span class="text-xs font-normal text-gray-400">· ${esc(o.mode||'—')} · ${esc(o.status||'—')}</span></div>
+                    <div class="text-xs text-gray-400 truncate">studentId: ${esc(o.studentId||'(missing)')}</div>
+                </div>
+                <button onclick="deleteOrphanedPayment('${o.id}')" class="flex-shrink-0 ml-3 px-3 py-1 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100">Remove</button>
+            </div>`).join('');
+    } catch(e) { console.error(e); }
+}
+
+async function deleteOrphanedPayment(paymentId) {
+    if (!confirm('Remove this payment record? It is not linked to any current student, so this will also reduce it out of Annual Revenue and Total Collected.')) return;
+    try {
+        await db.collection('payments').doc(paymentId).delete();
+        showToast('Removed');
+        loadOrphanedPaymentsPanel(); loadDashboardData(); loadFeeStats(); loadFeeHistory();
+    } catch(e) { console.error(e); showToast('Error removing payment','error'); }
+}
+
+async function cleanAllOrphanedPayments() {
+    const orphans = await findOrphanedPayments();
+    if (!orphans.length) { showToast('No orphaned payments found'); return; }
+    const total = orphans.filter(o=>o.status==='approved').reduce((s,o)=>s+(o.amount||0),0);
+    if (!confirm(`Remove all ${orphans.length} orphaned payment record(s)? This will reduce Annual Revenue and Total Collected by ₹${total.toLocaleString()}. This cannot be undone.`)) return;
+    const chunks = [];
+    for (let i = 0; i < orphans.length; i += 450) chunks.push(orphans.slice(i, i+450));
+    for (const chunk of chunks) {
+        const batch = db.batch();
+        chunk.forEach(o => batch.delete(o.ref));
+        await batch.commit();
+    }
+    showToast(`${orphans.length} orphaned payment(s) removed`);
+    loadOrphanedPaymentsPanel(); loadDashboardData(); loadFeeStats(); loadFeeHistory();
+}
 async function loadFeeStats() {
     try {
-        const snap=await db.collection('students').get();
+        const students = await getStudentsSnapshot();
+        checkForMissingFeeConfig(students);
         let collected=0, pending=0, discounts=0;
-        snap.forEach(doc=>{ const d=doc.data(), fees=d.fees||{}, base=getStudentBaseFee(d), disc=d.offer?.discount||0;
+        students.forEach(({data: d})=>{ const fees=d.fees||{}, base=getStudentBaseFee(d), disc=d.offer?.discount||0;
             collected+=fees.paid||0; discounts+=disc; pending+=Math.max(0,Math.max(0,base-disc)-(fees.paid||0)); });
         document.getElementById('totalCollected').textContent='₹'+collected.toLocaleString();
         document.getElementById('totalPending').textContent='₹'+pending.toLocaleString();
@@ -1354,27 +2021,30 @@ async function loadFeeStats() {
 async function loadPayments() {
     const filter=document.getElementById('paymentFilter')?.value||'pending';
     try {
-        const snap=await db.collection('payments').where('status','==',filter).limit(100).get();
+        // Sort client-side rather than relying on orderBy so this never
+        // silently empties out due to a missing composite index or a
+        // payment doc that lacks createdAt.
+        const snap=await db.collection('payments').where('status','==',filter).limit(200).get();
         const payments=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
             const da=a.createdAt?.toDate?a.createdAt.toDate():new Date(0);
             const db2=b.createdAt?.toDate?b.createdAt.toDate():new Date(0);
             return db2-da;
         });
         const tbody=document.getElementById('paymentsTable');
-        if(!payments.length){ tbody.innerHTML=`<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No ${filter} payments</td></tr>`; return; }
+        if(!payments.length){ tbody.innerHTML=`<tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">No ${esc(filter)} payments</td></tr>`; return; }
         const rows=await Promise.all(payments.map(async d=>{
             const sd=await db.collection('students').doc(d.studentId).get();
             const name=sd.exists?(sd.data().fullName||sd.data().firstName):'Unknown';
             return `<tr class="table-row">
-            <td class="px-6 py-4 font-medium">${name}</td>
-            <td class="px-6 py-4 font-bold">₹${d.amount?.toLocaleString()}</td>
-            <td class="px-6 py-4"><span class="capitalize px-2 py-1 rounded text-xs ${d.mode==='cash'?'bg-green-100 text-green-800':'bg-blue-100 text-blue-800'}">${d.mode}</span></td>
+            <td class="px-6 py-4 font-medium">${esc(name)}</td>
+            <td class="px-6 py-4 font-bold">₹${(d.amount||0).toLocaleString()}</td>
+            <td class="px-6 py-4"><span class="capitalize px-2 py-1 rounded text-xs ${d.mode==='cash'?'bg-green-100 text-green-800':'bg-blue-100 text-blue-800'}">${esc(d.mode)}</span></td>
             <td class="px-6 py-4 text-gray-600">${d.createdAt?.toDate?d.createdAt.toDate().toLocaleDateString():'N/A'}</td>
-            <td class="px-6 py-4"><span class="badge badge-${d.status}">${d.status}</span></td>
-            <td class="px-6 py-4">${d.status==='pending'&&d.proofUrl?`<button onclick="viewPaymentProof('${d.id}','${d.proofUrl}',${d.amount},'${d.mode}')" class="text-primary text-sm font-medium">View Proof</button>`:d.status==='pending'?'<span class="text-gray-400 text-sm">No proof</span>':'—'}</td></tr>`;
+            <td class="px-6 py-4"><span class="badge badge-${d.status}">${esc(d.status)}</span></td>
+            <td class="px-6 py-4">${d.status==='pending'&&d.proofUrl?`<button onclick="viewPaymentProof('${d.id}','${d.proofUrl}',${d.amount||0},'${d.mode}')" class="text-primary text-sm font-medium">View Proof</button>`:d.status==='pending'?'<span class="text-gray-400 text-sm">No proof</span>':'—'}</td></tr>`;
         }));
         tbody.innerHTML=rows.join('');
-    } catch(e) { console.error(e); }
+    } catch(e) { console.error(e); showToast('Error loading payments','error'); }
 }
 
 function switchFeeTab(tab) {
@@ -1390,15 +2060,18 @@ function switchFeeTab(tab) {
 
 async function loadFeeCollectionData() {
     try {
-        const snap=await db.collection('students').get();
+        const students = await getStudentsSnapshot();
         const grid=document.getElementById('feeCollectionGrid');
-        const students=snap.docs.map(doc=>{ const d=doc.data(), base=getStudentBaseFee(d), disc=d.offer?.discount||0, net=Math.max(0,base-disc), paid=d.fees?.paid||0, rem=Math.max(0,net-paid); return{id:doc.id,...d,_rem:rem}; }).filter(s=>s._rem>0);
-        if(!students.length){ grid.innerHTML='<div class="col-span-full text-center py-8 text-gray-500">No pending fees 🎉</div>'; return; }
-        grid.innerHTML=students.map(s=>{
-            const disc=s.offer?.discount||0, base=getStudentBaseFee(s);
-            return `<div class="card p-4 border-l-4 border-yellow-500">
-            <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">${(s.firstName?.[0]||'S').toUpperCase()}</div>
-            <div class="flex-1 min-w-0"><div class="font-bold text-sm truncate">${s.fullName||s.firstName}</div><div class="text-xs text-gray-500">Class ${s.class} • ${s.mode||'N/A'}</div></div></div>
+        const filtered=students.map(({id, data: d})=>{ const base=getStudentBaseFee(d), disc=d.offer?.discount||0, net=Math.max(0,base-disc), paid=d.fees?.paid||0, rem=Math.max(0,net-paid); return{id,...d,_rem:rem,_base:base}; }).filter(s=>s._rem>0);
+        if(!filtered.length){ grid.innerHTML='<div class="col-span-full text-center py-8 text-gray-500">No pending fees 🎉</div>'; return; }
+        grid.innerHTML=filtered.map(s=>{
+            const disc=s.offer?.discount||0, base=s._base;
+            const isLocked = s.access?.locked === true;
+            const noFeeConfigured = base===0;
+            return `<div class="card p-4 border-l-4 ${isLocked?'border-red-600':noFeeConfigured?'border-amber-400':'border-yellow-500'}">
+            <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold">${esc((s.firstName?.[0]||'S').toUpperCase())}</div>
+            <div class="flex-1 min-w-0"><div class="font-bold text-sm truncate">${esc(s.fullName||s.firstName)}${isLocked?' 🔒':''}</div><div class="text-xs text-gray-500">Class ${esc(s.class)} • ${esc(s.mode)||'N/A'}</div></div></div>
+            ${noFeeConfigured?`<div class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1 mb-2">⚠️ No base fee set for this class/board</div>`:''}
             <div class="bg-gray-50 rounded-lg p-3 mb-3 text-xs space-y-1">
                 <div class="flex justify-between"><span class="text-gray-500">Base</span><span class="font-medium text-purple-700">₹${base.toLocaleString()}</span></div>
                 ${disc>0?`<div class="flex justify-between"><span class="text-orange-600">Offer</span><span class="font-medium text-orange-700">-₹${disc.toLocaleString()}</span></div>`:''}
@@ -1420,6 +2093,7 @@ async function openFeeCollection(id) {
         document.getElementById('collectBaseFee').textContent='₹'+base.toLocaleString();
         document.getElementById('collectOfferAmt').textContent=disc>0?'-₹'+disc.toLocaleString():'₹0';
         document.getElementById('collectRemaining').textContent='₹'+rem.toLocaleString();
+        document.getElementById('feeCollectWarning').classList.toggle('hidden', base>0);
         document.getElementById('collectAmount').value=rem||'';
         const now=new Date(), ayStart=now.getMonth()>=3?now.getFullYear():now.getFullYear()-1;
         const ay=`${ayStart}-${String(ayStart+1).slice(-2)}`;
@@ -1441,30 +2115,84 @@ async function collectFee(e) {
         const sDoc=await db.collection('students').doc(id).get();
         const sd=sDoc.data(), base=getStudentBaseFee(sd), disc=sd.offer?.discount||0, net=Math.max(0,base-disc);
         const newPaid=(sd.fees?.paid||0)+amount, newPending=Math.max(0,net-newPaid);
-        batch.update(db.collection('students').doc(id),{'fees.paid':newPaid,'fees.pending':newPending,lastPaymentDate:firebase.firestore.FieldValue.serverTimestamp()});
+        // Auto-unlock on full clearance: if a student was locked for
+        // non-payment and this collection brings them to zero due,
+        // restore access automatically so the admin doesn't have to
+        // remember a second manual step.
+        const studentUpdate = {'fees.paid':newPaid,'fees.pending':newPending,lastPaymentDate:firebase.firestore.FieldValue.serverTimestamp()};
+        if (newPending <= 0 && sd.access?.locked === true) {
+            studentUpdate['access.locked'] = false;
+            studentUpdate['access.unlockedAt'] = firebase.firestore.FieldValue.serverTimestamp();
+            studentUpdate['access.unlockedBy'] = currentAdmin.uid;
+            studentUpdate['access.reason'] = '';
+        }
+        batch.update(db.collection('students').doc(id), studentUpdate);
         await batch.commit();
         await db.collection('notifications').add({userId:id,title:'Fee Payment Received',message:`₹${amount.toLocaleString()} received for ${period}. Thank you!`,type:'payment',read:false,createdAt:firebase.firestore.FieldValue.serverTimestamp()}).catch(()=>{});
-        showToast('Fee collected ✅'); closeModal('feeCollectionModal'); loadStudents(); loadFeeStats(); loadFeeCollectionData();
+        showToast(newPending<=0 && sd.access?.locked ? 'Fee collected ✅ — access auto-unlocked 🔓' : 'Fee collected ✅');
+        closeModal('feeCollectionModal');
+        invalidateStudentsCache();
+        loadStudents(); loadFeeStats(); loadFeeCollectionData();
     } catch(e) { console.error(e); showToast('Error','error'); }
 }
 
+// Holds the last-loaded, name-resolved history rows so searchFeeHistory()
+// can filter client-side without re-fetching or re-resolving student
+// names on every keystroke. Cleared/repopulated each time loadFeeHistory
+// runs (nav-in, or after a reconcile/delete that could change history).
+let _feeHistoryCache = [];
+
 async function loadFeeHistory() {
     try {
-        const snap=await db.collection('payments').where('status','==','approved').orderBy('approvedAt','desc').limit(50).get();
+        // Client-side sort — see note in loadAdmissions/loadPayments on why
+        // orderBy+where was replaced (missing-index risk).
+        const snap=await db.collection('payments').where('status','==','approved').limit(100).get();
         const tbody=document.getElementById('feeHistoryTable');
-        if(snap.empty){ tbody.innerHTML='<tr><td colspan="5" class="text-center py-8 text-gray-500">No transactions</td></tr>'; return; }
-        const rows=await Promise.all(snap.docs.map(async doc=>{
-            const d=doc.data(), sd=await db.collection('students').doc(d.studentId).get();
-            const name=sd.exists?(sd.data().fullName||sd.data().firstName):'Unknown';
-            return `<tr class="table-row">
-            <td class="px-6 py-4 text-gray-600">${d.approvedAt?.toDate().toLocaleDateString()}</td>
-            <td class="px-6 py-4 font-medium">${name}</td>
-            <td class="px-6 py-4 font-bold text-green-600">₹${d.amount?.toLocaleString()}</td>
-            <td class="px-6 py-4"><span class="capitalize px-2 py-1 rounded text-xs ${d.mode==='cash'?'bg-green-100 text-green-800':'bg-blue-100 text-blue-800'}">${d.mode}</span></td>
-            <td class="px-6 py-4 text-gray-600">${d.collectedByName||'Admin'}</td></tr>`;
+        if(snap.empty){ _feeHistoryCache=[]; tbody.innerHTML='<tr><td colspan="5" class="text-center py-8 text-gray-500">No transactions</td></tr>'; return; }
+        const docs = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+            const da=(a.approvedAt?.toDate?.()||a.createdAt?.toDate?.()||new Date(0));
+            const dbb=(b.approvedAt?.toDate?.()||b.createdAt?.toDate?.()||new Date(0));
+            return dbb-da;
+        }).slice(0,50);
+        _feeHistoryCache = await Promise.all(docs.map(async d=>{
+            // "Unknown" here (rather than crashing or silently skipping)
+            // is intentional: this makes an orphaned payment — one whose
+            // student was deleted — visibly searchable via "unknown"
+            // rather than disappearing from history entirely.
+            const sd=await db.collection('students').doc(d.studentId||'').get().catch(()=>({exists:false}));
+            const name = sd.exists ? (sd.data().fullName||sd.data().firstName||'Unknown') : 'Unknown (student deleted)';
+            const dateLabel = d.approvedAt?.toDate ? d.approvedAt.toDate().toLocaleDateString() : (d.createdAt?.toDate ? d.createdAt.toDate().toLocaleDateString() : 'N/A');
+            return { ...d, _name: name, _dateLabel: dateLabel };
         }));
-        tbody.innerHTML=rows.join('');
-    } catch(e) { console.error(e); }
+        renderFeeHistoryRows(_feeHistoryCache);
+    } catch(e) { console.error(e); showToast('Error loading fee history','error'); }
+}
+
+function renderFeeHistoryRows(rows) {
+    const tbody=document.getElementById('feeHistoryTable');
+    if (!rows.length) { tbody.innerHTML='<tr><td colspan="5" class="text-center py-8 text-gray-500">No matching transactions</td></tr>'; return; }
+    tbody.innerHTML = rows.map(d => `<tr class="table-row">
+        <td class="px-6 py-4 text-gray-600">${d._dateLabel}</td>
+        <td class="px-6 py-4 font-medium">${esc(d._name)}</td>
+        <td class="px-6 py-4 font-bold text-green-600">₹${(d.amount||0).toLocaleString()}</td>
+        <td class="px-6 py-4"><span class="capitalize px-2 py-1 rounded text-xs ${d.mode==='cash'?'bg-green-100 text-green-800':'bg-blue-100 text-blue-800'}">${esc(d.mode)}</span></td>
+        <td class="px-6 py-4 text-gray-600">${esc(d.collectedByName)||'Admin'}</td></tr>`).join('');
+}
+
+// Filters the already-fetched _feeHistoryCache by student name, payment
+// mode, or who collected it — searches the FULL loaded set (not just
+// visible rows), so it stays correct against the 50 most recent
+// transactions regardless of how many happen to be on-screen.
+function searchFeeHistory() {
+    const q = document.getElementById('feeHistorySearch').value.toLowerCase().trim();
+    if (!q) { renderFeeHistoryRows(_feeHistoryCache); return; }
+    const filtered = _feeHistoryCache.filter(d =>
+        (d._name||'').toLowerCase().includes(q) ||
+        (d.mode||'').toLowerCase().includes(q) ||
+        (d.collectedByName||'').toLowerCase().includes(q) ||
+        String(d.amount||'').includes(q)
+    );
+    renderFeeHistoryRows(filtered);
 }
 
 function viewPaymentProof(id, url, amount, mode) {
@@ -1474,26 +2202,97 @@ function viewPaymentProof(id, url, amount, mode) {
     document.getElementById('proofMethod').textContent=mode;
     openModal('paymentModal');
 }
-async function approvePayment() { await db.collection('payments').doc(selectedPaymentId).update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp()}); showToast('Approved'); closeModal('paymentModal'); loadPayments(); loadFeeStats(); }
-async function rejectPayment()  { await db.collection('payments').doc(selectedPaymentId).update({status:'rejected',rejectedAt:firebase.firestore.FieldValue.serverTimestamp()}); showToast('Rejected'); closeModal('paymentModal'); loadPayments(); }
+
+// ═══════════════════════════════════════════════════════
+// approving a student-submitted payment proof credits fees.paid on the
+// student doc, exactly like collectFee() does for admin-recorded payments.
+// ═══════════════════════════════════════════════════════
+async function approvePayment() {
+    if (!selectedPaymentId) return;
+    try {
+        const pRef = db.collection('payments').doc(selectedPaymentId);
+        const pDoc = await pRef.get();
+        if (!pDoc.exists) { showToast('Payment record not found','error'); return; }
+        const p = pDoc.data();
+
+        if (p.status === 'approved') {
+            // Already approved (e.g. by another admin tab) — don't double-credit.
+            showToast('Already approved'); closeModal('paymentModal'); loadPayments(); return;
+        }
+
+        const sRef = db.collection('students').doc(p.studentId);
+        const sDoc = await sRef.get();
+        if (!sDoc.exists) {
+            // Payment references a student that no longer exists — approve
+            // the payment record for audit purposes but warn the admin,
+            // rather than silently failing or crediting nothing.
+            await pRef.update({status:'approved',approvedAt:firebase.firestore.FieldValue.serverTimestamp(),approvedBy:currentAdmin.uid});
+            showToast('Approved, but student record was not found — fees not credited','warning');
+            closeModal('paymentModal'); loadPayments(); return;
+        }
+
+        const sd = sDoc.data();
+        const base = getStudentBaseFee(sd);
+        const disc = sd.offer?.discount || 0;
+        const net = Math.max(0, base - disc);
+        const newPaid = (sd.fees?.paid || 0) + (p.amount || 0);
+        const newPending = Math.max(0, net - newPaid);
+
+        const batch = db.batch();
+        batch.update(pRef, {status:'approved', approvedAt:firebase.firestore.FieldValue.serverTimestamp(), approvedBy:currentAdmin.uid});
+        const studentUpdate = {'fees.paid':newPaid, 'fees.pending':newPending, lastPaymentDate:firebase.firestore.FieldValue.serverTimestamp()};
+        // Same auto-unlock behavior as collectFee(), so a proof-based
+        // payment that clears the balance also lifts a fee-based lock.
+        if (newPending <= 0 && sd.access?.locked === true) {
+            studentUpdate['access.locked'] = false;
+            studentUpdate['access.unlockedAt'] = firebase.firestore.FieldValue.serverTimestamp();
+            studentUpdate['access.unlockedBy'] = currentAdmin.uid;
+            studentUpdate['access.reason'] = '';
+        }
+        batch.update(sRef, studentUpdate);
+        await batch.commit();
+
+        await db.collection('notifications').add({
+            userId:p.studentId, title:'Fee Payment Approved',
+            message:`Your payment of ₹${(p.amount||0).toLocaleString()} has been verified and credited.`,
+            type:'payment', read:false, createdAt:firebase.firestore.FieldValue.serverTimestamp()
+        }).catch(()=>{});
+
+        showToast('Approved and credited ✅');
+        closeModal('paymentModal');
+        invalidateStudentsCache();
+        loadPayments(); loadFeeStats(); loadStudents(); loadFeeCollectionData();
+    } catch(e) {
+        console.error(e);
+        showToast('Error approving payment','error');
+    }
+}
+
+async function rejectPayment() {
+    if (!selectedPaymentId) return;
+    try {
+        await db.collection('payments').doc(selectedPaymentId).update({status:'rejected',rejectedAt:firebase.firestore.FieldValue.serverTimestamp(),rejectedBy:currentAdmin.uid});
+        showToast('Rejected'); closeModal('paymentModal'); loadPayments();
+    } catch(e) { console.error(e); showToast('Error rejecting payment','error'); }
+}
 
 // ═══════════════════════════════════════════════════════
 // EXPORT
 // ═══════════════════════════════════════════════════════
 async function exportToCSV(type) {
     try {
-        const snap = await db.collection(type).get();
-        if(snap.empty){ showToast('No data to export','warning'); return; }
+        const snap = type==='students' ? { docs: (await getStudentsSnapshot()).map(s=>({data:()=>s.data})) } : await db.collection(type).get();
+        if(!snap.docs.length){ showToast('No data to export','warning'); return; }
         const rows = snap.docs.map(doc => {
             const d = doc.data();
-            if(type==='students') return [d.fullName||(d.firstName+' '+d.lastName), d.email, `Class ${d.class}`, d.board||'regular', d.mode||'online', d.phone||'', getStudentBaseFee(d), d.fees?.paid||0];
+            if(type==='students') return [d.fullName||(d.firstName+' '+d.lastName), d.email, `Class ${d.class}`, d.board||'regular', d.mode||'online', d.phone||'', getStudentBaseFee(d, {silent:true}), d.fees?.paid||0, d.access?.locked?'Locked':'Active'];
             return [d.fullName||(d.firstName+' '+d.lastName), d.email, (d.subjects||[]).join(';'), d.isApproved?'Approved':'Pending'];
         });
-        const headers = type==='students' ? ['Name','Email','Class','Board','Mode','Phone','Base Fee','Paid'] : ['Name','Email','Subjects','Status'];
-        const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+        const headers = type==='students' ? ['Name','Email','Class','Board','Mode','Phone','Base Fee','Paid','Access'] : ['Name','Email','Subjects','Status'];
+        const csv = [headers, ...rows].map(r => r.map(c => `"${(c??'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
         const a = document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download=`${type}_${new Date().toISOString().slice(0,10)}.csv`; a.click();
         showToast(`${type} exported`);
-    } catch(e) { showToast('Export failed','error'); }
+    } catch(e) { console.error(e); showToast('Export failed','error'); }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1513,7 +2312,7 @@ async function loadCourseStats() {
         document.getElementById('totalVideos').textContent = vids;
         document.getElementById('totalPDFs').textContent   = pdfs;
 
-        const recSnap = await db.collection('courseContent').orderBy('uploadedAt','desc').limit(5).get();
+        const recSnap = await db.collection('courseContent').orderBy('uploadedAt','desc').limit(5).get().catch(()=>({empty:true,docs:[]}));
         const el = document.getElementById('recentUploads');
         if(recSnap.empty){ el.innerHTML='<p class="text-gray-400 text-center py-4">No uploads yet</p>'; return; }
         const rows = await Promise.all(recSnap.docs.map(async doc=>{
@@ -1522,8 +2321,8 @@ async function loadCourseStats() {
             const subName=sd.exists?sd.data().name:'Unknown';
             return `<div class="content-item">
                 <div class="w-10 h-10 ${d.type==='video'?'bg-blue-100 text-blue-600':'bg-orange-100 text-orange-600'} rounded-lg flex items-center justify-center">${d.type==='video'?'🎥':'📄'}</div>
-                <div class="flex-1 min-w-0"><div class="font-medium text-sm truncate">${d.title}</div><div class="text-xs text-gray-500">${subName} • ${d.uploadedAt?.toDate().toLocaleDateString()}</div></div>
-                <a href="${d.driveUrl}" target="_blank" class="text-primary text-xs hover:underline flex-shrink-0">View ↗</a>
+                <div class="flex-1 min-w-0"><div class="font-medium text-sm truncate">${esc(d.title)}</div><div class="text-xs text-gray-500">${esc(subName)} • ${d.uploadedAt?.toDate().toLocaleDateString()}</div></div>
+                <a href="${d.driveUrl||d.youtubeUrl}" target="_blank" class="text-primary text-xs hover:underline flex-shrink-0">View ↗</a>
             </div>`;
         }));
         el.innerHTML=rows.join('');
@@ -1542,10 +2341,9 @@ async function loadCourseStructure() {
     const treeEl = document.getElementById('courseStructureTree');
     treeEl.innerHTML='<div class="text-center py-4 text-gray-400 text-sm">⏳ Loading...</div>';
     try {
-        const subSnap = await db.collection('subjects').get();
+        const [subSnap, chSnap] = await Promise.all([db.collection('subjects').get(), db.collection('chapters').get()]);
         if(subSnap.empty){ treeEl.innerHTML='<div class="text-center py-6 text-gray-400 text-xs">No subjects yet.<br>Click <strong>"+ Subject"</strong> to add.</div>'; return; }
         const subjects = subSnap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(parseInt(a.class)||0)-(parseInt(b.class)||0)||(a.name||'').localeCompare(b.name||''));
-        const chSnap   = await db.collection('chapters').get();
         const allChaps = chSnap.docs.map(d=>({id:d.id,...d.data()}));
         subjects.forEach(s=>{ _subjMap[s.id]=s; });
         allChaps.forEach(c=>{ _chapMap[c.id]=c; });
@@ -1557,7 +2355,7 @@ async function loadCourseStructure() {
                 <div class="tree-subject-header" onclick="toggleTreeSubject('${sub.id}',this)">
                     <span class="caret">▶</span><span>📁</span>
                     <span class="flex-1 min-w-0 truncate">${esc(sub.name)}</span>
-                    <span class="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-medium flex-shrink-0">Cls ${sub.class}</span>
+                    <span class="text-xs bg-gray-200 text-gray-600 px-1.5 py-0.5 rounded font-medium flex-shrink-0">Cls ${esc(sub.class)}</span>
                     <span class="icon-btn-sm text-red-400 hover:text-red-600 flex-shrink-0" onclick="event.stopPropagation();deleteSubject('${sub.id}')">🗑</span>
                 </div>
                 <div class="tree-children" id="sub-ch-${sub.id}">
@@ -1569,11 +2367,9 @@ async function loadCourseStructure() {
         treeEl.innerHTML=html;
     } catch(err) {
         console.error(err);
-        treeEl.innerHTML=`<div class="text-red-500 text-xs p-3 bg-red-50 rounded-lg">⚠️ ${err.message}<br><button onclick="loadCourseStructure()" class="mt-1 text-white bg-red-500 px-2 py-0.5 rounded text-xs">Retry</button></div>`;
+        treeEl.innerHTML=`<div class="text-red-500 text-xs p-3 bg-red-50 rounded-lg">⚠️ ${esc(err.message)}<br><button onclick="loadCourseStructure()" class="mt-1 text-white bg-red-500 px-2 py-0.5 rounded text-xs">Retry</button></div>`;
     }
 }
-
-function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function toggleTreeSubject(subId, hdr) {
     const ch=document.getElementById('sub-ch-'+subId); if(!ch) return;
@@ -1589,7 +2385,7 @@ function selectChapter(chapterId, el) {
     el.classList.add('active');
     hideEl('noSelectionMsg');
     const us=document.getElementById('uploadSection'); us.style.display='flex'; us.style.flexDirection='column';
-    const subLabel=sub?`${esc(sub.name)} · Class ${sub.class}`:'';
+    const subLabel=sub?`${esc(sub.name)} · Class ${esc(sub.class)}`:'';
     document.getElementById('uploadLocation').textContent=ch.name+(subLabel?' — '+subLabel:'');
     setContentType(currentContentType||'video');
     loadChapterContent(chapterId);
@@ -1606,12 +2402,12 @@ async function loadChapterContent(chapterId) {
             const link=d.type==='video'?(d.youtubeUrl||d.driveUrl):d.driveUrl;
             return `<div class="content-item">
                 <span class="text-lg">${d.type==='video'?'🎥':d.type==='dpp'?'📝':'📄'}</span>
-                <div class="flex-1 min-w-0 text-xs"><div class="font-medium truncate">${esc(d.title||'Untitled')}</div><div class="text-gray-400 uppercase">${d.type||'file'}${d.type==='video'?' · YouTube':''}</div></div>
+                <div class="flex-1 min-w-0 text-xs"><div class="font-medium truncate">${esc(d.title||'Untitled')}</div><div class="text-gray-400 uppercase">${esc(d.type)||'file'}${d.type==='video'?' · YouTube':''}</div></div>
                 <a href="${link}" target="_blank" class="text-primary text-xs flex-shrink-0">↗ Open</a>
                 <button onclick="deleteContent('${doc.id}','${d.fileId||''}')" class="text-red-400 hover:text-red-600 ml-2 flex-shrink-0">✕</button>
             </div>`;
         }).join('');
-    } catch(e){ el.innerHTML=`<div class="text-xs text-red-400 text-center py-2">Error: ${e.message}</div>`; }
+    } catch(e){ el.innerHTML=`<div class="text-xs text-red-400 text-center py-2">Error: ${esc(e.message)}</div>`; }
 }
 
 function setContentType(type) {
@@ -1812,12 +2608,12 @@ async function loadAnnouncements() {
             const d=doc.data();
             return `<div class="p-4 bg-gray-50 rounded-lg ${d.isPinned?'border-l-4 border-primary bg-indigo-50':'border border-gray-200'} hover:shadow-md transition">
                 <div class="flex items-start justify-between mb-2">
-                    <h4 class="font-bold text-gray-800">${d.isPinned?'📌 ':''}${d.title}</h4>
+                    <h4 class="font-bold text-gray-800">${d.isPinned?'📌 ':''}${esc(d.title)}</h4>
                     ${d.isPinned?'<span class="text-xs bg-primary text-white px-2 py-1 rounded-full flex-shrink-0 ml-2">Pinned</span>':''}
                 </div>
-                <p class="text-sm text-gray-600">${d.message}</p>
+                <p class="text-sm text-gray-600">${esc(d.message)}</p>
                 <div class="flex items-center justify-between text-xs text-gray-400 mt-3">
-                    <span class="capitalize px-2 py-1 bg-gray-200 rounded">${d.target}</span>
+                    <span class="capitalize px-2 py-1 bg-gray-200 rounded">${esc(d.target)}</span>
                     <span>${d.createdAt?.toDate?d.createdAt.toDate().toLocaleDateString():'Just now'}</span>
                 </div>
             </div>`;
@@ -1856,8 +2652,18 @@ async function logout() {
     catch(e){ showToast('Error logging out','error'); }
 }
 
-// Auto-refresh dashboard every 30s
+// Auto-refresh dashboard every 30s (only while that tab is visible/active,
+// and only the overview page — was already scoped this way, kept as-is)
 setInterval(() => { if(document.getElementById('page-overview').classList.contains('active')) loadDashboardData(); }, 30000);
+
+// Also periodically refresh fee stats and students while those pages are
+// open, so an approval from another device shows up without a manual
+// reload — this is a polling fallback on top of the onSnapshot listener
+// above, in case a Firestore index for the listener's query isn't set up.
+setInterval(() => {
+    if (document.getElementById('page-fees').classList.contains('active')) loadFeeStats();
+    if (document.getElementById('page-students').classList.contains('active')) loadStudents();
+}, 20000);
 </script>
 </body>
 </html>
